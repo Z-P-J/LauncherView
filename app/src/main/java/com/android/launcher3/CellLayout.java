@@ -34,7 +34,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.util.Log;

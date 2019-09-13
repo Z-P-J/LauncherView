@@ -18,9 +18,8 @@ package com.android.launcher3;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -31,10 +30,6 @@ import com.android.launcher3.views.BaseDragLayer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_FOCUSED;
-import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
-import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
 
 /**
  * Base class for a View which shows a floating UI on top of the launcher UI.

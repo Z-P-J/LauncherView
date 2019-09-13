@@ -867,6 +867,7 @@ public class LauncherProvider extends ContentProvider {
             }
 
             ArrayList<ItemInfo> itemInfoArrayList = new ArrayList<>(HomepageUtils.initHomeNav());
+            Log.d(TAG, "loadFavorites size=" + itemInfoArrayList.size());
             for (ItemInfo info : itemInfoArrayList) {
                 values.clear();
                 values.put(Favorites._ID, generateNewItemId());

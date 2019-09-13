@@ -3,7 +3,7 @@ package com.qianxun.browser.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.launcher3.base.App;
 

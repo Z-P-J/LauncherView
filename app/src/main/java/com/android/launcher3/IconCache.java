@@ -37,8 +37,8 @@ import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.Process;
 import android.os.UserHandle;
-import android.support.annotation.NonNull;
-import android.support.v4.graphics.ColorUtils;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.ColorUtils;
 import android.text.TextUtils;
 import android.util.Log;
 

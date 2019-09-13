@@ -16,7 +16,7 @@
 
 package com.android.launcher3.popup;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;

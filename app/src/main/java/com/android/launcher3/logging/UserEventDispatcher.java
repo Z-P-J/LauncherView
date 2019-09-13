@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
@@ -163,15 +163,6 @@ public class UserEventDispatcher {
         return true;
     }
 
-    public void logNotificationLaunch(View v, PendingIntent intent) {
-        LauncherEvent event = newLauncherEvent(newTouchAction(Action.Touch.TAP),
-                newItemTarget(v), newTarget(Target.Type.CONTAINER));
-        if (fillInLogContainerData(event, v)) {
-            event.srcTarget[0].packageNameHash = (mUuidStr + intent.getCreatorPackage()).hashCode();
-        }
-        dispatchUserEvent(event, null);
-    }
-
     public void logActionCommand(int command, int srcContainerType, int dstContainerType) {
         logActionCommand(command, newContainerTarget(srcContainerType),
                 dstContainerType >=0 ? newContainerTarget(dstContainerType) : null);
@@ -214,23 +205,6 @@ public class UserEventDispatcher {
         logActionOnControl(action, controlType, null, -1);
     }
 
-    public void logActionOnControl(int action, int controlType, int parentContainerType) {
-        logActionOnControl(action, controlType, null, parentContainerType);
-    }
-
-    public void logActionOnControl(int action, int controlType, @Nullable View controlInContainer) {
-        logActionOnControl(action, controlType, controlInContainer, -1);
-    }
-
-    public void logActionOnControl(int action, int controlType, int parentContainer,
-                                   int grandParentContainer){
-        LauncherEvent event = newLauncherEvent(newTouchAction(action),
-                newControlTarget(controlType),
-                newContainerTarget(parentContainer),
-                newContainerTarget(grandParentContainer));
-        dispatchUserEvent(event, null);
-    }
-
     public void logActionOnControl(int action, int controlType, @Nullable View controlInContainer,
                                    int parentContainerType) {
         final LauncherEvent event = (controlInContainer == null && parentContainerType < 0)
@@ -257,59 +231,11 @@ public class UserEventDispatcher {
         dispatchUserEvent(event, null);
     }
 
-    public void logActionBounceTip(int containerType) {
-        LauncherEvent event = newLauncherEvent(newAction(Action.Type.TIP),
-                newContainerTarget(containerType));
-        event.srcTarget[0].tipType = LauncherLogProto.TipType.BOUNCE;
-        dispatchUserEvent(event, null);
-    }
-
-    public void logActionOnContainer(int action, int dir, int containerType) {
-        logActionOnContainer(action, dir, containerType, 0);
-    }
-
     public void logActionOnContainer(int action, int dir, int containerType, int pageIndex) {
         LauncherEvent event = newLauncherEvent(newTouchAction(action),
                 newContainerTarget(containerType));
         event.action.dir = dir;
         event.srcTarget[0].pageIndex = pageIndex;
-        dispatchUserEvent(event, null);
-    }
-
-    /**
-     * Used primarily for swipe up and down when state changes when swipe up happens from the
-     * navbar bezel, the {@param srcChildContainerType} is NAVBAR and
-     * {@param srcParentContainerType} is either one of the two
-     * (1) WORKSPACE: if the launcher is the foreground activity
-     * (2) APP: if another app was the foreground activity
-     */
-    public void logStateChangeAction(int action, int dir, int srcChildTargetType,
-                                     int srcParentContainerType, int dstContainerType,
-                                     int pageIndex) {
-        LauncherEvent event;
-        if (srcChildTargetType == LauncherLogProto.ItemType.TASK) {
-            event = newLauncherEvent(newTouchAction(action),
-                    newItemTarget(srcChildTargetType),
-                    newContainerTarget(srcParentContainerType));
-        } else {
-            event = newLauncherEvent(newTouchAction(action),
-                    newContainerTarget(srcChildTargetType),
-                    newContainerTarget(srcParentContainerType));
-        }
-        event.destTarget = new Target[1];
-        event.destTarget[0] = newContainerTarget(dstContainerType);
-        event.action.dir = dir;
-        event.action.isStateChange = true;
-        event.srcTarget[0].pageIndex = pageIndex;
-        dispatchUserEvent(event, null);
-        resetElapsedContainerMillis("state changed");
-    }
-
-    public void logActionOnItem(int action, int dir, int itemType) {
-        Target itemTarget = newTarget(Target.Type.ITEM);
-        itemTarget.itemType = itemType;
-        LauncherEvent event = newLauncherEvent(newTouchAction(action), itemTarget);
-        event.action.dir = dir;
         dispatchUserEvent(event, null);
     }
 
@@ -325,15 +251,6 @@ public class UserEventDispatcher {
         dispatchUserEvent(event, null);
 
         resetElapsedContainerMillis("deep shortcut open");
-    }
-
-    /* Currently we are only interested in whether this event happens or not and don't
-    * care about which screen moves to where. */
-    public void logOverviewReorder() {
-        LauncherEvent event = newLauncherEvent(newTouchAction(Action.Touch.DRAGDROP),
-                newContainerTarget(ContainerType.WORKSPACE),
-                newContainerTarget(ContainerType.OVERVIEW));
-        dispatchUserEvent(event, null);
     }
 
     public void logDragNDrop(DropTarget.DragObject dragObj, View dropTargetAsView) {
