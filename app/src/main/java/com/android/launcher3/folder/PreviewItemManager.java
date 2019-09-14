@@ -22,7 +22,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
@@ -79,9 +79,9 @@ public class PreviewItemManager {
                                                           final Runnable onCompleteRunnable) {
         return reverse
                 ? new FolderPreviewItemAnim(this, mFirstPageParams.get(0), 0, 2, -1, -1,
-                        FINAL_ITEM_ANIMATION_DURATION, onCompleteRunnable)
+                FINAL_ITEM_ANIMATION_DURATION, onCompleteRunnable)
                 : new FolderPreviewItemAnim(this, mFirstPageParams.get(0), -1, -1, 0, 2,
-                        INITIAL_ITEM_ANIMATION_DURATION, onCompleteRunnable);
+                INITIAL_ITEM_ANIMATION_DURATION, onCompleteRunnable);
     }
 
     Drawable prepareCreateAnimation(final View destView) {
@@ -135,7 +135,7 @@ public class PreviewItemManager {
     }
 
     public void drawParams(Canvas canvas, ArrayList<PreviewItemDrawingParams> params,
-            float transX) {
+                           float transX) {
         canvas.translate(transX, 0);
         // The first item should be drawn last (ie. on top of later items)
         for (int i = params.size() - 1; i >= 0; i--) {
@@ -290,16 +290,16 @@ public class PreviewItemManager {
 
     /**
      * Handles the case where items in the preview are either:
-     *  - Moving into the preview
-     *  - Moving into a new position
-     *  - Moving out of the preview
+     * - Moving into the preview
+     * - Moving into a new position
+     * - Moving out of the preview
      *
      * @param oldParams The list of items in the old preview.
      * @param newParams The list of items in the new preview.
-     * @param dropped The item that was dropped onto the FolderIcon.
+     * @param dropped   The item that was dropped onto the FolderIcon.
      */
     public void onDrop(List<BubbleTextView> oldParams, List<BubbleTextView> newParams,
-            ShortcutInfo dropped) {
+                       ShortcutInfo dropped) {
         int numItems = newParams.size();
         final ArrayList<PreviewItemDrawingParams> params = mFirstPageParams;
         buildParamsForPage(0, params, false);

@@ -3,7 +3,7 @@ package com.qianxun.browser.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import androidx.core.content.ContextCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.android.launcher3.base.App;
 
@@ -34,7 +34,6 @@ public class ContextHelper {
     public static void setActivity(Activity mActivity) {
         activity = mActivity;
     }
-
 
 
     public static Resources getResources() {

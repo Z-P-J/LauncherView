@@ -17,7 +17,7 @@
 package com.android.launcher3.uioverrides.dynamicui;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import com.android.launcher3.Utilities;
 
@@ -47,7 +47,8 @@ public abstract class WallpaperManagerCompat {
     }
 
 
-    public abstract @Nullable WallpaperColorsCompat getWallpaperColors(int which);
+    public abstract @Nullable
+    WallpaperColorsCompat getWallpaperColors(int which);
 
     public abstract void addOnColorsChangedListener(OnColorsChangedListenerCompat listener);
 

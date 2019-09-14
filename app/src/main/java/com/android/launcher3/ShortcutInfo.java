@@ -19,7 +19,6 @@ package com.android.launcher3;
 import android.content.ComponentName;
 import android.content.Intent;
 
-import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.util.ContentWriter;
 
 /**
@@ -59,11 +58,6 @@ public class ShortcutInfo extends ItemInfoWithIcon {
     public static final int FLAG_SUPPORTS_WEB_UI = 16; //0B10000;
 
     /**
-     * The intent used to start the application.
-     */
-    public Intent intent;
-
-    /**
      * If isShortcut=true and customIcon=false, this contains a reference to the
      * shortcut icon as an application's resource.
      */
@@ -89,17 +83,24 @@ public class ShortcutInfo extends ItemInfoWithIcon {
     public ShortcutInfo(ShortcutInfo info) {
         super(info);
         title = info.title;
-        intent = new Intent(info.intent);
         iconResource = info.iconResource;
         status = info.status;
         mInstallProgress = info.mInstallProgress;
     }
 
+//    /**
+//     * Creates a {@link ShortcutInfo} from a {@link ShortcutInfoCompat}.
+//     */
+//    @TargetApi(Build.VERSION_CODES.N)
+//    public ShortcutInfo(ShortcutInfoCompat shortcutInfo, Context context) {
+//        user = shortcutInfo.getUserHandle();
+//        itemType = LauncherSettings.Favorites.ITEM_TYPE_DEEP_SHORTCUT;
+//    }
+
     @Override
     public void onAddToDatabase(ContentWriter writer) {
         super.onAddToDatabase(writer);
         writer.put(LauncherSettings.BaseLauncherColumns.TITLE, title)
-                .put(LauncherSettings.BaseLauncherColumns.INTENT, getIntent())
                 .put(LauncherSettings.Favorites.RESTORED, status);
 
         if (!usingLowResIcon) {
@@ -112,35 +113,21 @@ public class ShortcutInfo extends ItemInfoWithIcon {
         }
     }
 
-    @Override
-    public Intent getIntent() {
-        return intent;
-    }
-
     public boolean hasStatusFlag(int flag) {
         return (status & flag) != 0;
     }
 
-
-    public final boolean isPromise() {
-        return hasStatusFlag(FLAG_RESTORED_ICON | FLAG_AUTOINSTALL_ICON);
-    }
-
-    public boolean hasPromiseIconUi() {
-        return isPromise() && !hasStatusFlag(FLAG_SUPPORTS_WEB_UI);
-    }
-
-
     @Override
     public ComponentName getTargetComponent() {
         ComponentName cn = super.getTargetComponent();
-        if (cn == null && (itemType == Favorites.ITEM_TYPE_APPLICATION
+        if (cn == null && (itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION
                 || hasStatusFlag(FLAG_SUPPORTS_WEB_UI))) {
             // Legacy shortcuts and promise icons with web UI may not have a componentName but just
             // a packageName. In that case create a dummy componentName instead of adding additional
             // check everywhere.
-            String pkg = intent.getPackage();
-            return pkg == null ? null : new ComponentName(pkg, IconCache.EMPTY_CLASS_NAME);
+//            String pkg = intent.getPackage();
+//            return pkg == null ? null : new ComponentName(pkg, IconCache.EMPTY_CLASS_NAME);
+            return null;
         }
         return cn;
     }

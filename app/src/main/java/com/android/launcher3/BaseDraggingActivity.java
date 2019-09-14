@@ -23,20 +23,14 @@ import android.view.ActionMode;
 import android.view.View;
 
 import com.android.launcher3.uioverrides.DisplayRotationListener;
-import com.android.launcher3.uioverrides.WallpaperColorInfo;
 import com.android.launcher3.views.BaseDragLayer;
 
 /**
  * Extension of BaseActivity allowing support for drag-n-drop
  */
-public abstract class BaseDraggingActivity extends BaseActivity
-        implements WallpaperColorInfo.OnChangeListener {
+public abstract class BaseDraggingActivity extends BaseActivity {
 
     private static final String TAG = "BaseDraggingActivity";
-
-    // The Intent extra that defines whether to ignore the launch animation
-    public static final String INTENT_EXTRA_IGNORE_LAUNCH_ANIMATION =
-            "com.android.launcher3.intent.extra.shortcut.INGORE_LAUNCH_ANIMATION";
 
     // When starting an action mode, setting this tag will cause the action mode to be cancelled
     // automatically when user interacts with the launcher.
@@ -45,10 +39,6 @@ public abstract class BaseDraggingActivity extends BaseActivity
     private ActionMode mCurrentActionMode;
     protected boolean mIsSafeModeEnabled;
 
-    private OnStartCallback mOnStartCallback;
-
-    private int mThemeRes = R.style.LauncherTheme;
-
     private DisplayRotationListener mRotationListener;
 
     @Override
@@ -56,32 +46,6 @@ public abstract class BaseDraggingActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         mIsSafeModeEnabled = getPackageManager().isSafeMode();
         mRotationListener = new DisplayRotationListener(this, this::onDeviceRotationChanged);
-
-        // Update theme
-        WallpaperColorInfo wallpaperColorInfo = WallpaperColorInfo.getInstance(this);
-        wallpaperColorInfo.addOnChangeListener(this);
-        int themeRes = getThemeRes(wallpaperColorInfo);
-        if (themeRes != mThemeRes) {
-            mThemeRes = themeRes;
-            setTheme(themeRes);
-        }
-    }
-
-    @Override
-    public void onExtractedColorsChanged(WallpaperColorInfo wallpaperColorInfo) {
-        if (mThemeRes != getThemeRes(wallpaperColorInfo)) {
-            recreate();
-        }
-    }
-
-    protected int getThemeRes(WallpaperColorInfo wallpaperColorInfo) {
-        if (wallpaperColorInfo.isDark()) {
-            return wallpaperColorInfo.supportsDarkText() ?
-                    R.style.LauncherThemeDark_DarKText : R.style.LauncherThemeDark;
-        } else {
-            return wallpaperColorInfo.supportsDarkText() ?
-                    R.style.LauncherTheme_DarkText : R.style.LauncherTheme;
-        }
     }
 
     @Override
@@ -110,8 +74,6 @@ public abstract class BaseDraggingActivity extends BaseActivity
 
     public abstract View getRootView();
 
-    public abstract void invalidateParent(ItemInfo info);
-
     public static BaseDraggingActivity fromContext(Context context) {
         if (context instanceof BaseDraggingActivity) {
             return (BaseDraggingActivity) context;
@@ -122,22 +84,12 @@ public abstract class BaseDraggingActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-
-        if (mOnStartCallback != null) {
-            mOnStartCallback.onActivityStart(this);
-            mOnStartCallback = null;
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        WallpaperColorInfo.getInstance(this).removeOnChangeListener(this);
         mRotationListener.disable();
-    }
-
-    public <T extends BaseDraggingActivity> void setOnStartCallback(OnStartCallback<T> callback) {
-        mOnStartCallback = callback;
     }
 
     protected void onDeviceProfileInitiated() {
@@ -157,11 +109,4 @@ public abstract class BaseDraggingActivity extends BaseActivity
 
     protected abstract void reapplyUi();
 
-    /**
-     * Callback for listening for onStart
-     */
-    public interface OnStartCallback<T extends BaseDraggingActivity> {
-
-        void onActivityStart(T activity);
-    }
 }

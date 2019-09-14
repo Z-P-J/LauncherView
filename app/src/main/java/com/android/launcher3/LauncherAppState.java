@@ -18,11 +18,13 @@ package com.android.launcher3;
 
 import android.content.ContentProviderClient;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 
-import com.android.launcher3.util.ConfigMonitor;
+import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.util.Preconditions;
 
 import java.util.concurrent.Callable;
@@ -30,12 +32,13 @@ import java.util.concurrent.ExecutionException;
 
 public class LauncherAppState {
 
+    public static final String ACTION_FORCE_ROLOAD = "force-reload-launcher";
+
     // We do not need any synchronization for this variable as its only written on UI thread.
     private static LauncherAppState INSTANCE;
 
     private final Context mContext;
     private final LauncherModel mModel;
-    private final IconCache mIconCache;
     private final InvariantDeviceProfile mInvariantDeviceProfile;
 
     public static LauncherAppState getInstance(final Context context) {
@@ -76,20 +79,35 @@ public class LauncherAppState {
         mContext = context;
 
         mInvariantDeviceProfile = new InvariantDeviceProfile(mContext);
-        mIconCache = new IconCache(mContext, mInvariantDeviceProfile);
-        mModel = new LauncherModel(this, mIconCache);
+        mModel = new LauncherModel(this);
 
-        new ConfigMonitor(mContext).register();
+        // Register intent receivers
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_LOCALE_CHANGED);
+        // For handling managed profiles
+        filter.addAction(Intent.ACTION_MANAGED_PROFILE_ADDED);
+        filter.addAction(Intent.ACTION_MANAGED_PROFILE_REMOVED);
+        filter.addAction(Intent.ACTION_MANAGED_PROFILE_AVAILABLE);
+        filter.addAction(Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE);
+        filter.addAction(Intent.ACTION_MANAGED_PROFILE_UNLOCKED);
+
+        if (FeatureFlags.IS_DOGFOOD_BUILD) {
+            filter.addAction(ACTION_FORCE_ROLOAD);
+        }
+
+        mContext.registerReceiver(mModel, filter);
+    }
+
+    /**
+     * Call from Application.onTerminate(), which is not guaranteed to ever be called.
+     */
+    public void onTerminate() {
+        mContext.unregisterReceiver(mModel);
     }
 
     LauncherModel setLauncher(Launcher launcher) {
-        getLocalProvider(mContext).setLauncherProviderChangeListener(launcher);
         mModel.initialize(launcher);
         return mModel;
-    }
-
-    public IconCache getIconCache() {
-        return mIconCache;
     }
 
     public LauncherModel getModel() {

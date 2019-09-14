@@ -31,8 +31,11 @@ public abstract class DragDriver {
 
     public interface EventListener {
         void onDriverDragMove(float x, float y);
+
         void onDriverDragExitWindow();
+
         void onDriverDragEnd(float x, float y);
+
         void onDriverDragCancel();
     }
 
@@ -43,7 +46,8 @@ public abstract class DragDriver {
     /**
      * Handles ending of the DragView animation.
      */
-    public void onDragViewAnimationEnd() { }
+    public void onDragViewAnimationEnd() {
+    }
 
     public boolean onTouchEvent(MotionEvent ev) {
         final int action = ev.getAction();
@@ -64,7 +68,7 @@ public abstract class DragDriver {
         return true;
     }
 
-    public abstract boolean onDragEvent (DragEvent event);
+    public abstract boolean onDragEvent(DragEvent event);
 
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -115,7 +119,7 @@ class SystemDragDriver extends DragDriver {
     }
 
     @Override
-    public boolean onDragEvent (DragEvent event) {
+    public boolean onDragEvent(DragEvent event) {
         final int action = event.getAction();
 
         switch (action) {
@@ -162,5 +166,7 @@ class InternalDragDriver extends DragDriver {
     }
 
     @Override
-    public boolean onDragEvent (DragEvent event) { return false; }
+    public boolean onDragEvent(DragEvent event) {
+        return false;
+    }
 }

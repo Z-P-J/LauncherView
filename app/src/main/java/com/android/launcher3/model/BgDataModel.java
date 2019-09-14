@@ -18,25 +18,21 @@ package com.android.launcher3.model;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.MutableInt;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.logging.DumpTargetWrapper;
-import com.android.launcher3.model.nano.LauncherDumpProto;
-import com.android.launcher3.model.nano.LauncherDumpProto.ContainerType;
-import com.android.launcher3.model.nano.LauncherDumpProto.DumpTarget;
 import com.android.launcher3.util.LongArrayMap;
-import com.google.protobuf.nano.MessageNano;
 
 import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * All the data stored in-memory and managed by the LauncherModel
@@ -68,9 +64,9 @@ public class BgDataModel {
     public final ArrayList<Long> workspaceScreens = new ArrayList<>();
 
     /**
-     * True if the launcher has permission to access deep shortcuts.
+     * Maps all launcher activities to the id's of their shortcuts (if they have any).
      */
-    public boolean hasShortcutHostPermission;
+//    public final MultiHashMap<ComponentKey, String> deepShortcutMap = new MultiHashMap<>();
 
     /**
      * Id when the model was last bound
@@ -85,108 +81,6 @@ public class BgDataModel {
         folders.clear();
         itemsIdMap.clear();
         workspaceScreens.clear();
-    }
-
-    public synchronized void dump(String prefix, FileDescriptor fd, PrintWriter writer,
-            String[] args) {
-        if (Arrays.asList(args).contains("--proto")) {
-            dumpProto(prefix, fd, writer, args);
-            return;
-        }
-        writer.println(prefix + "Data Model:");
-        writer.print(prefix + " ---- workspace screens: ");
-        for (int i = 0; i < workspaceScreens.size(); i++) {
-            writer.print(" " + workspaceScreens.get(i).toString());
-        }
-        writer.println();
-        writer.println(prefix + " ---- workspace items ");
-        for (int i = 0; i < workspaceItems.size(); i++) {
-            writer.println(prefix + '\t' + workspaceItems.get(i).toString());
-        }
-        writer.println(prefix + " ---- folder items ");
-        for (int i = 0; i< folders.size(); i++) {
-            writer.println(prefix + '\t' + folders.valueAt(i).toString());
-        }
-        writer.println(prefix + " ---- items id map ");
-        for (int i = 0; i< itemsIdMap.size(); i++) {
-            writer.println(prefix + '\t' + itemsIdMap.valueAt(i).toString());
-        }
-
-        if (args.length > 0 && TextUtils.equals(args[0], "--all")) {
-            writer.println(prefix + "shortcuts");
-        }
-    }
-
-    private synchronized void dumpProto(String prefix, FileDescriptor fd, PrintWriter writer,
-            String[] args) {
-
-        // Add top parent nodes. (L1)
-        DumpTargetWrapper hotseat = new DumpTargetWrapper(ContainerType.HOTSEAT, 0);
-        LongArrayMap<DumpTargetWrapper> workspaces = new LongArrayMap<>();
-        for (int i = 0; i < workspaceScreens.size(); i++) {
-            workspaces.put(workspaceScreens.get(i),
-                    new DumpTargetWrapper(ContainerType.WORKSPACE, i));
-        }
-        DumpTargetWrapper dtw;
-        // Add non leaf / non top nodes (L2)
-        for (int i = 0; i < folders.size(); i++) {
-            FolderInfo fInfo = folders.valueAt(i);
-            dtw = new DumpTargetWrapper(ContainerType.FOLDER, folders.size());
-            dtw.writeToDumpTarget(fInfo);
-            for(ShortcutInfo sInfo: fInfo.contents) {
-                DumpTargetWrapper child = new DumpTargetWrapper(sInfo);
-                child.writeToDumpTarget(sInfo);
-                dtw.add(child);
-            }
-            if (fInfo.container == LauncherSettings.Favorites.CONTAINER_HOTSEAT) {
-                hotseat.add(dtw);
-            } else if (fInfo.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
-                workspaces.get(fInfo.screenId).add(dtw);
-            }
-        }
-        // Add leaf nodes (L3): *Info
-        for (int i = 0; i < workspaceItems.size(); i++) {
-            ItemInfo info = workspaceItems.get(i);
-            if (info instanceof FolderInfo) {
-                continue;
-            }
-            dtw = new DumpTargetWrapper(info);
-            dtw.writeToDumpTarget(info);
-            if (info.container == LauncherSettings.Favorites.CONTAINER_HOTSEAT) {
-                hotseat.add(dtw);
-            } else if (info.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
-                workspaces.get(info.screenId).add(dtw);
-            }
-        }
-
-
-        // Traverse target wrapper
-        ArrayList<DumpTarget> targetList = new ArrayList<>();
-        targetList.addAll(hotseat.getFlattenedList());
-        for (int i = 0; i < workspaces.size(); i++) {
-            targetList.addAll(workspaces.valueAt(i).getFlattenedList());
-        }
-
-        if (Arrays.asList(args).contains("--debug")) {
-            for (int i = 0; i < targetList.size(); i++) {
-                writer.println(prefix + DumpTargetWrapper.getDumpTargetStr(targetList.get(i)));
-            }
-            return;
-        } else {
-            LauncherDumpProto.LauncherImpression proto = new LauncherDumpProto.LauncherImpression();
-            proto.targets = new DumpTarget[targetList.size()];
-            for (int i = 0; i < targetList.size(); i++) {
-                proto.targets[i] = targetList.get(i);
-            }
-            FileOutputStream fos = new FileOutputStream(fd);
-            try {
-
-                fos.write(MessageNano.toByteArray(proto));
-                Log.d(TAG, MessageNano.toByteArray(proto).length + "Bytes");
-            } catch (IOException e) {
-                Log.e(TAG, "Exception writing dumpsys --proto", e);
-            }
-        }
     }
 
     public synchronized void removeItem(Context context, ItemInfo... items) {

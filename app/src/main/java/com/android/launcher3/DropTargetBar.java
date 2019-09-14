@@ -79,7 +79,7 @@ public class DropTargetBar extends FrameLayout
 
     @Override
     public void setInsets(Rect insets) {
-        LayoutParams lp = (LayoutParams) getLayoutParams();
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) getLayoutParams();
         DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
         mIsVertical = grid.isVerticalBarLayout();
 

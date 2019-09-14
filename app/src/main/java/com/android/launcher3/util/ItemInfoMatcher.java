@@ -17,7 +17,6 @@
 package com.android.launcher3.util;
 
 import android.content.ComponentName;
-import android.os.UserHandle;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
@@ -61,7 +60,7 @@ public abstract class ItemInfoMatcher {
      * Returns a new matcher with returns true if either this or {@param matcher} returns true.
      */
     public ItemInfoMatcher or(final ItemInfoMatcher matcher) {
-       final ItemInfoMatcher that = this;
+        final ItemInfoMatcher that = this;
         return new ItemInfoMatcher() {
             @Override
             public boolean matches(ItemInfo info, ComponentName cn) {
@@ -96,32 +95,4 @@ public abstract class ItemInfoMatcher {
         };
     }
 
-    public static ItemInfoMatcher ofUser(final UserHandle user) {
-        return new ItemInfoMatcher() {
-            @Override
-            public boolean matches(ItemInfo info, ComponentName cn) {
-                return info.user.equals(user);
-            }
-        };
-    }
-
-    public static ItemInfoMatcher ofComponents(
-            final HashSet<ComponentName> components, final UserHandle user) {
-        return new ItemInfoMatcher() {
-            @Override
-            public boolean matches(ItemInfo info, ComponentName cn) {
-                return components.contains(cn) && info.user.equals(user);
-            }
-        };
-    }
-
-    public static ItemInfoMatcher ofPackages(
-            final HashSet<String> packageNames, final UserHandle user) {
-        return new ItemInfoMatcher() {
-            @Override
-            public boolean matches(ItemInfo info, ComponentName cn) {
-                return packageNames.contains(cn.getPackageName()) && info.user.equals(user);
-            }
-        };
-    }
 }

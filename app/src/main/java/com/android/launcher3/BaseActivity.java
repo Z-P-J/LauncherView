@@ -19,27 +19,19 @@ package com.android.launcher3;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.res.Configuration;
-import androidx.annotation.IntDef;
-import android.view.View.AccessibilityDelegate;
+import android.support.annotation.IntDef;
 
 import com.android.launcher3.DeviceProfile.OnDeviceProfileChangeListener;
-import com.android.launcher3.logging.UserEventDispatcher;
-import com.android.launcher3.logging.UserEventDispatcher.UserEventDelegate;
-import com.android.launcher3.uioverrides.UiFactory;
-import com.android.launcher3.userevent.nano.LauncherLogProto;
 import com.android.launcher3.util.SystemUiController;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 
 import static com.android.launcher3.util.SystemUiController.UI_STATE_OVERVIEW;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-public abstract class BaseActivity extends Activity implements UserEventDelegate{
+public abstract class BaseActivity extends Activity {
 
     public static final int INVISIBLE_BY_STATE_HANDLER = 1 << 0;
     public static final int INVISIBLE_BY_APP_TRANSITIONS = 1 << 1;
@@ -50,14 +42,12 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
     @IntDef(
             flag = true,
             value = {INVISIBLE_BY_STATE_HANDLER, INVISIBLE_BY_APP_TRANSITIONS})
-    public @interface InvisibilityFlags{}
+    public @interface InvisibilityFlags {
+    }
 
     private final ArrayList<OnDeviceProfileChangeListener> mDPChangeListeners = new ArrayList<>();
-    private final ArrayList<MultiWindowModeChangedListener> mMultiWindowModeChangedListeners =
-            new ArrayList<>();
 
     protected DeviceProfile mDeviceProfile;
-    protected UserEventDispatcher mUserEventDispatcher;
     protected SystemUiController mSystemUiController;
 
     private static final int ACTIVITY_STATE_STARTED = 1 << 0;
@@ -65,7 +55,6 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
     /**
      * State flag indicating if the user is active or the actitvity when to background as a result
      * of user action.
-     * @see #isUserActive()
      */
     private static final int ACTIVITY_STATE_USER_ACTIVE = 1 << 2;
 
@@ -73,30 +62,19 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
     @IntDef(
             flag = true,
             value = {ACTIVITY_STATE_STARTED, ACTIVITY_STATE_RESUMED, ACTIVITY_STATE_USER_ACTIVE})
-    public @interface ActivityFlags{}
+    public @interface ActivityFlags {
+    }
 
     @ActivityFlags
     private int mActivityFlags;
 
     // When the recents animation is running, the visibility of the Launcher is managed by the
     // animation
-    @InvisibilityFlags private int mForceInvisible;
+    @InvisibilityFlags
+    private int mForceInvisible;
 
     public DeviceProfile getDeviceProfile() {
         return mDeviceProfile;
-    }
-
-    public AccessibilityDelegate getAccessibilityDelegate() {
-        return null;
-    }
-
-    public void modifyUserEvent(LauncherLogProto.LauncherEvent event) {}
-
-    public final UserEventDispatcher getUserEventDispatcher() {
-        if (mUserEventDispatcher == null) {
-            mUserEventDispatcher = UserEventDispatcher.newInstance(this, mDeviceProfile, this);
-        }
-        return mUserEventDispatcher;
     }
 
     public boolean isInMultiWindowModeCompat() {
@@ -115,11 +93,6 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
             mSystemUiController = new SystemUiController(getWindow());
         }
         return mSystemUiController;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -143,9 +116,6 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
     @Override
     public void onMultiWindowModeChanged(boolean isInMultiWindowMode, Configuration newConfig) {
         super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
-        for (int i = mMultiWindowModeChangedListeners.size() - 1; i >= 0; i--) {
-            mMultiWindowModeChangedListeners.get(i).onMultiWindowModeChanged(isInMultiWindowMode);
-        }
     }
 
     @Override
@@ -178,43 +148,14 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
         return (mActivityFlags & ACTIVITY_STATE_RESUMED) != 0;
     }
 
-    public boolean isUserActive() {
-        return (mActivityFlags & ACTIVITY_STATE_USER_ACTIVE) != 0;
-    }
-
     public void addOnDeviceProfileChangeListener(OnDeviceProfileChangeListener listener) {
         mDPChangeListeners.add(listener);
-    }
-
-    public void removeOnDeviceProfileChangeListener(OnDeviceProfileChangeListener listener) {
-        mDPChangeListeners.remove(listener);
     }
 
     protected void dispatchDeviceProfileChanged() {
         for (int i = mDPChangeListeners.size() - 1; i >= 0; i--) {
             mDPChangeListeners.get(i).onDeviceProfileChanged(mDeviceProfile);
         }
-    }
-
-    public void addMultiWindowModeChangedListener(MultiWindowModeChangedListener listener) {
-        mMultiWindowModeChangedListeners.add(listener);
-    }
-
-    public void removeMultiWindowModeChangedListener(MultiWindowModeChangedListener listener) {
-        mMultiWindowModeChangedListeners.remove(listener);
-    }
-
-    /**
-     * Used to set the override visibility state, used only to handle the transition home with the
-     * recents animation.
-     * @see LauncherAppTransitionManagerImpl.getWallpaperOpenRunner()
-     */
-    public void addForceInvisibleFlag(@InvisibilityFlags int flag) {
-        mForceInvisible |= flag;
-    }
-
-    public void clearForceInvisibleFlag(@InvisibilityFlags int flag) {
-        mForceInvisible &= ~flag;
     }
 
 
@@ -225,22 +166,4 @@ public abstract class BaseActivity extends Activity implements UserEventDelegate
         return mForceInvisible != 0;
     }
 
-    public interface MultiWindowModeChangedListener {
-        void onMultiWindowModeChanged(boolean isInMultiWindowMode);
-    }
-
-    @Override
-    public void dump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
-        if (!UiFactory.dumpActivity(this, writer)) {
-            super.dump(prefix, fd, writer, args);
-        }
-    }
-
-    protected void dumpMisc(PrintWriter writer) {
-        writer.println(" deviceProfile isTransposed=" + getDeviceProfile().isVerticalBarLayout());
-        writer.println(" orientation=" + getResources().getConfiguration().orientation);
-        writer.println(" mSystemUiController: " + mSystemUiController);
-        writer.println(" mActivityFlags: " + mActivityFlags);
-        writer.println(" mForceInvisible: " + mForceInvisible);
-    }
 }

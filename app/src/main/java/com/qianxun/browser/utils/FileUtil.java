@@ -58,13 +58,13 @@ public class FileUtil {
         outStream.close();
     }
 
-    public static String readFromData(String fileNmae) throws FileNotFoundException, IOException{
+    public static String readFromData(String fileNmae) throws FileNotFoundException, IOException {
         FileInputStream inStream = null;
         inStream = ContextHelper.getAppContext().openFileInput(fileNmae);
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();//输出到内存
-        int len=0;
+        int len = 0;
         byte[] buffer = new byte[1024];
-        while((len = inStream.read(buffer))!=-1){
+        while ((len = inStream.read(buffer)) != -1) {
             outStream.write(buffer, 0, len);//
         }
 

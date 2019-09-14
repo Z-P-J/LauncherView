@@ -15,16 +15,16 @@
  */
 package com.android.launcher3.states;
 
+import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
+import static com.android.launcher3.states.RotationHelper.REQUEST_LOCK;
+
 import android.graphics.Rect;
 
+import com.android.launcher3.ContainerType;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.Workspace;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
-import static com.android.launcher3.states.RotationHelper.REQUEST_LOCK;
 
 /**
  * Definition for spring loaded state used during drag and drop.
@@ -49,7 +49,7 @@ public class SpringLoadedState extends LauncherState {
 
         if (grid.isVerticalBarLayout()) {
             float scale = grid.workspaceSpringLoadShrinkFactor;
-            return new float[] {scale, 0, 0};
+            return new float[]{scale, 0, 0};
         }
 
         float scale = grid.workspaceSpringLoadShrinkFactor;
@@ -68,7 +68,7 @@ public class SpringLoadedState extends LauncherState {
         float myCenter = ws.getTop() + halfHeight;
         float cellTopFromCenter = halfHeight - ws.getChildAt(0).getTop();
         float actualCellTop = myCenter - cellTopFromCenter * scale;
-        return new float[] { scale, 0, (desiredCellTop - actualCellTop) / scale};
+        return new float[]{scale, 0, (desiredCellTop - actualCellTop) / scale};
     }
 
     @Override
@@ -76,9 +76,6 @@ public class SpringLoadedState extends LauncherState {
         Workspace ws = launcher.getWorkspace();
         ws.showPageIndicatorAtCurrentScroll();
         ws.getPageIndicator().setShouldAutoHide(false);
-
-        // Prevent any Un/InstallShortcutReceivers from updating the db while we are
-        // in spring loaded mode
 
         launcher.getRotationHelper().setCurrentStateRequest(REQUEST_LOCK);
     }

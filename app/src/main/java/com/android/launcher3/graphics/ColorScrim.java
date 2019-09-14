@@ -17,13 +17,9 @@ package com.android.launcher3.graphics;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import androidx.core.graphics.ColorUtils;
+import android.support.v4.graphics.ColorUtils;
 import android.view.View;
 import android.view.animation.Interpolator;
-
-import com.android.launcher3.R;
-import com.android.launcher3.anim.Interpolators;
-import com.android.launcher3.uioverrides.WallpaperColorInfo;
 
 /**
  * Simple scrim which draws a color
@@ -53,12 +49,12 @@ public class ColorScrim extends ViewScrim {
         }
     }
 
-    public static ColorScrim createExtractedColorScrim(View view) {
-        WallpaperColorInfo colors = WallpaperColorInfo.getInstance(view.getContext());
-        int alpha = view.getResources().getInteger(R.integer.extracted_color_gradient_alpha);
-        ColorScrim scrim = new ColorScrim(view, ColorUtils.setAlphaComponent(
-                colors.getSecondaryColor(), alpha), Interpolators.LINEAR);
-        scrim.attach();
-        return scrim;
-    }
+//    public static ColorScrim createExtractedColorScrim(View view) {
+//        WallpaperColorInfo colors = WallpaperColorInfo.getInstance(view.getContext());
+//        int alpha = view.getResources().getInteger(R.integer.extracted_color_gradient_alpha);
+//        ColorScrim scrim = new ColorScrim(view, ColorUtils.setAlphaComponent(
+//                colors.getSecondaryColor(), alpha), Interpolators.LINEAR);
+//        scrim.attach();
+//        return scrim;
+//    }
 }

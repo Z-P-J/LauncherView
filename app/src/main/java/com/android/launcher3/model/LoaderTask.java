@@ -20,10 +20,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.launcher3.FolderInfo;
-import com.android.launcher3.IconCache;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherModel;
@@ -33,13 +33,11 @@ import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.folder.Folder;
 import com.android.launcher3.folder.FolderIconPreviewVerifier;
-import com.android.launcher3.provider.ImportDataTask;
 import com.android.launcher3.util.LooperIdleLock;
 import com.android.launcher3.util.TraceHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.concurrent.CancellationException;
 
 import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
@@ -47,10 +45,10 @@ import static com.android.launcher3.model.LoaderResults.filterCurrentWorkspaceIt
 
 /**
  * Runnable for the thread that loads the contents of the launcher:
- *   - workspace icons
- *   - widgets
- *   - all apps icons
- *   - deep shortcuts within apps
+ * - workspace icons
+ * - widgets
+ * - all apps icons
+ * - deep shortcuts within apps
  */
 public class LoaderTask implements Runnable {
     private static final String TAG = "LoaderTask";
@@ -58,11 +56,7 @@ public class LoaderTask implements Runnable {
     private final LauncherAppState mApp;
     private final BgDataModel mBgDataModel;
 
-//    private FirstScreenBroadcast mFirstScreenBroadcast;
-
     private final LoaderResults mResults;
-
-    private final IconCache mIconCache;
 
     private boolean mStopped;
 
@@ -71,8 +65,6 @@ public class LoaderTask implements Runnable {
         mApp = app;
         mBgDataModel = dataModel;
         mResults = results;
-
-        mIconCache = mApp.getIconCache();
     }
 
     protected synchronized void waitForIdle() {
@@ -82,28 +74,13 @@ public class LoaderTask implements Runnable {
         LooperIdleLock idleLock = mResults.newIdleLock(this);
         // Just in case mFlushingWorkerThread changes but we aren't woken up,
         // wait no longer than 1sec at a time
-        while (!mStopped && idleLock.awaitLocked(1000));
+        while (!mStopped && idleLock.awaitLocked(1000)) ;
     }
 
     private synchronized void verifyNotStopped() throws CancellationException {
         if (mStopped) {
             throw new CancellationException("Loader stopped");
         }
-    }
-
-    private void sendFirstScreenActiveInstallsBroadcast() {
-        ArrayList<ItemInfo> firstScreenItems = new ArrayList<>();
-
-        ArrayList<ItemInfo> allItems = new ArrayList<>();
-        synchronized (mBgDataModel) {
-            allItems.addAll(mBgDataModel.workspaceItems);
-        }
-        long firstScreen = mBgDataModel.workspaceScreens.isEmpty()
-                ? -1 // In this case, we can still look at the items in the hotseat.
-                : mBgDataModel.workspaceScreens.get(0);
-        filterCurrentWorkspaceItems(firstScreen, allItems, firstScreenItems,
-                new ArrayList<>() /* otherScreenItems are ignored */);
-//        mFirstScreenBroadcast.sendBroadcasts(mApp.getContext(), firstScreenItems);
     }
 
     public void run() {
@@ -115,7 +92,9 @@ public class LoaderTask implements Runnable {
         }
 
         TraceHelper.beginSection(TAG);
+        Log.d(TAG, "run before");
         try (LauncherModel.LoaderTransaction transaction = mApp.getModel().beginLoader(this)) {
+            Log.d(TAG, "run start");
             TraceHelper.partitionSection(TAG, "step 1.1: loading workspace");
             loadWorkspace();
 
@@ -124,28 +103,49 @@ public class LoaderTask implements Runnable {
             mResults.bindWorkspace();
 
             // Notify the installer packages of packages with active installs on the first screen.
-            TraceHelper.partitionSection(TAG, "step 1.3: send first screen broadcast");
-            sendFirstScreenActiveInstallsBroadcast();
+//            TraceHelper.partitionSection(TAG, "step 1.3: send first screen broadcast");
+//            sendFirstScreenActiveInstallsBroadcast();
 
             // Take a break
             TraceHelper.partitionSection(TAG, "step 1 completed, wait for idle");
             waitForIdle();
             verifyNotStopped();
 
-            TraceHelper.partitionSection(TAG, "step 2.2: Binding all apps");
-            verifyNotStopped();
+            // second step
+//            TraceHelper.partitionSection(TAG, "step 2.1: loading all apps");
+//            loadAllApps();
 
-            verifyNotStopped();
-            TraceHelper.partitionSection(TAG, "step 2.3: Update icon cache");
-            updateIconCache();
+//            TraceHelper.partitionSection(TAG, "step 2.2: Binding all apps");
+//            verifyNotStopped();
+//            mResults.bindAllApps();
+
+//            verifyNotStopped();
+//            TraceHelper.partitionSection(TAG, "step 2.3: Update icon cache");
 
             // Take a break
-            TraceHelper.partitionSection(TAG, "step 2 completed, wait for idle");
-            waitForIdle();
-            verifyNotStopped();
+//            TraceHelper.partitionSection(TAG, "step 2 completed, wait for idle");
+//            waitForIdle();
+//            verifyNotStopped();
 
-            verifyNotStopped();
-            TraceHelper.partitionSection(TAG, "step 4.2: Binding widgets");
+            // third step
+//            TraceHelper.partitionSection(TAG, "step 3.1: loading deep shortcuts");
+//            loadDeepShortcuts();
+
+//            verifyNotStopped();
+//            TraceHelper.partitionSection(TAG, "step 3.2: bind deep shortcuts");
+//            mResults.bindDeepShortcuts();
+
+            // Take a break
+//            TraceHelper.partitionSection(TAG, "step 3 completed, wait for idle");
+//            waitForIdle();
+//            verifyNotStopped();
+
+            // fourth step
+//            TraceHelper.partitionSection(TAG, "step 4.1: loading widgets");
+
+//            verifyNotStopped();
+//            TraceHelper.partitionSection(TAG, "step 4.2: Binding widgets");
+//            mResults.bindWidgets();
 
             transaction.commit();
         } catch (CancellationException e) {
@@ -167,12 +167,14 @@ public class LoaderTask implements Runnable {
         final Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_home);
 
         boolean clearDb = false;
-        try {
-            ImportDataTask.performImportIfPossible(context);
-        } catch (Exception e) {
-            // Migration failed. Clear workspace.
-            clearDb = true;
-        }
+//        try {
+//            boolean b = ImportDataTask.performImportIfPossible(context);
+//            Log.d(TAG, "loadWorkspace b=" + b);
+//        } catch (Exception e) {
+//            // Migration failed. Clear workspace.
+//            e.printStackTrace();
+//            clearDb = true;
+//        }
 
         if (!clearDb && GridSizeMigrationTask.ENABLED &&
                 !GridSizeMigrationTask.migrateGridIfNeeded(context)) {
@@ -233,7 +235,6 @@ public class LoaderTask implements Runnable {
                             info = new ShortcutInfo();
                             c.applyCommonProperties(info);
                             info.setIconBitmap(icon);
-                            info.intent = c.parseIntent();
                             info.title = c.getString(titleIndex);
                             info.rank = c.getInt(rankIndex);
 
@@ -243,6 +244,9 @@ public class LoaderTask implements Runnable {
                             FolderInfo folderInfo = mBgDataModel.findOrMakeFolder(c.id);
                             c.applyCommonProperties(folderInfo);
                             folderInfo.title = c.getString(c.titleIndex);
+                            if (TextUtils.isEmpty(folderInfo.title)) {
+                                folderInfo.title = "文件夹";
+                            }
                             folderInfo.options = c.getInt(optionsIndex);
                             c.markRestored();
                             c.checkAndAddItem(folderInfo, mBgDataModel);
@@ -287,7 +291,6 @@ public class LoaderTask implements Runnable {
                     if (info.usingLowResIcon
                             && info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION
                             && verifier.isItemInPreview(info.rank)) {
-                        mIconCache.getTitleAndIcon(info, false);
                         numItemsInPreview++;
                     }
 
@@ -301,7 +304,7 @@ public class LoaderTask implements Runnable {
 
             // Remove any empty screens
             ArrayList<Long> unusedScreens = new ArrayList<>(mBgDataModel.workspaceScreens);
-            for (ItemInfo item: mBgDataModel.itemsIdMap) {
+            for (ItemInfo item : mBgDataModel.itemsIdMap) {
                 long screenId = item.screenId;
                 if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP &&
                         unusedScreens.contains(screenId)) {
@@ -317,19 +320,38 @@ public class LoaderTask implements Runnable {
         }
     }
 
-    private void updateIconCache() {
-        // Ignore packages which have a promise icon.
-        HashSet<String> packagesToIgnore = new HashSet<>();
-        synchronized (mBgDataModel) {
-            for (ItemInfo info : mBgDataModel.itemsIdMap) {
-                if (info instanceof ShortcutInfo) {
-                    ShortcutInfo si = (ShortcutInfo) info;
-                    if (si.isPromise() && si.getTargetComponent() != null) {
-                        packagesToIgnore.add(si.getTargetComponent().getPackageName());
-                    }
-                }
-            }
-        }
-        mIconCache.updateDbIcons(packagesToIgnore);
-    }
+//    private void loadAllApps() {
+//        final List<UserHandle> profiles = mUserManager.getUserProfiles();
+//
+//        // Clear the list of apps
+//        mBgAllAppsList.clear();
+//        for (UserHandle user : profiles) {
+//            // Query for the set of apps
+//            final List<LauncherActivityInfo> apps = mLauncherApps.getActivityList(null, user);
+//            // Fail if we don't have any apps
+//            // TODO: Fix this. Only fail for the current user.
+//            if (apps == null || apps.isEmpty()) {
+//                return;
+//            }
+//            boolean quietMode = mUserManager.isQuietModeEnabled(user);
+//            // Create the ApplicationInfos
+//            for (int i = 0; i < apps.size(); i++) {
+//                LauncherActivityInfo app = apps.get(i);
+//                // This builds the icon bitmaps.
+//                mBgAllAppsList.add(new AppInfo(app, user, quietMode), app);
+//            }
+//        }
+//
+//        if (FeatureFlags.LAUNCHER3_PROMISE_APPS_IN_ALL_APPS) {
+//            // get all active sessions and add them to the all apps list
+//            for (PackageInstaller.SessionInfo info :
+//                    mPackageInstaller.getAllVerifiedSessions()) {
+//                mBgAllAppsList.addPromiseApp(mApp.getContext(),
+//                        PackageInstallerCompat.PackageInstallInfo.fromInstallingState(info));
+//            }
+//        }
+//
+//        mBgAllAppsList.added = new ArrayList<>();
+//    }
+
 }

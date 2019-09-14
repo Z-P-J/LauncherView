@@ -122,8 +122,8 @@ public class DeviceProfile {
     private boolean mIsSeascape;
 
     public DeviceProfile(Context context, InvariantDeviceProfile inv,
-            Point minSize, Point maxSize,
-            int width, int height, boolean isLandscape, boolean isMultiWindowMode) {
+                         Point minSize, Point maxSize,
+                         int width, int height, boolean isLandscape, boolean isMultiWindowMode) {
 
         this.inv = inv;
         this.isLandscape = isLandscape;
@@ -179,7 +179,7 @@ public class DeviceProfile {
         hotseatBarSizePx = isVerticalBarLayout()
                 ? Utilities.pxFromDp(inv.iconSize, dm)
                 : res.getDimensionPixelSize(R.dimen.dynamic_grid_hotseat_size)
-                        + hotseatBarTopPaddingPx + hotseatBarBottomPaddingPx;
+                + hotseatBarTopPaddingPx + hotseatBarBottomPaddingPx;
 
         // Determine sizes.
         widthPx = width;
@@ -248,6 +248,7 @@ public class DeviceProfile {
 
     /**
      * Inverse of {@link #getMultiWindowProfile(Context, Point)}
+     *
      * @return device profile corresponding to the current orientation in non multi-window mode.
      */
     public DeviceProfile getFullScreenProfile() {
@@ -502,6 +503,7 @@ public class DeviceProfile {
     public static int calculateCellWidth(int width, int countX) {
         return width / countX;
     }
+
     public static int calculateCellHeight(int height, int countY) {
         return height / countY;
     }

@@ -103,6 +103,7 @@ public class FolderAdaptiveIcon extends AdaptiveIconDrawable {
         bg.drawShadow(c);
         bg.drawBackgroundStroke(c);
 
+
         // Initialize preview
         final float sizeScaleFactor = 1 + 2 * AdaptiveIconDrawable.getExtraInsetFraction();
         final int previewWidth = (int) (dragViewSize.x * sizeScaleFactor);
@@ -155,7 +156,8 @@ public class FolderAdaptiveIcon extends AdaptiveIconDrawable {
         }
 
         @Override
-        public void setAlpha(int i) { }
+        public void setAlpha(int i) {
+        }
 
         @Override
         public void setColorFilter(ColorFilter colorFilter) {

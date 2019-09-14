@@ -16,7 +16,9 @@
 
 package com.android.launcher3.popup;
 
-import androidx.annotation.NonNull;
+import android.content.ComponentName;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;
@@ -24,6 +26,8 @@ import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.MultiHashMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,10 +35,13 @@ import java.util.List;
  */
 public class PopupDataProvider {
 
+    private static final boolean LOGD = false;
     private static final String TAG = "PopupDataProvider";
 
-    /** Note that these are in order of priority. */
-    private static final SystemShortcut[] SYSTEM_SHORTCUTS = new SystemShortcut[] {
+    /**
+     * Note that these are in order of priority.
+     */
+    private static final SystemShortcut[] SYSTEM_SHORTCUTS = new SystemShortcut[]{
             new SystemShortcut.AppInfo(),
             new SystemShortcut.Widgets(),
             new SystemShortcut.Install()
@@ -42,20 +49,35 @@ public class PopupDataProvider {
 
     private final Launcher mLauncher;
 
-    /** Maps launcher activity components to their list of shortcut ids. */
+    /**
+     * Maps launcher activity components to their list of shortcut ids.
+     */
     private MultiHashMap<ComponentKey, String> mDeepShortcutMap = new MultiHashMap<>();
 
     public PopupDataProvider(Launcher launcher) {
         mLauncher = launcher;
     }
 
-    public @NonNull List<SystemShortcut> getEnabledSystemShortcutsForItem(ItemInfo info) {
-        List<SystemShortcut> systemShortcuts = new ArrayList<>();
-        for (SystemShortcut systemShortcut : SYSTEM_SHORTCUTS) {
-            if (systemShortcut.getOnClickListener(mLauncher, info) != null) {
-                systemShortcuts.add(systemShortcut);
-            }
-        }
-        return systemShortcuts;
+    public void setDeepShortcutMap(MultiHashMap<ComponentKey, String> deepShortcutMapCopy) {
+        mDeepShortcutMap = deepShortcutMapCopy;
+        if (LOGD) Log.d(TAG, "bindDeepShortcutMap: " + mDeepShortcutMap);
     }
+
+    public List<String> getShortcutIdsForItem(ItemInfo info) {
+
+        ComponentName component = info.getTargetComponent();
+        if (component == null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<String> ids = mDeepShortcutMap.get(new ComponentKey(component, info.user));
+        return ids == null ? Collections.EMPTY_LIST : ids;
+    }
+
+
+    public @NonNull
+    List<SystemShortcut> getEnabledSystemShortcutsForItem(ItemInfo info) {
+        return new ArrayList<>(Arrays.asList(SYSTEM_SHORTCUTS));
+    }
+
 }

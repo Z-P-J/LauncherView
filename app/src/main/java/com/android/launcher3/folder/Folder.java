@@ -39,7 +39,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.Alarm;
@@ -65,10 +64,7 @@ import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragController.DragListener;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
-import com.android.launcher3.logging.LoggerUtils;
 import com.android.launcher3.pageindicators.PageIndicatorDots;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Thunk;
 
 import java.util.ArrayList;
@@ -191,7 +187,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
      * Used to inflate the Workspace from XML.
      *
      * @param context The application's context.
-     * @param attrs The attributes set containing the Workspace's customization values.
+     * @param attrs   The attributes set containing the Workspace's customization values.
      */
     public Folder(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -431,7 +427,6 @@ public class Folder extends AbstractFloatingView implements DragSource,
      * Creates a new UserFolder, inflated from R.layout.user_folder.
      *
      * @param launcher The main activity.
-     *
      * @return A new UserFolder.
      */
     @SuppressLint("InflateParams")
@@ -506,11 +501,10 @@ public class Folder extends AbstractFloatingView implements DragSource,
                 mFolderIcon.setBackgroundVisible(false);
                 mFolderIcon.drawLeaveBehindIfExists();
             }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 mState = STATE_OPEN;
-
-                mLauncher.getUserEventDispatcher().resetElapsedContainerMillis("folder opened");
                 mContent.setFocusOnFirstChild();
             }
         });
@@ -520,7 +514,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
             int footerWidth = mContent.getDesiredWidth()
                     - mFooter.getPaddingLeft() - mFooter.getPaddingRight();
 
-            float textWidth =  mFolderName.getPaint().measureText(mFolderName.getText().toString());
+            float textWidth = mFolderName.getPaint().measureText(mFolderName.getText().toString());
             float translation = (footerWidth - textWidth) / 2;
             mFolderName.setTranslationX(mContent.mIsRtl ? -translation : translation);
             mPageIndicator.prepareEntryAnimation();
@@ -534,9 +528,9 @@ public class Folder extends AbstractFloatingView implements DragSource,
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mFolderName.animate().setDuration(FOLDER_NAME_ANIMATION_DURATION)
-                        .translationX(0)
-                        .setInterpolator(AnimationUtils.loadInterpolator(
-                                mLauncher, android.R.interpolator.fast_out_slow_in));
+                            .translationX(0)
+                            .setInterpolator(AnimationUtils.loadInterpolator(
+                                    mLauncher, android.R.interpolator.fast_out_slow_in));
                     mPageIndicator.playEntryAnimation();
 
                     if (updateAnimationFlag) {
@@ -651,7 +645,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
     public boolean acceptDrop(DragObject d) {
         final ItemInfo item = d.dragInfo;
         final int itemType = item.itemType;
-        return ((itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION));
+        return (itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION);
     }
 
     public void onDragEnter(DragObject d) {
@@ -692,6 +686,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
             mReorderAlarm.setOnAlarmListener(mReorderAlarmListener);
             mReorderAlarm.setAlarm(REORDER_DELAY);
             mPrevTargetRank = mTargetRank;
+
         }
 
         float x = r[0];
@@ -775,8 +770,20 @@ public class Folder extends AbstractFloatingView implements DragSource,
         }
     }
 
+    /**
+     * When performing an accessibility drop, onDrop is sent immediately after onDragEnter. So we
+     * need to complete all transient states based on timers.
+     */
+    @Override
+    public void prepareAccessibilityDrop() {
+        if (mReorderAlarm.alarmPending()) {
+            mReorderAlarm.cancelAlarm();
+            mReorderAlarmListener.onAlarm(mReorderAlarm);
+        }
+    }
+
     public void onDropCompleted(final View target, final DragObject d,
-            final boolean success) {
+                                final boolean success) {
 
         if (success) {
             if (mDeleteFolderOnDropCompleted && !mItemAddedBackToSelfViaIcon && target != this) {
@@ -871,7 +878,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
             mLauncher.getWorkspace().getPageAreaRelativeToDragLayer(sTempRect);
         }
         int left = Math.min(Math.max(sTempRect.left, centeredLeft),
-                sTempRect.right- width);
+                sTempRect.right - width);
         int top = Math.min(Math.max(sTempRect.top, centeredTop),
                 sTempRect.bottom - height);
 
@@ -916,6 +923,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
     public float getPivotXForIconAnimation() {
         return mFolderIconPivotX;
     }
+
     public float getPivotYForIconAnimation() {
         return mFolderIconPivotY;
     }
@@ -980,8 +988,9 @@ public class Folder extends AbstractFloatingView implements DragSource,
 
     /**
      * Rearranges the children based on their rank.
+     *
      * @param itemCount if greater than the total children count, empty spaces are left at the end,
-     * otherwise it is ignored.
+     *                  otherwise it is ignored.
      */
     public void rearrangeChildren(int itemCount) {
         ArrayList<View> views = getItemsInReadingOrder();
@@ -1080,19 +1089,17 @@ public class Folder extends AbstractFloatingView implements DragSource,
     }
 
     public void onDrop(DragObject d, DragOptions options) {
-        Toast.makeText(mLauncher, "onDrop111", Toast.LENGTH_SHORT).show();
         // If the icon was dropped while the page was being scrolled, we need to compute
         // the target location again such that the icon is placed of the final page.
         if (!mContent.rankOnCurrentPage(mEmptyCellRank)) {
-            Toast.makeText(mLauncher, "onDrop222", Toast.LENGTH_SHORT).show();
             // Reorder again.
             mTargetRank = getTargetRank(d, null);
 
-//            // Rearrange items immediately.
-//            mReorderAlarmListener.onAlarm(mReorderAlarm);
-//
-//            mOnScrollHintAlarm.cancelAlarm();
-//            mScrollPauseAlarm.cancelAlarm();
+            // Rearrange items immediately.
+            mReorderAlarmListener.onAlarm(mReorderAlarm);
+
+            mOnScrollHintAlarm.cancelAlarm();
+            mScrollPauseAlarm.cancelAlarm();
         }
         mContent.completePendingPageChanges();
 
@@ -1159,6 +1166,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
         View v = getViewForInfo(info);
         v.setVisibility(INVISIBLE);
     }
+
     public void showItem(ShortcutInfo info) {
         View v = getViewForInfo(info);
         v.setVisibility(VISIBLE);
@@ -1269,13 +1277,13 @@ public class Folder extends AbstractFloatingView implements DragSource,
         outRect.right += mScrollAreaOffset;
     }
 
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        target.gridX = info.cellX;
-        target.gridY = info.cellY;
-        target.pageIndex = mContent.getCurrentPage();
-        targetParent.containerType = ContainerType.FOLDER;
-    }
+//    @Override
+//    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
+//        target.gridX = info.cellX;
+//        target.gridY = info.cellY;
+//        target.pageIndex = mContent.getCurrentPage();
+//        targetParent.containerType = ContainerType.FOLDER;
+//    }
 
     private class OnScrollHintListener implements OnAlarmListener {
 
@@ -1365,12 +1373,6 @@ public class Folder extends AbstractFloatingView implements DragSource,
     }
 
     @Override
-    public void logActionCommand(int command) {
-        mLauncher.getUserEventDispatcher().logActionCommand(
-                command, getFolderIcon(), ContainerType.FOLDER);
-    }
-
-    @Override
     public boolean onBackPressed() {
         if (isEditingName()) {
             mFolderName.dispatchBackKey();
@@ -1392,8 +1394,8 @@ public class Folder extends AbstractFloatingView implements DragSource,
                 }
                 return false;
             } else if (!dl.isEventOverView(this, ev)) {
-                mLauncher.getUserEventDispatcher().logActionTapOutside(
-                        LoggerUtils.newContainerTarget(ContainerType.FOLDER));
+//                mLauncher.getUserEventDispatcher().logActionTapOutside(
+//                        LoggerUtils.newContainerTarget(ContainerType.FOLDER));
                 close(true);
                 return true;
             }

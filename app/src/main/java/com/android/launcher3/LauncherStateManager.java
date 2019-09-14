@@ -16,25 +16,8 @@
 
 package com.android.launcher3;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.os.Handler;
-import android.os.Looper;
-import androidx.annotation.IntDef;
-
-import com.android.launcher3.anim.AnimationSuccessListener;
-import com.android.launcher3.anim.AnimatorPlaybackController;
-import com.android.launcher3.anim.AnimatorSetBuilder;
-import com.android.launcher3.anim.PropertySetter;
-import com.android.launcher3.anim.PropertySetter.AnimatedPropertySetter;
-import com.android.launcher3.uioverrides.UiFactory;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-
 import static android.view.View.VISIBLE;
+import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_OVERVIEW_FADE;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_OVERVIEW_SCALE;
@@ -47,46 +30,64 @@ import static com.android.launcher3.anim.Interpolators.OVERSHOOT_1_2;
 import static com.android.launcher3.anim.Interpolators.clampToProgress;
 import static com.android.launcher3.anim.PropertySetter.NO_ANIM_PROPERTY_SETTER;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.IntDef;
+
+import com.android.launcher3.anim.AnimationSuccessListener;
+import com.android.launcher3.anim.AnimatorPlaybackController;
+import com.android.launcher3.anim.AnimatorSetBuilder;
+import com.android.launcher3.anim.PropertySetter;
+import com.android.launcher3.anim.PropertySetter.AnimatedPropertySetter;
+import com.android.launcher3.uioverrides.UiFactory;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+
 /**
  * TODO: figure out what kind of tests we can write for this
- *
+ * <p>
  * Things to test when changing the following class.
- *   - Home from workspace
- *          - from center screen
- *          - from other screens
- *   - Home from all apps
- *          - from center screen
- *          - from other screens
- *   - Back from all apps
- *          - from center screen
- *          - from other screens
- *   - Launch app from workspace and quit
- *          - with back
- *          - with home
- *   - Launch app from all apps and quit
- *          - with back
- *          - with home
- *   - Go to a screen that's not the default, then all
- *     apps, and launch and app, and go back
- *          - with back
- *          -with home
- *   - On workspace, long press power and go back
- *          - with back
- *          - with home
- *   - On all apps, long press power and go back
- *          - with back
- *          - with home
- *   - On workspace, power off
- *   - On all apps, power off
- *   - Launch an app and turn off the screen while in that app
- *          - Go back with home key
- *          - Go back with back key  TODO: make this not go to workspace
- *          - From all apps
- *          - From workspace
- *   - Enter and exit car mode (becase it causes an extra configuration changed)
- *          - From all apps
- *          - From the center workspace
- *          - From another workspace
+ * - Home from workspace
+ * - from center screen
+ * - from other screens
+ * - Home from all apps
+ * - from center screen
+ * - from other screens
+ * - Back from all apps
+ * - from center screen
+ * - from other screens
+ * - Launch app from workspace and quit
+ * - with back
+ * - with home
+ * - Launch app from all apps and quit
+ * - with back
+ * - with home
+ * - Go to a screen that's not the default, then all
+ * apps, and launch and app, and go back
+ * - with back
+ * -with home
+ * - On workspace, long press power and go back
+ * - with back
+ * - with home
+ * - On all apps, long press power and go back
+ * - with back
+ * - with home
+ * - On workspace, power off
+ * - On all apps, power off
+ * - Launch an app and turn off the screen while in that app
+ * - Go back with home key
+ * - Go back with back key  TODO: make this not go to workspace
+ * - From all apps
+ * - From workspace
+ * - Enter and exit car mode (becase it causes an extra configuration changed)
+ * - From all apps
+ * - From the center workspace
+ * - From another workspace
  */
 public class LauncherStateManager {
 
@@ -101,7 +102,9 @@ public class LauncherStateManager {
             ATOMIC_COMPONENT
     })
     @Retention(RetentionPolicy.SOURCE)
-    public @interface AnimationComponents {}
+    public @interface AnimationComponents {
+    }
+
     public static final int NON_ATOMIC_COMPONENT = 1 << 0;
     public static final int ATOMIC_COMPONENT = 1 << 1;
 
@@ -162,7 +165,7 @@ public class LauncherStateManager {
      * Changes the Launcher state to the provided state.
      *
      * @param animated false if the state should change immediately without any animation,
-     *                true otherwise
+     *                 true otherwise
      * @paras onCompleteRunnable any action to perform at the end of the transition, of null.
      */
     public void goToState(LauncherState state, boolean animated, Runnable onCompleteRunnable) {
@@ -299,9 +302,10 @@ public class LauncherStateManager {
     /**
      * Creates a {@link AnimatorPlaybackController} that can be used for a controlled
      * state transition.
-     * @param state the final state for the transition.
+     *
+     * @param state    the final state for the transition.
      * @param duration intended duration for normal playback. Use higher duration for better
-     *                accuracy.
+     *                 accuracy.
      */
     public AnimatorPlaybackController createAnimationToNewWorkspace(
             LauncherState state, long duration) {
@@ -332,9 +336,7 @@ public class LauncherStateManager {
 
         for (StateHandler handler : getStateHandlers()) {
             builder.startTag(handler);
-            if (handler != null) {
-                handler.setStateWithAnimation(state, builder, mConfig);
-            }
+            handler.setStateWithAnimation(state, builder, mConfig);
         }
 
         final AnimatorSet animation = builder.build();
@@ -501,7 +503,8 @@ public class LauncherStateManager {
         public long duration;
         public boolean userControlled;
         public AnimatorPlaybackController playbackController;
-        public @AnimationComponents int animComponents = ANIM_ALL;
+        public @AnimationComponents
+        int animComponents = ANIM_ALL;
         private PropertySetter mPropertySetter;
 
         private AnimatorSet mCurrentAnimation;
@@ -581,6 +584,7 @@ public class LauncherStateManager {
         void onStateSetImmediately(LauncherState state);
 
         void onStateTransitionStart(LauncherState toState);
+
         void onStateTransitionComplete(LauncherState finalState);
     }
 }

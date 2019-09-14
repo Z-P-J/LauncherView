@@ -20,17 +20,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Toast;
 
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.folder.Folder;
-import com.android.launcher3.logging.LoggerUtils;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 
 public class DeleteDropTarget extends ButtonDropTarget {
-
-    private int mControlType = ControlType.DEFAULT_CONTROLTYPE;
 
     public DeleteDropTarget(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -53,7 +47,6 @@ public class DeleteDropTarget extends ButtonDropTarget {
     public void onDragStart(DropTarget.DragObject dragObject, DragOptions options) {
         super.onDragStart(dragObject, options);
         setTextBasedOnDragSource(dragObject.dragInfo);
-        setControlTypeBasedOnDragSource(dragObject.dragInfo);
     }
 
     @Override
@@ -73,29 +66,26 @@ public class DeleteDropTarget extends ButtonDropTarget {
         }
     }
 
-    /**
-     * Set mControlType depending on the drag item.
-     */
-    private void setControlTypeBasedOnDragSource(ItemInfo item) {
-        mControlType = item.id != ItemInfo.NO_ID ? ControlType.REMOVE_TARGET
-                : ControlType.CANCEL_TARGET;
-    }
-
     @Override
     public void completeDrop(DragObject d) {
         ItemInfo item = d.dragInfo;
         if ((d.dragSource instanceof Workspace) || (d.dragSource instanceof Folder)) {
-            Toast.makeText(mLauncher, "移除", Toast.LENGTH_SHORT).show();
-//            onAccessibilityDrop(null, item);
-            mLauncher.removeItem(null, item, true /* deleteFromDb */);
-            mLauncher.getWorkspace().stripEmptyScreens();
+            onAccessibilityDrop(null, item);
         }
     }
 
+    /**
+     * Removes the item from the workspace. If the view is not null, it also removes the view.
+     */
     @Override
-    public Target getDropTargetForLogging() {
-        Target t = LoggerUtils.newTarget(Target.Type.CONTROL);
-        t.controlType = mControlType;
-        return t;
+    public void onAccessibilityDrop(View view, ItemInfo item) {
+        // Remove the item from launcher and the db, we can ignore the containerInfo in this call
+        // because we already remove the drag view from the folder (if the drag originated from
+        // a folder) in Folder.beginDrag()
+        mLauncher.removeItem(view, item, true /* deleteFromDb */);
+        mLauncher.getWorkspace().stripEmptyScreens();
+        mLauncher.getDragLayer()
+                .announceForAccessibility(getContext().getString(R.string.item_removed));
     }
+
 }

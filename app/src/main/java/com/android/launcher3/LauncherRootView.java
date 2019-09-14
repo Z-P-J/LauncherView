@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewDebug;
-import android.view.ViewGroup;
 
 import static com.android.launcher3.util.SystemUiController.FLAG_DARK_NAV;
 import static com.android.launcher3.util.SystemUiController.UI_STATE_ROOT_VIEW;
@@ -45,6 +44,31 @@ public class LauncherRootView extends InsettableFrameLayout {
             mAlignedView = getChildAt(0);
         }
         super.onFinishInflate();
+//        WallpaperUtil.with(getContext())
+//                .setDrawable(getBackground())
+//                .setOnChangeListener(new WallpaperUtil.OnChangeListener() {
+//                    @Override
+//                    public void onExtractedColorsChanged(WallpaperUtil.WallpaperColorInfo wallpaperColorInfo) {
+//                        int style;
+//                        if (wallpaperColorInfo.isDark()) {
+//                             style = wallpaperColorInfo.isSupportsDarkText() ?
+//                                    R.style.LauncherThemeDark_DarKText : R.style.LauncherThemeDark;
+//                        } else {
+//                            style =  wallpaperColorInfo.isSupportsDarkText() ?
+//                                    R.style.LauncherTheme_DarkText : R.style.LauncherTheme;
+//                        }
+//                        post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                mLauncher.setTheme(style);
+//                                mLauncher.recreate();
+//                            }
+//                        });
+//
+//                        Log.d("LauncherRootView", "wallpaperColorInfo=" + wallpaperColorInfo);
+//                    }
+//                })
+//                .run();
     }
 
     @TargetApi(23)
@@ -59,7 +83,7 @@ public class LauncherRootView extends InsettableFrameLayout {
             mConsumedInsets.bottom = insets.bottom;
             insets = new Rect(0, insets.top, 0, 0);
             drawInsetBar = true;
-        } else  if ((insets.right > 0 || insets.left > 0) &&
+        } else if ((insets.right > 0 || insets.left > 0) &&
                 (!Utilities.ATLEAST_MARSHMALLOW ||
                         getContext().getSystemService(ActivityManager.class).isLowRamDevice())) {
             mConsumedInsets.left = insets.left;
@@ -78,7 +102,7 @@ public class LauncherRootView extends InsettableFrameLayout {
 
         if (mAlignedView != null) {
             // Apply margins on aligned view to handle consumed insets.
-            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mAlignedView.getLayoutParams();
+            MarginLayoutParams lp = (MarginLayoutParams) mAlignedView.getLayoutParams();
             if (lp.leftMargin != mConsumedInsets.left || lp.rightMargin != mConsumedInsets.right ||
                     lp.bottomMargin != mConsumedInsets.bottom) {
                 lp.leftMargin = mConsumedInsets.left;
@@ -88,9 +112,9 @@ public class LauncherRootView extends InsettableFrameLayout {
                 mAlignedView.setLayoutParams(lp);
             }
         }
-//        if (resetState) {
-//            mLauncher.getStateManager().reapplyState(true /* cancelCurrentAnimation */);
-//        }
+        if (resetState) {
+            mLauncher.getStateManager().reapplyState(true /* cancelCurrentAnimation */);
+        }
 
         return true; // I'll take it from here
     }

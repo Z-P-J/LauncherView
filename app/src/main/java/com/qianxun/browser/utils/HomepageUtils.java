@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
+import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.R;
 import com.android.launcher3.ShortcutInfo;
 
@@ -37,27 +38,26 @@ public class HomepageUtils {
         return jsonObject;
     }
 
-    public static List<ItemInfo> initHomeNav(){
+    public static List<ItemInfo> initHomeNav() {
         List<ItemInfo> gridList = new ArrayList<>();
         try {
             JSONArray jsonArray = getJson().getJSONArray("sites");
-            for (int i = 0; i < jsonArray.length(); i ++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject site = jsonArray.getJSONObject(i);
                 int type = site.getInt("type");
                 String title = site.getString("title");
                 int id = site.getInt("position");
-                int cellX = i % 4;
-                int cellY = i / 4;
+                int cellX = i % 5;
+                int cellY = i / 5 + 3;
                 if (type == 0) {
                     ShortcutInfo item = new ShortcutInfo();
                     item.setIconBitmap(BitmapFactory.decodeResource(ContextHelper.getAppContext().getResources(), R.mipmap.ic_launcher_home));
                     item.title = title;
                     item.id = id;
                     item.screenId = 0;
-                    item.intent = new Intent();
                     item.spanX = 1;
                     item.spanY = 1;
-                    item.itemType = 0;
+                    item.itemType = LauncherSettings.Favorites.ITEM_TYPE_APPLICATION;
                     item.container = -100;
                     item.cellX = cellX;
                     item.cellY = cellY;
@@ -73,17 +73,16 @@ public class HomepageUtils {
                     folder.id = id;
                     folder.title = title;
                     JSONArray folderItems = site.getJSONArray("sites");
-                    for (int j = 0; j < folderItems.length(); j ++) {
+                    for (int j = 0; j < folderItems.length(); j++) {
                         JSONObject folderItem = folderItems.getJSONObject(j);
                         ShortcutInfo item = new ShortcutInfo();
                         item.setIconBitmap(BitmapFactory.decodeResource(ContextHelper.getAppContext().getResources(), R.mipmap.ic_launcher_home));
                         item.title = folderItem.getString("title");
                         item.id = folderItem.getInt("position");
-                        item.intent = new Intent();
                         item.screenId = 0;
                         item.spanX = 1;
                         item.spanY = 1;
-                        item.itemType = 0;
+                        item.itemType = LauncherSettings.Favorites.ITEM_TYPE_APPLICATION;
                         item.container = -100;
                         item.cellX = j % 4;
                         item.cellY = j / 4;

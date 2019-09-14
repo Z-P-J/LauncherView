@@ -20,7 +20,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import androidx.core.graphics.ColorUtils;
+import android.support.v4.graphics.ColorUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -71,8 +71,6 @@ public class DoubleShadowBubbleTextView extends BubbleTextView {
                 ColorUtils.setAlphaComponent(mShadowInfo.keyShadowColor, alpha));
         drawWithoutBadge(canvas);
         canvas.restore();
-
-//        drawBadgeIfNecessary(canvas);
     }
 
     public static class ShadowInfo {

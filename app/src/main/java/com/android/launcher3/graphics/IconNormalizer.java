@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -30,8 +31,8 @@ import android.graphics.RectF;
 import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.launcher3.LauncherAppState;
@@ -82,7 +83,9 @@ public class IconNormalizer {
     private final Path mShapePath;
     private final Matrix mMatrix;
 
-    /** package private **/
+    /**
+     * package private
+     **/
     IconNormalizer(Context context) {
         // Use twice the icon size as maximum size to avoid scaling down twice.
         mMaxSize = LauncherAppState.getIDP(context).iconBitmapSize * 2;
@@ -97,13 +100,13 @@ public class IconNormalizer {
         mPaintMaskShape = new Paint();
         mPaintMaskShape.setColor(Color.RED);
         mPaintMaskShape.setStyle(Paint.Style.FILL);
-        mPaintMaskShape.setXfermode(new PorterDuffXfermode(Mode.XOR));
+        mPaintMaskShape.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.XOR));
 
         mPaintMaskShapeOutline = new Paint();
         mPaintMaskShapeOutline.setStrokeWidth(2 * context.getResources().getDisplayMetrics().density);
         mPaintMaskShapeOutline.setStyle(Paint.Style.STROKE);
         mPaintMaskShapeOutline.setColor(Color.BLACK);
-        mPaintMaskShapeOutline.setXfermode(new PorterDuffXfermode(Mode.CLEAR));
+        mPaintMaskShapeOutline.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
         mShapePath = new Path();
         mMatrix = new Matrix();
@@ -179,19 +182,19 @@ public class IconNormalizer {
     /**
      * Returns the amount by which the {@param d} should be scaled (in both dimensions) so that it
      * matches the design guidelines for a launcher icon.
-     *
+     * <p>
      * We first calculate the convex hull of the visible portion of the icon.
      * This hull then compared with the bounding rectangle of the hull to find how closely it
      * resembles a circle and a square, by comparing the ratio of the areas. Note that this is not an
      * ideal solution but it gives satisfactory result without affecting the performance.
-     *
+     * <p>
      * This closeness is used to determine the ratio of hull area to the full icon size.
      * Refer {@link #MAX_CIRCLE_AREA_FACTOR} and {@link #MAX_SQUARE_AREA_FACTOR}
      *
      * @param outBounds optional rect to receive the fraction distance from each edge.
      */
     public synchronized float getScale(@NonNull Drawable d, @Nullable RectF outBounds,
-            @Nullable Path path, @Nullable boolean[] outMaskShape) {
+                                       @Nullable Path path, @Nullable boolean[] outMaskShape) {
         if (Utilities.ATLEAST_OREO && d instanceof AdaptiveIconDrawable) {
             if (mAdaptiveIconScale != SCALE_NOT_INITIALIZED) {
                 if (outBounds != null) {
@@ -324,10 +327,11 @@ public class IconNormalizer {
     /**
      * Modifies {@param xCoordinates} to represent a convex border. Fills in all missing values
      * (except on either ends) with appropriate values.
+     *
      * @param xCoordinates map of x coordinate per y.
-     * @param direction 1 for left border and -1 for right border.
-     * @param topY the first Y position (inclusive) with a valid value.
-     * @param bottomY the last Y position (inclusive) with a valid value.
+     * @param direction    1 for left border and -1 for right border.
+     * @param topY         the first Y position (inclusive) with a valid value.
+     * @param bottomY      the last Y position (inclusive) with a valid value.
      */
     private static void convertToConvexArray(
             float[] xCoordinates, int direction, int topY, int bottomY) {
@@ -355,7 +359,7 @@ public class IconNormalizer {
                 // position which creates a convex angle.
                 if ((currentAngle - lastAngle) * direction < 0) {
                     while (start > first) {
-                        start --;
+                        start--;
                         currentAngle = (xCoordinates[i] - xCoordinates[start]) / (i - start);
                         if ((currentAngle - angles[start]) * direction >= 0) {
                             break;

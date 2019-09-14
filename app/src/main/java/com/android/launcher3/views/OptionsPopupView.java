@@ -16,31 +16,26 @@
 package com.android.launcher3.views;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.text.TextUtils;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Toast;
 
+import com.android.launcher3.ControlType;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
-import com.android.launcher3.Utilities;
 import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
+import com.android.launcher3.widget.WidgetsFullSheet;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.android.launcher3.BaseDraggingActivity.INTENT_EXTRA_IGNORE_LAUNCH_ANIMATION;
-import static com.android.launcher3.Utilities.EXTRA_WALLPAPER_OFFSET;
 
 /**
  * Popup shown on long pressing an empty space in launcher
@@ -61,31 +56,27 @@ public class OptionsPopupView extends ArrowPopup
 
     @Override
     public void onClick(View view) {
-        handleViewClick(view, Action.Touch.TAP);
+        handleViewClick(view);
     }
 
     @Override
     public boolean onLongClick(View view) {
-        return handleViewClick(view, Action.Touch.LONGPRESS);
+        return handleViewClick(view);
     }
 
-    private boolean handleViewClick(View view, int action) {
+    private boolean handleViewClick(View view) {
         OptionItem item = mItemMap.get(view);
         if (item == null) {
             return false;
         }
         if (item.mControlTypeForLog > 0) {
-            logTap(action, item.mControlTypeForLog);
+
         }
         if (item.mClickListener.onLongClick(view)) {
             close(true);
             return true;
         }
         return false;
-    }
-
-    private void logTap(int action, int controlType) {
-        mLauncher.getUserEventDispatcher().logActionOnControl(action, controlType);
     }
 
     @Override
@@ -98,11 +89,6 @@ public class OptionsPopupView extends ArrowPopup
         }
         close(true);
         return true;
-    }
-
-    @Override
-    public void logActionCommand(int command) {
-        // TODO:
     }
 
     @Override
@@ -121,6 +107,7 @@ public class OptionsPopupView extends ArrowPopup
         popup.mTargetRect = targetRect;
 
         for (OptionItem item : items) {
+            Log.d("OptionsPopupView", "show");
             DeepShortcutView view = popup.inflateAndAdd(R.layout.system_shortcut, popup);
             view.getIconView().setBackgroundResource(item.mIconRes);
             view.getBubbleText().setText(item.mLabelRes);
@@ -153,6 +140,7 @@ public class OptionsPopupView extends ArrowPopup
 
     public static boolean onWidgetsClicked(View view) {
         Toast.makeText(view.getContext(), "微件", Toast.LENGTH_SHORT).show();
+        WidgetsFullSheet.show(Launcher.getLauncher(view.getContext()), true);
         return true;
     }
 
@@ -166,8 +154,8 @@ public class OptionsPopupView extends ArrowPopup
      * on the home screen.
      */
     public static boolean startWallpaperPicker(View v) {
-        Toast.makeText(v.getContext(), "startWallpaperPicker", Toast.LENGTH_SHORT).show();
-       return true;
+        Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     public static class OptionItem {
@@ -178,7 +166,7 @@ public class OptionsPopupView extends ArrowPopup
         private final OnLongClickListener mClickListener;
 
         public OptionItem(int labelRes, int iconRes, int controlTypeForLog,
-                OnLongClickListener clickListener) {
+                          OnLongClickListener clickListener) {
             mLabelRes = labelRes;
             mIconRes = iconRes;
             mControlTypeForLog = controlTypeForLog;

@@ -15,6 +15,13 @@
  */
 package com.android.launcher3.touch;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
+import static com.android.launcher3.LauncherState.ALL_APPS;
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.LauncherState.OVERVIEW;
+
 import android.view.View;
 import android.view.View.OnLongClickListener;
 
@@ -23,14 +30,10 @@ import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.DropTarget;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherState;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.folder.Folder;
-
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-import static com.android.launcher3.LauncherState.NORMAL;
-import static com.android.launcher3.LauncherState.OVERVIEW;
 
 /**
  * Class to handle long-clicks on workspace items and start drag as a result.
@@ -49,7 +52,6 @@ public class ItemLongClickListener {
         if (!launcher.isInState(NORMAL) && !launcher.isInState(OVERVIEW)) return false;
         if (!(v.getTag() instanceof ItemInfo)) return false;
 
-        launcher.setWaitingForResult(null);
         beginDrag(v, launcher, (ItemInfo) v.getTag(), new DragOptions());
         return true;
     }
@@ -76,7 +78,7 @@ public class ItemLongClickListener {
         Launcher launcher = Launcher.getLauncher(v.getContext());
         if (!canStartDrag(launcher)) return false;
         // When we have exited all apps or are in transition, disregard long clicks
-        if (!launcher.isInState(OVERVIEW)) return false;
+        if (!launcher.isInState(ALL_APPS) && !launcher.isInState(OVERVIEW)) return false;
         if (launcher.getWorkspace().isSwitchingState()) return false;
 
         // Start the drag
@@ -97,7 +99,7 @@ public class ItemLongClickListener {
         DeviceProfile grid = launcher.getDeviceProfile();
         DragOptions options = new DragOptions();
         options.intrinsicIconScaleFactor = (float) grid.allAppsIconSizePx / grid.iconSizePx;
-//        launcher.getWorkspace().beginDragShared(v, launcher.getAppsView(), options);
+        launcher.getWorkspace().beginDragShared(v, launcher.getAppsView(), options);
         return false;
     }
 

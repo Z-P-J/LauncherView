@@ -22,12 +22,10 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -38,8 +36,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.os.StrictMode;
 import android.os.UserHandle;
-import androidx.annotation.Nullable;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 import android.text.method.TextKeyListener;
 import android.util.Log;
 import android.util.SparseArray;
@@ -52,28 +49,25 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.OvershootInterpolator;
 
 import com.android.launcher3.Workspace.ItemOperator;
+import com.android.launcher3.allapps.AllAppsContainerView;
+import com.android.launcher3.allapps.AllAppsTransitionController;
+import com.android.launcher3.allapps.DiscoveryBounce;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.folder.FolderIcon;
-import com.android.launcher3.folder.FolderIconPreviewVerifier;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
-import com.android.launcher3.logging.FileLog;
-import com.android.launcher3.logging.UserEventDispatcher;
-import com.android.launcher3.logging.UserEventDispatcher.UserEventDelegate;
 import com.android.launcher3.model.ModelWriter;
 import com.android.launcher3.popup.PopupDataProvider;
 import com.android.launcher3.states.InternalStateHandler;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.uioverrides.UiFactory;
-import com.android.launcher3.userevent.nano.LauncherLogProto;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
+import com.android.launcher3.util.ComponentKey;
+import com.android.launcher3.util.ItemInfoMatcher;
+import com.android.launcher3.util.MultiHashMap;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.MultiValueAlpha.AlphaProperty;
-import com.android.launcher3.util.PendingRequestArgs;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
@@ -82,32 +76,31 @@ import com.android.launcher3.util.UiThreadHelper;
 import com.android.launcher3.util.ViewOnDrawExecutor;
 import com.android.launcher3.views.OptionsPopupView;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
 import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;
+import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.dragndrop.DragLayer.ALPHA_INDEX_LAUNCHER_LOAD;
-import static com.android.launcher3.logging.LoggerUtils.newContainerTarget;
-import static com.android.launcher3.logging.LoggerUtils.newTarget;
 
 /**
  * Default launcher application.
  */
-public class Launcher extends BaseDraggingActivity implements LauncherModel.Callbacks,
-        LauncherProviderChangeListener, UserEventDelegate{
+public class Launcher extends BaseDraggingActivity implements LauncherExterns,
+        LauncherModel.Callbacks {
     public static final String TAG = "Launcher";
     static final boolean LOGD = false;
+
+    public static final int NEW_SHORTCUT_BOUNCE_DURATION = 450;
+    public static final int NEW_SHORTCUT_STAGGER_DELAY = 85;
 
     static final boolean DEBUG_STRICT_MODE = false;
 
     private static final int REQUEST_CREATE_SHORTCUT = 1;
-
-    private static final int REQUEST_PERMISSION_CALL_PHONE = 14;
+    private static final int REQUEST_CREATE_APPWIDGET = 5;
 
     private static final float BOUNCE_ANIMATION_TENSION = 1.3f;
 
@@ -121,8 +114,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     private static final String RUNTIME_STATE_CURRENT_SCREEN = "launcher.current_screen";
     // Type: int
     private static final String RUNTIME_STATE = "launcher.state";
-    // Type: PendingRequestArgs
-    private static final String RUNTIME_STATE_PENDING_REQUEST_ARGS = "launcher.request_args";
     // Type: ActivityResultInfo
     private static final String RUNTIME_STATE_PENDING_ACTIVITY_RESULT = "launcher.activity_result";
     // Type: SparseArray<Parcelable>
@@ -135,27 +126,39 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     // How long to wait before the new-shortcut animation automatically pans the workspace
     private static final int NEW_APPS_PAGE_MOVE_DELAY = 500;
     private static final int NEW_APPS_ANIMATION_INACTIVE_TIMEOUT_SECONDS = 5;
-    @Thunk static final int NEW_APPS_ANIMATION_DELAY = 500;
+    @Thunk
+    static final int NEW_APPS_ANIMATION_DELAY = 500;
 
     private Configuration mOldConfig;
 
     @Thunk
     Workspace mWorkspace;
     private View mLauncherView;
-    @Thunk DragLayer mDragLayer;
+    @Thunk
+    DragLayer mDragLayer;
     private DragController mDragController;
 
     private final int[] mTmpAddItemCellCoordinates = new int[2];
 
-    @Thunk Hotseat mHotseat;
-    @Nullable private View mHotseatSearchBox;
+    @Thunk
+    HotSeat mHotSeat;
+    @Nullable
+    private View mHotseatSearchBox;
 
     private DropTargetBar mDropTargetBar;
+
+    // Main container view for the all apps screen.
+    @Thunk
+    AllAppsContainerView mAppsView;
+    AllAppsTransitionController mAllAppsController;
 
     // UI and state for the overview panel
     private View mOverviewPanel;
 
-    @Thunk boolean mWorkspaceLoading = true;
+    private View mOverviewPanelContainer;
+
+    @Thunk
+    boolean mWorkspaceLoading = true;
 
     private OnResumeCallback mOnResumeCallback;
 
@@ -164,7 +167,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     private LauncherModel mModel;
     private ModelWriter mModelWriter;
 
-
     private PopupDataProvider mPopupDataProvider;
 
     private int mSynchronouslyBoundPage = PagedView.INVALID_PAGE;
@@ -172,10 +174,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     // We only want to get the SharedPreferences once since it does an FS stat each time we get
     // it from the context.
     private SharedPreferences mSharedPrefs;
-    /**
-     * Holds extra information required to handle a result from an external call, like
-     */
-    private PendingRequestArgs mPendingRequestArgs;
 
     public ViewGroupFocusHelper mFocusHandler;
 
@@ -183,7 +181,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
 
     private final Handler mHandler = new Handler();
-    private final Runnable mLogOnDelayedResume = this::logOnDelayedResume;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,7 +211,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         mSharedPrefs = Utilities.getPrefs(this);
 
         mDragController = new DragController(this);
-//        mAllAppsController = new AllAppsTransitionController(this);
+        mAllAppsController = new AllAppsTransitionController(this);
         mStateManager = new LauncherStateManager(this);
         UiFactory.onCreate(this);
 
@@ -225,14 +222,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
         mRotationHelper = new RotationHelper(this);
 
-        boolean internalStateHandled = InternalStateHandler.handleCreate(this, getIntent());
-        if (internalStateHandled) {
-            if (savedInstanceState != null) {
-                // InternalStateHandler has already set the appropriate state.
-                // We dont need to do anything.
-                savedInstanceState.remove(RUNTIME_STATE);
-            }
-        }
         restoreState(savedInstanceState);
 
         // We only load the page synchronously if the user rotates (or triggers a
@@ -242,12 +231,10 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
             currentScreen = savedInstanceState.getInt(RUNTIME_STATE_CURRENT_SCREEN, currentScreen);
         }
 
-        if (!mModel.startLoader(currentScreen)) {
-            if (!internalStateHandled) {
-                // If we are not binding synchronously, show a fade in animation when
-                // the first page bind completes.
-                mDragLayer.getAlphaProperty(ALPHA_INDEX_LAUNCHER_LOAD).setValue(0);
-            }
+        boolean startLoader = mModel.startLoader(currentScreen);
+        Log.d(TAG, "startLoader=" + startLoader);
+        if (!startLoader) {
+            mDragLayer.getAlphaProperty(ALPHA_INDEX_LAUNCHER_LOAD).setValue(0);
         } else {
             // Pages bound synchronously.
             mWorkspace.setCurrentPage(currentScreen);
@@ -262,15 +249,18 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         getRootView().dispatchInsets();
 
         // Listen for broadcasts
-        registerReceiver(mScreenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+//        registerReceiver(mScreenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
         getSystemUiController().updateUiState(SystemUiController.UI_STATE_BASE_WINDOW,
                 Themes.getAttrBoolean(this, R.attr.isWorkspaceDarkText));
 
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onCreate(savedInstanceState);
-        }
         mRotationHelper.initialize();
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                getWorkspace().setTranslationY(0);
+//            }
+//        }, 100);
 
         TraceHelper.endSection("Launcher-onCreate");
     }
@@ -279,7 +269,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     public void onConfigurationChanged(Configuration newConfig) {
         int diff = newConfig.diff(mOldConfig);
         if ((diff & (CONFIG_ORIENTATION | CONFIG_SCREEN_SIZE)) != 0) {
-            mUserEventDispatcher = null;
             initDeviceProfile(mDeviceProfile.inv);
             dispatchDeviceProfileChanged();
             reapplyUi();
@@ -335,34 +324,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         return mLauncherView.findViewById(id);
     }
 
-    @Override
-    public void onAppWidgetHostReset() {
-    }
-
-    private LauncherCallbacks mLauncherCallbacks;
-
-    /**
-     * Call this after onCreate to set or clear overlay.
-     */
-    public void setLauncherOverlay(LauncherOverlay overlay) {
-        if (overlay != null) {
-            overlay.setOverlayCallbacks(new LauncherOverlayCallbacksImpl());
-        }
-        mWorkspace.setLauncherOverlay(overlay);
-    }
-
-    public boolean setLauncherCallbacks(LauncherCallbacks callbacks) {
-        mLauncherCallbacks = callbacks;
-        return true;
-    }
-
-    @Override
-    public void onLauncherProviderChanged() {
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onLauncherProviderChange();
-        }
-    }
-
     public boolean isDraggingEnabled() {
         // We prevent dragging when we are loading the workspace as it is possible to pick up a view
         // that is subsequently removed from the workspace in startBinding().
@@ -382,54 +343,9 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     }
 
     @Override
-    public void invalidateParent(ItemInfo info) {
-        FolderIconPreviewVerifier verifier = new FolderIconPreviewVerifier(getDeviceProfile().inv);
-        if (verifier.isItemInPreview(info.rank) && (info.container >= 0)) {
-            View folderIcon = getWorkspace().getHomescreenIconByItemId(info.container);
-            if (folderIcon != null) {
-                folderIcon.invalidate();
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
-        PendingRequestArgs pendingArgs = mPendingRequestArgs;
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onRequestPermissionsResult(requestCode, permissions,
-                    grantResults);
-        }
-    }
-
-    /**
-     * Check to see if a given screen id exists. If not, create it at the end, return the new id.
-     *
-     * @param screenId the screen id to check
-     * @return the new screen, or screenId if it exists
-     */
-    private long ensurePendingDropLayoutExists(long screenId) {
-        CellLayout dropLayout = mWorkspace.getScreenWithId(screenId);
-        if (dropLayout == null) {
-            // it's possible that the add screen was removed because it was
-            // empty and a re-bind occurred
-            mWorkspace.addExtraEmptyScreen();
-            return mWorkspace.commitExtraEmptyScreen();
-        } else {
-            return screenId;
-        }
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         FirstFrameAnimatorHelper.setIsVisible(false);
-
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onStop();
-        }
-        getUserEventDispatcher().logActionCommand(Action.Command.STOP,
-                mStateManager.getState().containerType, -1);
 
         getStateManager().moveToRestState();
 
@@ -441,19 +357,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     protected void onStart() {
         super.onStart();
         FirstFrameAnimatorHelper.setIsVisible(true);
-
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onStart();
-        }
         UiFactory.onStart(this);
-    }
-
-    private void logOnDelayedResume() {
-        if (hasBeenResumed()) {
-            getUserEventDispatcher().logActionCommand(Action.Command.RESUME,
-                    mStateManager.getState().containerType, -1);
-            getUserEventDispatcher().startSession();
-        }
     }
 
     @Override
@@ -462,14 +366,9 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         super.onResume();
         TraceHelper.partitionSection("ON_RESUME", "superCall");
 
-        mHandler.removeCallbacks(mLogOnDelayedResume);
-        Utilities.postAsyncCallback(mHandler, mLogOnDelayedResume);
-
         setOnResumeCallback(null);
 
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onResume();
-        }
+        DiscoveryBounce.showForHomeIfNeeded(this);
         UiFactory.onLauncherStateOrResumeChanged(this);
 
         TraceHelper.endSection("ON_RESUME");
@@ -481,10 +380,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         super.onPause();
         mDragController.cancelDrag();
         mDragController.resetLastGestureUpTime();
-
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onPause();
-        }
     }
 
     @Override
@@ -517,35 +412,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
          */
         void onScrollChange(float progress, boolean rtl);
 
-        /**
-         * Called when the launcher is ready to use the overlay
-         * @param callbacks A set of callbacks provided by Launcher in relation to the overlay
-         */
-        void setOverlayCallbacks(LauncherOverlayCallbacks callbacks);
-    }
-
-    public interface LauncherOverlayCallbacks {
-        void onScrollChanged(float progress);
-    }
-
-    class LauncherOverlayCallbacksImpl implements LauncherOverlayCallbacks {
-
-        public void onScrollChanged(float progress) {
-            if (mWorkspace != null) {
-                mWorkspace.onOverlayScrollChanged(progress);
-            }
-        }
-    }
-
-    public boolean hasSettings() {
-        if (mLauncherCallbacks != null) {
-            return mLauncherCallbacks.hasSettings();
-        } else {
-            // On O and above we there is always some setting present settings (add icon to
-            // home screen or icon badging). On earlier APIs we will have the allow rotation
-            // setting, on devices with a locked orientation,
-            return Utilities.ATLEAST_OREO || !getResources().getBoolean(R.bool.allow_rotation);
-        }
     }
 
     public boolean isInState(LauncherState state) {
@@ -568,13 +434,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         if (!state.disableRestore) {
             mStateManager.goToState(state, false /* animated */);
         }
-
-        PendingRequestArgs requestArgs = savedState.getParcelable(RUNTIME_STATE_PENDING_REQUEST_ARGS);
-        if (requestArgs != null) {
-            setWaitingForResult(requestArgs);
-        }
-
-
     }
 
     /**
@@ -586,7 +445,8 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         mWorkspace = mDragLayer.findViewById(R.id.workspace);
         mWorkspace.initParentViews(mDragLayer);
         mOverviewPanel = findViewById(R.id.overview_panel);
-        mHotseat = findViewById(R.id.hotseat);
+        mOverviewPanelContainer = findViewById(R.id.overview_panel_container);
+        mHotSeat = findViewById(R.id.hotseat);
         mHotseatSearchBox = findViewById(R.id.search_container_hotseat);
 
         mLauncherView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -608,13 +468,14 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         mDropTargetBar = mDragLayer.findViewById(R.id.drop_target_bar);
 
         // Setup Apps
-//        mAppsView = findViewById(R.id.apps_view);
+        mAppsView = findViewById(R.id.apps_view);
 
         // Setup the drag controller (drop targets have to be added in reverse order in priority)
         mDragController.setMoveTarget(mWorkspace);
         mDropTargetBar.setup(mDragController);
 
-//        mAllAppsController.setupViews(mAppsView);
+        mAllAppsController.setupViews(mAppsView);
+        mStateManager.goToState(ALL_APPS, false /* animated */);
     }
 
     /**
@@ -630,8 +491,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
      * Creates a view representing a shortcut inflated from the specified resource.
      *
      * @param parent The group the shortcut belongs to.
-     * @param info The data structure describing the shortcut.
-     *
+     * @param info   The data structure describing the shortcut.
      * @return A View inflated from layoutResId.
      */
     public View createShortcut(ViewGroup parent, ShortcutInfo info) {
@@ -652,34 +512,20 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         });
     }
 
-    private final BroadcastReceiver mScreenOffReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Reset AllApps to its initial state only if we are not in the middle of
-            // processing a multi-step drop
-            if (mPendingRequestArgs == null) {
-                mStateManager.goToState(NORMAL);
-            }
-        }
-    };
-
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
         FirstFrameAnimatorHelper.initializeDrawListener(getWindow().getDecorView());
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onAttachedToWindow();
-        }
     }
 
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+    }
 
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onDetachedFromWindow();
-        }
+    public AllAppsTransitionController getAllAppsController() {
+        return mAllAppsController;
     }
 
     @Override
@@ -692,15 +538,19 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         return mDragLayer;
     }
 
+    public AllAppsContainerView getAppsView() {
+        return mAppsView;
+    }
+
     public Workspace getWorkspace() {
         return mWorkspace;
     }
 
-    public Hotseat getHotseat() {
-        return mHotseat;
+    public HotSeat getHotseat() {
+        return mHotSeat;
     }
 
-    public View getHotseatSearchBox() {
+    public View getHotSeatSearchBox() {
         return mHotseatSearchBox;
     }
 
@@ -724,7 +574,9 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         return mSharedPrefs;
     }
 
-    public int getOrientation() { return mOldConfig.orientation; }
+    public int getOrientation() {
+        return mOldConfig.orientation;
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -741,21 +593,17 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         boolean isActionMain = Intent.ACTION_MAIN.equals(intent.getAction());
         boolean internalStateHandled = InternalStateHandler
                 .handleNewIntent(this, intent, isStarted());
+        Log.d(TAG, "onNewIntent internalStateHandled=" + internalStateHandled);
 
         if (isActionMain) {
             if (!internalStateHandled) {
                 // Note: There should be at most one log per method call. This is enforced
                 // implicitly by using if-else statements.
-                UserEventDispatcher ued = getUserEventDispatcher();
-                AbstractFloatingView topOpenView = AbstractFloatingView.getTopOpenView(this);
-                if (topOpenView != null) {
-                    topOpenView.logActionCommand(Action.Command.HOME_INTENT);
-                } else if (alreadyOnHome) {
-                    Target target = newContainerTarget(mStateManager.getState().containerType);
-                    target.pageIndex = mWorkspace.getCurrentPage();
-                    ued.logActionCommand(Action.Command.HOME_INTENT, target,
-                            newContainerTarget(ContainerType.WORKSPACE));
-                }
+//                AbstractFloatingView topOpenView = AbstractFloatingView.getTopOpenView(this);
+//                if (topOpenView != null) {
+//
+//                } else if (alreadyOnHome) {
+//                }
 
                 // In all these cases, only animate if we're already on home
                 AbstractFloatingView.closeAllOpenViews(this, isStarted());
@@ -766,10 +614,10 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
                     mStateManager.goToState(NORMAL);
                 }
 
-//                // Reset the apps view
-//                if (!alreadyOnHome) {
-//                    mAppsView.reset(isStarted() /* animate */);
-//                }
+                // Reset the apps view
+                if (!alreadyOnHome) {
+                    mAppsView.reset(isStarted() /* animate */);
+                }
 
                 if (shouldMoveToDefaultScreen && !mWorkspace.isTouchActive()) {
                     mWorkspace.post(mWorkspace::moveToDefaultScreen);
@@ -779,10 +627,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
             final View v = getWindow().peekDecorView();
             if (v != null && v.getWindowToken() != null) {
                 UiThreadHelper.hideKeyboardAsync(this, v.getWindowToken());
-            }
-
-            if (mLauncherCallbacks != null) {
-                mLauncherCallbacks.onHomeIntent(internalStateHandled);
             }
         }
 
@@ -818,22 +662,14 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         // and we need to make sure this state is reflected.
         AbstractFloatingView.closeAllOpenViews(this, false);
 
-        if (mPendingRequestArgs != null) {
-            outState.putParcelable(RUNTIME_STATE_PENDING_REQUEST_ARGS, mPendingRequestArgs);
-        }
-
         super.onSaveInstanceState(outState);
-
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onSaveInstanceState(outState);
-        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        unregisterReceiver(mScreenOffReceiver);
+//        unregisterReceiver(mScreenOffReceiver);
         mWorkspace.removeFolderListeners();
 
         UiFactory.setOnTouchControllersChangedListener(this, null);
@@ -852,10 +688,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         LauncherAnimUtils.onDestroyActivity();
 
         clearPendingBinds();
-
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onDestroy();
-        }
     }
 
     public DragController getDragController() {
@@ -863,45 +695,18 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     }
 
     @Override
-    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
-        super.startActivityForResult(intent, requestCode, options);
-    }
-
-    @Override
-    public void startIntentSenderForResult (IntentSender intent, int requestCode,
-            Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options) {
+    public void startIntentSenderForResult(IntentSender intent, int requestCode,
+                                           Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options) {
         try {
             super.startIntentSenderForResult(intent, requestCode,
-                fillInIntent, flagsMask, flagsValues, extraFlags, options);
+                    fillInIntent, flagsMask, flagsValues, extraFlags, options);
         } catch (IntentSender.SendIntentException e) {
             throw new ActivityNotFoundException();
         }
     }
 
-    /**
-     * Indicates that we want global search for this activity by setting the globalSearch
-     * argument for {@link #startSearch} to true.
-     */
-    @Override
-    public void startSearch(String initialQuery, boolean selectInitialQuery,
-            Bundle appSearchData, boolean globalSearch) {
-        if (appSearchData == null) {
-            appSearchData = new Bundle();
-            appSearchData.putString("source", "launcher-search");
-        }
-
-        if (mLauncherCallbacks == null ||
-                !mLauncherCallbacks.startSearch(initialQuery, selectInitialQuery, appSearchData)) {
-            // Starting search from the callbacks failed. Start the default global search.
-            super.startSearch(initialQuery, selectInitialQuery, appSearchData, true);
-        }
-
-        // We need to show the workspace after starting the search
-        mStateManager.goToState(NORMAL);
-    }
-
     public boolean isWorkspaceLocked() {
-        return mWorkspaceLoading || mPendingRequestArgs != null;
+        return mWorkspaceLoading;
     }
 
     public boolean isWorkspaceLoading() {
@@ -912,29 +717,8 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         mWorkspaceLoading = value;
     }
 
-    public void setWaitingForResult(PendingRequestArgs args) {
-        mPendingRequestArgs = args;
-    }
-
-    public void addPendingItem(PendingAddItemInfo info, long container, long screenId,
-            int[] cell, int spanX, int spanY) {
-        info.container = container;
-        info.screenId = screenId;
-        if (cell != null) {
-            info.cellX = cell[0];
-            info.cellY = cell[1];
-        }
-        info.spanX = spanX;
-        info.spanY = spanY;
-
-        switch (info.itemType) {
-            default:
-                throw new IllegalStateException("Unknown item type: " + info.itemType);
-            }
-    }
-
     FolderIcon addFolder(CellLayout layout, long container, final long screenId, int cellX,
-            int cellY) {
+                         int cellY) {
         final FolderInfo folderInfo = new FolderInfo();
         folderInfo.title = getText(R.string.folder_name);
 
@@ -953,8 +737,8 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     /**
      * Unbinds the view for the specified item, and removes the item and all its children.
      *
-     * @param v the view being removed.
-     * @param itemInfo the {@link ItemInfo} for this view.
+     * @param v            the view being removed.
+     * @param itemInfo     the {@link ItemInfo} for this view.
      * @param deleteFromDb whether or not to delete this item from the db.
      */
     public boolean removeItem(View v, final ItemInfo itemInfo, boolean deleteFromDb) {
@@ -986,17 +770,17 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "keyEvent=" + event);
         return (event.getKeyCode() == KeyEvent.KEYCODE_HOME) || super.dispatchKeyEvent(event);
     }
 
     @Override
     public void onBackPressed() {
         if (finishAutoCancelActionMode()) {
+            Log.d(TAG, "finishAutoCancelActionMode=true");
             return;
         }
-        if (mLauncherCallbacks != null && mLauncherCallbacks.handleBackPressed()) {
-            return;
-        }
+        Log.d(TAG, "finishAutoCancelActionMode=false");
 
         if (mDragController.isDragging()) {
             mDragController.cancelDrag();
@@ -1005,40 +789,27 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
         // Note: There should be at most one log per method call. This is enforced implicitly
         // by using if-else statements.
-        UserEventDispatcher ued = getUserEventDispatcher();
         AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(this);
+        Log.d(TAG, "topView=" + topView + " isInState(ALL_APPS)=" + isInState(ALL_APPS));
         if (topView != null && topView.onBackPressed()) {
             // Handled by the floating view.
-        } else if (!isInState(NORMAL)) {
-            LauncherState lastState = mStateManager.getLastState();
-            ued.logActionCommand(Action.Command.BACK, mStateManager.getState().containerType,
-                    lastState.containerType);
-            mStateManager.goToState(lastState);
+        }
+//        else if (!isInState(NORMAL)) {
+//            LauncherState lastState = mStateManager.getLastState();
+//            mStateManager.goToState(lastState);
+//        }
+        else if (isInState(ALL_APPS)) {
+            mStateManager.goToState(NORMAL);
         } else {
             // Back button is a no-op here, but give at least some feedback for the button press
             mWorkspace.showOutlinesTemporarily();
         }
     }
 
-    @Override
-    public void modifyUserEvent(LauncherLogProto.LauncherEvent event) {
-        if (event.srcTarget != null && event.srcTarget.length > 0 &&
-                event.srcTarget[1].containerType == ContainerType.PREDICTION) {
-            Target[] targets = new Target[3];
-            targets[0] = event.srcTarget[0];
-            targets[1] = event.srcTarget[1];
-            targets[2] = newTarget(Target.Type.CONTAINER);
-            event.srcTarget = targets;
-            LauncherState state = mStateManager.getState();
-            if (state == LauncherState.OVERVIEW) {
-                event.srcTarget[2].containerType = ContainerType.TASKSWITCHER;
-            }
-        }
-    }
-
     boolean isHotseatLayout(View layout) {
         // TODO: Remove this method
-        return mHotseat != null && (layout instanceof CellLayout) && (layout == mHotseat.getLayout());
+        return mHotSeat != null && layout != null &&
+                (layout instanceof CellLayout) && (layout == mHotSeat.getLayout());
     }
 
     /**
@@ -1046,8 +817,8 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
      */
     public CellLayout getCellLayout(long container, long screenId) {
         if (container == LauncherSettings.Favorites.CONTAINER_HOTSEAT) {
-            if (mHotseat != null) {
-                return mHotseat.getLayout();
+            if (mHotSeat != null) {
+                return mHotSeat.getLayout();
             } else {
                 return null;
             }
@@ -1066,9 +837,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
             // This clears all widget bitmaps from the widget tray
             // TODO(hyunyoungs)
-        }
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.onTrimMemory(level);
         }
         UiFactory.onTrimMemory(this, level);
     }
@@ -1119,7 +887,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
     /**
      * Refreshes the shortcuts shown on the workspace.
-     *
+     * <p>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void startBinding() {
@@ -1136,8 +904,8 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
         mWorkspace.clearDropTargets();
         mWorkspace.removeAllWorkspaceScreens();
 
-        if (mHotseat != null) {
-            mHotseat.resetLayout(mDeviceProfile.isVerticalBarLayout());
+        if (mHotSeat != null) {
+            mHotSeat.resetLayout(mDeviceProfile.isVerticalBarLayout());
         }
         TraceHelper.endSection("startBinding");
     }
@@ -1175,7 +943,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
     @Override
     public void bindAppsAdded(ArrayList<Long> newScreens, ArrayList<ItemInfo> addNotAnimated,
-            ArrayList<ItemInfo> addAnimated) {
+                              ArrayList<ItemInfo> addAnimated) {
         // Add the new screens
         if (newScreens != null) {
             bindAddScreens(newScreens);
@@ -1196,7 +964,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
     /**
      * Bind the items start-end from the list.
-     *
+     * <p>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     @Override
@@ -1213,7 +981,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
             // Short circuit if we are loading dock items for a configuration which has no dock
             if (item.container == LauncherSettings.Favorites.CONTAINER_HOTSEAT &&
-                    mHotseat == null) {
+                    mHotSeat == null) {
                 continue;
             }
 
@@ -1234,7 +1002,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
                     throw new RuntimeException("Invalid Item Type");
             }
 
-             /*
+            /*
              * Remove colliding items.
              */
             if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
@@ -1307,10 +1075,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
             mPendingExecutor.markCompleted();
         }
         mPendingExecutor = executor;
-//        if (!isInState(ALL_APPS)) {
-//            mAppsView.getAppsStore().setDeferUpdates(true);
-//            mPendingExecutor.execute(() -> mAppsView.getAppsStore().setDeferUpdates(false));
-//        }
 
         executor.attachTo(this);
     }
@@ -1342,7 +1106,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
     /**
      * Callback saying that there aren't any more items to bind.
-     *
+     * <p>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void finishBindingItems() {
@@ -1361,11 +1125,21 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
 
     private ValueAnimator createNewAppBounceAnimation(View v, int i) {
         ValueAnimator bounceAnim = LauncherAnimUtils.ofViewAlphaAndScale(v, 1, 1, 1);
-        bounceAnim.setDuration(450);
-        bounceAnim.setStartDelay(i * 85);
+        bounceAnim.setDuration(NEW_SHORTCUT_BOUNCE_DURATION);
+        bounceAnim.setStartDelay(i * NEW_SHORTCUT_STAGGER_DELAY);
         bounceAnim.setInterpolator(new OvershootInterpolator(BOUNCE_ANIMATION_TENSION));
         return bounceAnim;
     }
+
+    /**
+     * Copies LauncherModel's map of activities to shortcut ids to Launcher's. This is necessary
+     * because LauncherModel's map is updated in the background, while Launcher runs on the UI.
+     */
+    @Override
+    public void bindDeepShortcutMap(MultiHashMap<ComponentKey, String> deepShortcutMapCopy) {
+        mPopupDataProvider.setDeepShortcutMap(deepShortcutMapCopy);
+    }
+
 
     /**
      * Some shortcuts were updated in the background.
@@ -1381,53 +1155,16 @@ public class Launcher extends BaseDraggingActivity implements LauncherModel.Call
     }
 
     /**
-     * $ adb shell dumpsys activity com.android.launcher3.Launcher [--all]
+     * A package was uninstalled/updated.  We take both the super set of packageNames
+     * in addition to specific applications to remove, the reason being that
+     * this can be called when a package is updated as well.  In that scenario,
+     * we only remove specific components from the workspace and hotseat, where as
+     * package-removal should clear all items by package name.
      */
     @Override
-    public void dump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
-        super.dump(prefix, fd, writer, args);
-
-        if (args.length > 0 && TextUtils.equals(args[0], "--all")) {
-            writer.println(prefix + "Workspace Items");
-            for (int i = 0; i < mWorkspace.getPageCount(); i++) {
-                writer.println(prefix + "  Homescreen " + i);
-
-                ViewGroup layout = ((CellLayout) mWorkspace.getPageAt(i)).getShortcutsAndWidgets();
-                for (int j = 0; j < layout.getChildCount(); j++) {
-                    Object tag = layout.getChildAt(j).getTag();
-                    if (tag != null) {
-                        writer.println(prefix + "    " + tag.toString());
-                    }
-                }
-            }
-
-            writer.println(prefix + "  Hotseat");
-            ViewGroup layout = mHotseat.getLayout().getShortcutsAndWidgets();
-            for (int j = 0; j < layout.getChildCount(); j++) {
-                Object tag = layout.getChildAt(j).getTag();
-                if (tag != null) {
-                    writer.println(prefix + "    " + tag.toString());
-                }
-            }
-        }
-
-        writer.println(prefix + "Misc:");
-        writer.print(prefix + "\tmWorkspaceLoading=" + mWorkspaceLoading);
-        writer.print(" mPendingRequestArgs=" + mPendingRequestArgs);
-        writer.println(" mRotationHelper: " + mRotationHelper);
-        dumpMisc(writer);
-
-        try {
-            FileLog.flushAll(writer);
-        } catch (Exception e) {
-            // Ignore
-        }
-
-        mModel.dumpState(prefix, fd, writer, args);
-
-        if (mLauncherCallbacks != null) {
-            mLauncherCallbacks.dump(prefix, fd, writer, args);
-        }
+    public void bindWorkspaceComponentsRemoved(final ItemInfoMatcher matcher) {
+        mWorkspace.removeItemsByMatcher(matcher);
+        mDragController.onAppsRemoved(matcher);
     }
 
     @Override

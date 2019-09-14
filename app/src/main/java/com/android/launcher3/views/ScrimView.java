@@ -27,13 +27,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
-import androidx.customview.widget.ExploreByTouchHelper;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.KeyEvent;
@@ -49,18 +43,15 @@ import com.android.launcher3.LauncherState;
 import com.android.launcher3.LauncherStateManager;
 import com.android.launcher3.LauncherStateManager.StateListener;
 import com.android.launcher3.R;
-import com.android.launcher3.Utilities;
 import com.android.launcher3.uioverrides.WallpaperColorInfo;
 import com.android.launcher3.uioverrides.WallpaperColorInfo.OnChangeListener;
 import com.android.launcher3.util.Themes;
 
-import java.util.List;
-
 import static android.content.Context.ACCESSIBILITY_SERVICE;
-import static androidx.core.graphics.ColorUtils.compositeColors;
-import static androidx.core.graphics.ColorUtils.setAlphaComponent;
+import static android.support.v4.graphics.ColorUtils.compositeColors;
+import static android.support.v4.graphics.ColorUtils.setAlphaComponent;
 import static android.view.MotionEvent.ACTION_DOWN;
-import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.anim.Interpolators.ACCEL;
 import static com.android.launcher3.anim.Interpolators.DEACCEL;
 
@@ -108,7 +99,6 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
     private final Rect mDragHandleBounds;
     private final RectF mHitRect = new RectF();
 
-    private final AccessibilityHelper mAccessibilityHelper;
     @Nullable
     protected Drawable mDragHandle;
 
@@ -126,16 +116,8 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
                 .getDimensionPixelSize(R.dimen.vertical_drag_handle_size);
         mDragHandleBounds = new Rect(0, 0, mDragHandleSize, mDragHandleSize);
 
-        mAccessibilityHelper = createAccessibilityHelper();
-        ViewCompat.setAccessibilityDelegate(this, mAccessibilityHelper);
-
         mAM = (AccessibilityManager) context.getSystemService(ACCESSIBILITY_SERVICE);
         setFocusable(false);
-    }
-
-    @NonNull
-    protected AccessibilityHelper createAccessibilityHelper() {
-        return new AccessibilityHelper();
     }
 
     @Override
@@ -191,7 +173,8 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
         }
     }
 
-    public void reInitUi() { }
+    public void reInitUi() {
+    }
 
     protected void updateColors() {
         mCurrentFlatColor = mProgress >= 1 ? 0 : setAlphaComponent(
@@ -245,7 +228,7 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
             frameTop.setInterpolator(DEACCEL);
             Keyframe frameBot = Keyframe.ofObject(1, mDragHandleBounds);
             frameBot.setInterpolator(ACCEL);
-            PropertyValuesHolder holder = PropertyValuesHolder .ofKeyframe("bounds",
+            PropertyValuesHolder holder = PropertyValuesHolder.ofKeyframe("bounds",
                     Keyframe.ofObject(0, mDragHandleBounds), frameTop, frameBot);
             holder.setEvaluator(new RectEvaluator());
 
@@ -325,23 +308,23 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
 
     @Override
     public boolean dispatchHoverEvent(MotionEvent event) {
-        return mAccessibilityHelper.dispatchHoverEvent(event) || super.dispatchHoverEvent(event);
+        return super.dispatchHoverEvent(event);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        return mAccessibilityHelper.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
     public void onFocusChanged(boolean gainFocus, int direction,
-            Rect previouslyFocusedRect) {
+                               Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-        mAccessibilityHelper.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
     }
 
     @Override
-    public void onStateTransitionStart(LauncherState toState) {}
+    public void onStateTransitionStart(LauncherState toState) {
+    }
 
     @Override
     public void onStateTransitionComplete(LauncherState finalState) {
@@ -350,66 +333,12 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
 
     @Override
     public void onStateSetImmediately(LauncherState state) {
-        setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+        setImportantForAccessibility(state == ALL_APPS
+                ? IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+                : IMPORTANT_FOR_ACCESSIBILITY_AUTO);
     }
 
-    protected class AccessibilityHelper extends ExploreByTouchHelper {
-
-        private static final int DRAG_HANDLE_ID = 1;
-
-        public AccessibilityHelper() {
-            super(ScrimView.this);
-        }
-
-        @Override
-        protected int getVirtualViewAt(float x, float y) {
-            return  mDragHandleBounds.contains((int) x, (int) y)
-                    ? DRAG_HANDLE_ID : INVALID_ID;
-        }
-
-        @Override
-        protected void getVisibleVirtualViews(List<Integer> virtualViewIds) {
-            virtualViewIds.add(DRAG_HANDLE_ID);
-        }
-
-        @Override
-        protected void onPopulateNodeForVirtualView(int virtualViewId,
-                AccessibilityNodeInfoCompat node) {
-            node.setContentDescription(getContext().getString(R.string.all_apps_button_label));
-            node.setBoundsInParent(mDragHandleBounds);
-
-            getLocationOnScreen(mTempPos);
-            mTempRect.set(mDragHandleBounds);
-            mTempRect.offset(mTempPos[0], mTempPos[1]);
-            node.setBoundsInScreen(mTempRect);
-
-            node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
-            node.setClickable(true);
-            node.setFocusable(true);
-
-            if (mLauncher.isInState(NORMAL)) {
-                Context context = getContext();
-                if (Utilities.isWallpaperAllowed(context)) {
-                    node.addAction(
-                            new AccessibilityActionCompat(WALLPAPERS, context.getText(WALLPAPERS)));
-                }
-                node.addAction(new AccessibilityActionCompat(WIDGETS, context.getText(WIDGETS)));
-                node.addAction(new AccessibilityActionCompat(SETTINGS, context.getText(SETTINGS)));
-            }
-        }
-
-        @Override
-        protected boolean onPerformActionForVirtualView(
-                int virtualViewId, int action, Bundle arguments) {
-            if (action == WALLPAPERS) {
-                return OptionsPopupView.startWallpaperPicker(ScrimView.this);
-            } else if (action == WIDGETS) {
-                return OptionsPopupView.onWidgetsClicked(ScrimView.this);
-            } else if (action == SETTINGS) {
-                return OptionsPopupView.startSettings(ScrimView.this);
-            }
-
-            return false;
-        }
+    public int getDragHandleSize() {
+        return mDragHandleSize;
     }
 }

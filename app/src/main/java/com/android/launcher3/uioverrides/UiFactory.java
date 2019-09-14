@@ -29,31 +29,47 @@ import java.io.PrintWriter;
 public class UiFactory {
 
     public static TouchController[] createTouchControllers(Launcher launcher) {
-        return new TouchController[] {
-                launcher.getDragController()};
+        return new TouchController[]{
+                launcher.getDragController(), new AllAppsSwipeController(launcher)};
     }
 
-    public static void setOnTouchControllersChangedListener(Context context, Runnable listener) { }
+    public static void setOnTouchControllersChangedListener(Context context, Runnable listener) {
+    }
 
     public static StateHandler[] getStateHandler(Launcher launcher) {
-        return new StateHandler[] {launcher.getWorkspace() };
+        return new StateHandler[]{
+                launcher.getAllAppsController(), launcher.getWorkspace()};
     }
 
-    public static void resetOverview(Launcher launcher) { }
+    public static void resetOverview(Launcher launcher) {
+    }
 
-    public static void onLauncherStateOrFocusChanged(Launcher launcher) { }
+    public static void onLauncherStateOrFocusChanged(Launcher launcher) {
+    }
 
-    public static void onCreate(Launcher launcher) { }
+    public static void onCreate(Launcher launcher) {
+    }
 
-    public static void onStart(Launcher launcher) { }
+    public static void onStart(Launcher launcher) {
+    }
 
-    public static void onLauncherStateOrResumeChanged(Launcher launcher) { }
+    public static void onLauncherStateOrResumeChanged(Launcher launcher) {
+    }
 
-    public static void onTrimMemory(Launcher launcher, int level) { }
+    public static void onTrimMemory(Launcher launcher, int level) {
+    }
+
+    public static void useFadeOutAnimationForLauncherStart(Launcher launcher,
+                                                           CancellationSignal cancellationSignal) {
+    }
 
     public static boolean dumpActivity(Activity activity, PrintWriter writer) {
         return false;
     }
 
-    public static void prepareToShowOverview(Launcher launcher) { }
+    public static void prepareToShowOverview(Launcher launcher) {
+    }
+
+    public static void setBackButtonAlpha(Launcher launcher, float alpha, boolean animate) {
+    }
 }

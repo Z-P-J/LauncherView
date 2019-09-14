@@ -18,19 +18,21 @@ package com.android.launcher3;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
-import com.android.launcher3.logging.UserEventDispatcher.LogContainerProvider;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
+import com.android.launcher3.config.FeatureFlags;
 
-public class Hotseat extends FrameLayout implements LogContainerProvider, Insettable {
+import static com.android.launcher3.LauncherState.ALL_APPS;
+
+public class HotSeat extends FrameLayout implements Insettable {
 
     private final Launcher mLauncher;
     private CellLayout mContent;
@@ -38,15 +40,15 @@ public class Hotseat extends FrameLayout implements LogContainerProvider, Insett
     @ViewDebug.ExportedProperty(category = "launcher")
     private boolean mHasVerticalHotseat;
 
-    public Hotseat(Context context) {
+    public HotSeat(Context context) {
         this(context, null);
     }
 
-    public Hotseat(Context context, AttributeSet attrs) {
+    public HotSeat(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public Hotseat(Context context, AttributeSet attrs, int defStyle) {
+    public HotSeat(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mLauncher = Launcher.getLauncher(context);
     }
@@ -84,6 +86,41 @@ public class Hotseat extends FrameLayout implements LogContainerProvider, Insett
         } else {
             mContent.setGridSize(idp.numHotseatIcons, 1);
         }
+
+        if (!FeatureFlags.NO_ALL_APPS_ICON) {
+            // Add the Apps button
+            Context context = getContext();
+            DeviceProfile grid = mLauncher.getDeviceProfile();
+            int allAppsButtonRank = grid.inv.getAllAppsButtonRank();
+
+            LayoutInflater inflater = LayoutInflater.from(context);
+            TextView allAppsButton = (TextView)
+                    inflater.inflate(R.layout.all_apps_button, mContent, false);
+            Drawable d = context.getResources().getDrawable(R.drawable.all_apps_button_icon);
+            d.setBounds(0, 0, grid.iconSizePx, grid.iconSizePx);
+
+            int scaleDownPx = getResources().getDimensionPixelSize(R.dimen.all_apps_button_scale_down);
+            Rect bounds = d.getBounds();
+            d.setBounds(bounds.left, bounds.top + scaleDownPx / 2, bounds.right - scaleDownPx,
+                    bounds.bottom - scaleDownPx / 2);
+            allAppsButton.setCompoundDrawables(null, d, null, null);
+
+            allAppsButton.setContentDescription(context.getString(R.string.all_apps_button_label));
+            allAppsButton.setOnClickListener((v) -> {
+                if (!mLauncher.isInState(ALL_APPS)) {
+                    mLauncher.getStateManager().goToState(ALL_APPS, true);
+                }
+            });
+            allAppsButton.setOnFocusChangeListener(mLauncher.mFocusHandler);
+
+            // Note: We do this to ensure that the hotseat is always laid out in the orientation of
+            // the hotseat in order regardless of which orientation they were added
+            int x = getCellXFromOrder(allAppsButtonRank);
+            int y = getCellYFromOrder(allAppsButtonRank);
+            CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x, y, 1, 1);
+            lp.canReorder = false;
+            mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
+        }
     }
 
     @Override
@@ -93,25 +130,25 @@ public class Hotseat extends FrameLayout implements LogContainerProvider, Insett
         return !mLauncher.getWorkspace().workspaceIconsCanBeDragged();
     }
 
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        target.gridX = info.cellX;
-        target.gridY = info.cellY;
-        targetParent.containerType = ContainerType.HOTSEAT;
-    }
+//    @Override
+//    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
+//        target.gridX = info.cellX;
+//        target.gridY = info.cellY;
+//        targetParent.containerType = ContainerType.HOTSEAT;
+//    }
 
     @Override
     public void setInsets(Rect insets) {
-        LayoutParams lp = (LayoutParams) getLayoutParams();
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) getLayoutParams();
         DeviceProfile grid = mLauncher.getDeviceProfile();
 
         if (grid.isVerticalBarLayout()) {
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
             if (grid.isSeascape()) {
-                lp.gravity = Gravity.LEFT;
+                lp.gravity = Gravity.START;
                 lp.width = grid.hotseatBarSizePx + insets.left + grid.hotseatBarSidePaddingPx;
             } else {
-                lp.gravity = Gravity.RIGHT;
+                lp.gravity = Gravity.END;
                 lp.width = grid.hotseatBarSizePx + insets.right + grid.hotseatBarSidePaddingPx;
             }
         } else {

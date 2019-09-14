@@ -21,7 +21,7 @@ import android.app.WallpaperManager;
 import android.app.WallpaperManager.OnColorsChangedListener;
 import android.content.Context;
 import android.graphics.Color;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.lang.reflect.Method;

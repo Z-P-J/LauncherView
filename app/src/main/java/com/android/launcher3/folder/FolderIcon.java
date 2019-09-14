@@ -16,12 +16,15 @@
 
 package com.android.launcher3.folder;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.LayoutInflater;
@@ -50,7 +53,6 @@ import com.android.launcher3.StylusEventHelper;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.anim.Interpolators;
-import com.android.launcher3.dragndrop.BaseItemDragListener;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragView;
 import com.android.launcher3.touch.ItemClickHandler;
@@ -68,9 +70,11 @@ import static com.android.launcher3.folder.PreviewItemManager.INITIAL_ITEM_ANIMA
 public class FolderIcon extends FrameLayout implements FolderListener {
     @Thunk
     Launcher mLauncher;
-    @Thunk Folder mFolder;
+    @Thunk
+    Folder mFolder;
     private FolderInfo mInfo;
-    @Thunk static boolean sStaticValuesDirty = true;
+    @Thunk
+    static boolean sStaticValuesDirty = true;
 
     private CheckLongPressHelper mLongPressHelper;
     private StylusEventHelper mStylusEventHelper;
@@ -83,7 +87,8 @@ public class FolderIcon extends FrameLayout implements FolderListener {
     // Delay when drag enters until the folder opens, in miliseconds.
     private static final int ON_OPEN_DELAY = 800;
 
-    @Thunk BubbleTextView mFolderName;
+    @Thunk
+    BubbleTextView mFolderName;
 
     PreviewBackground mBackground = new PreviewBackground();
     private boolean mBackgroundIsVisible = true;
@@ -101,8 +106,8 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     private Alarm mOpenAlarm = new Alarm();
 
-
     private float mBadgeScale;
+    private Point mTempSpaceForBadgeOffset = new Point();
 
     private static final Property<FolderIcon, Float> BADGE_SCALE_PROPERTY
             = new Property<FolderIcon, Float>(Float.TYPE, "badgeScale") {
@@ -154,7 +159,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         icon.mFolderName = icon.findViewById(R.id.folder_icon_name);
         icon.mFolderName.setText(folderInfo.title);
         icon.mFolderName.setCompoundDrawablePadding(0);
-        LayoutParams lp = (LayoutParams) icon.mFolderName.getLayoutParams();
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) icon.mFolderName.getLayoutParams();
         lp.topMargin = grid.iconSizePx + grid.iconDrawablePaddingPx;
 
         icon.setTag(folderInfo);
@@ -220,7 +225,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mBackground.animateToAccept(cl, lp.cellX, lp.cellY);
         mOpenAlarm.setOnAlarmListener(mOnOpenListener);
         if (SPRING_LOADING_ENABLED &&
-                dragInfo instanceof ShortcutInfo) {
+                ((dragInfo instanceof ShortcutInfo))) {
             mOpenAlarm.setAlarm(ON_OPEN_DELAY);
         }
     }
@@ -355,12 +360,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     public void onDrop(DragObject d, boolean itemReturnedOnFailedDrop) {
         ShortcutInfo item;
-        if (d.dragSource instanceof BaseItemDragListener){
-            // Came from a different window -- make a copy
-            item = new ShortcutInfo((ShortcutInfo) d.dragInfo);
-        } else {
-            item = (ShortcutInfo) d.dragInfo;
-        }
+        item = (ShortcutInfo) d.dragInfo;
         mFolder.notifyDrop();
         onDrop(item, d.dragView, null, 1.0f, mInfo.contents.size(),
                 itemReturnedOnFailedDrop);
@@ -368,6 +368,25 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     public ClippedFolderIconLayoutRule getLayoutRule() {
         return mPreviewLayoutRule;
+    }
+
+    /**
+     * Sets mBadgeScale to 1 or 0, animating if wasBadged or isBadged is false
+     * (the badge is being added or removed).
+     */
+    private void updateBadgeScale(boolean wasBadged, boolean isBadged) {
+        float newBadgeScale = isBadged ? 1f : 0f;
+        // Animate when a badge is first added or when it is removed.
+        if ((wasBadged ^ isBadged) && isShown()) {
+            createBadgeScaleAnimator(newBadgeScale).start();
+        } else {
+            mBadgeScale = newBadgeScale;
+            invalidate();
+        }
+    }
+
+    public Animator createBadgeScaleAnimator(float... badgeScales) {
+        return ObjectAnimator.ofFloat(this, BADGE_SCALE_PROPERTY, badgeScales);
     }
 
     private float getLocalCenterForIndex(int index, int curNumItems, int[] center) {
@@ -504,12 +523,14 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     @Override
     public void onAdd(ShortcutInfo item, int rank) {
-
+        invalidate();
+        requestLayout();
     }
 
     @Override
     public void onRemove(ShortcutInfo item) {
-
+        invalidate();
+        requestLayout();
     }
 
     @Override

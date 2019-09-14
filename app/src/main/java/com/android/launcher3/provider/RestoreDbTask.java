@@ -20,12 +20,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.android.launcher3.LauncherProvider.DatabaseHelper;
 import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.provider.LauncherDbUtils.SQLiteTransaction;
 import com.android.launcher3.util.LogConfig;
 
@@ -33,7 +33,7 @@ import java.io.InvalidObjectException;
 
 /**
  * Utility class to update DB schema after it has been restored.
- *
+ * <p>
  * This task is executed when Launcher starts for the first time and not immediately after restore.
  * This helps keep the model consistent if the launcher updates between restore and first startup.
  */
@@ -52,19 +52,19 @@ public class RestoreDbTask {
             t.commit();
             return true;
         } catch (Exception e) {
-            FileLog.e(TAG, "Failed to verify db", e);
+            Log.e(TAG, "Failed to verify db", e);
             return false;
         }
     }
 
     /**
      * Makes the following changes in the provider DB.
-     *   1. Removes all entries belonging to a managed profile as managed profiles
-     *      cannot be restored.
-     *   2. Marks all entries as restored. The flags are updated during first load or as
-     *      the restored apps get installed.
-     *   3. If the user serial for primary profile is different than that of the previous device,
-     *      update the entries to the new profile id.
+     * 1. Removes all entries belonging to a managed profile as managed profiles
+     * cannot be restored.
+     * 2. Marks all entries as restored. The flags are updated during first load or as
+     * the restored apps get installed.
+     * 3. If the user serial for primary profile is different than that of the previous device,
+     * update the entries to the new profile id.
      */
     private void sanitizeDB(DatabaseHelper helper, SQLiteDatabase db) throws Exception {
         long oldProfileId = getDefaultProfileId(db);
@@ -72,7 +72,7 @@ public class RestoreDbTask {
         int itemsDeleted = db.delete(
                 Favorites.TABLE_NAME, "profileId != ?", new String[]{Long.toString(oldProfileId)});
         if (itemsDeleted > 0) {
-            FileLog.d(TAG, itemsDeleted + " items belonging to a managed profile, were deleted");
+            Log.d(TAG, itemsDeleted + " items belonging to a managed profile, were deleted");
         }
 
         // Mark all items as restored.
@@ -82,9 +82,9 @@ public class RestoreDbTask {
                 | (keepAllIcons ? ShortcutInfo.FLAG_RESTORE_STARTED : 0));
         db.update(Favorites.TABLE_NAME, values, null, null);
 
-        long myProfileId = 0;
+        long myProfileId = helper.getDefaultUserSerial();
         if (Utilities.longCompare(oldProfileId, myProfileId) != 0) {
-            FileLog.d(TAG, "Changing primary user id from " + oldProfileId + " to " + myProfileId);
+            Log.d(TAG, "Changing primary user id from " + oldProfileId + " to " + myProfileId);
             migrateProfileId(db, myProfileId);
         }
     }
@@ -100,7 +100,7 @@ public class RestoreDbTask {
 
         // Change default value of the column.
         db.execSQL("ALTER TABLE favorites RENAME TO favorites_old;");
-        Favorites.addTableToDb(db, false);
+        Favorites.addTableToDb(db, newProfileId, false);
         db.execSQL("INSERT INTO favorites SELECT * FROM favorites_old;");
         db.execSQL("DROP TABLE favorites_old;");
     }
@@ -109,7 +109,7 @@ public class RestoreDbTask {
      * Returns the profile id used in the favorites table of the provided db.
      */
     protected long getDefaultProfileId(SQLiteDatabase db) throws Exception {
-        try (Cursor c = db.rawQuery("PRAGMA table_info (favorites)", null)){
+        try (Cursor c = db.rawQuery("PRAGMA table_info (favorites)", null)) {
             int nameIndex = c.getColumnIndex(INFO_COLUMN_NAME);
             while (c.moveToNext()) {
                 if (Favorites.PROFILE_ID.equals(c.getString(nameIndex))) {
@@ -125,7 +125,7 @@ public class RestoreDbTask {
     }
 
     public static void setPending(Context context, boolean isPending) {
-        FileLog.d(TAG, "Restore data received through full backup " + isPending);
+        Log.d(TAG, "Restore data received through full backup " + isPending);
         Utilities.getPrefs(context).edit().putBoolean(RESTORE_TASK_PENDING, isPending).commit();
     }
 }

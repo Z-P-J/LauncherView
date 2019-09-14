@@ -30,7 +30,6 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
@@ -50,8 +49,6 @@ import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.uioverrides.UiFactory;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.views.BaseDragLayer;
-
-
 
 /**
  * A ViewGroup that coordinates dragging across its descendants
@@ -75,8 +72,10 @@ public class DragLayer extends BaseDragLayer<Launcher> {
     private final TimeInterpolator mCubicEaseOutInterpolator = Interpolators.DEACCEL_1_5;
     @Thunk
     DragView mDropView = null;
-    @Thunk int mAnchorViewInitialScrollX = 0;
-    @Thunk View mAnchorView = null;
+    @Thunk
+    int mAnchorViewInitialScrollX = 0;
+    @Thunk
+    View mAnchorView = null;
 
     private boolean mHoverPointClosesFolder = false;
 
@@ -91,7 +90,7 @@ public class DragLayer extends BaseDragLayer<Launcher> {
      * Used to create a new DragLayer from XML.
      *
      * @param context The application's context.
-     * @param attrs The attributes set containing the Workspace's customization values.
+     * @param attrs   The attributes set containing the Workspace's customization values.
      */
     public DragLayer(Context context, AttributeSet attrs) {
         super(context, attrs, ALPHA_CHANNEL_COUNT);
@@ -181,6 +180,10 @@ public class DragLayer extends BaseDragLayer<Launcher> {
         return false;
     }
 
+    private void sendTapOutsideFolderAccessibilityEvent(boolean isEditingName) {
+        int stringId = isEditingName ? R.string.folder_tap_to_rename : R.string.folder_tap_to_close;
+    }
+
     @Override
     public boolean onHoverEvent(MotionEvent ev) {
         // If we've received this, we've already done the necessary handling
@@ -223,7 +226,7 @@ public class DragLayer extends BaseDragLayer<Launcher> {
     public void animateViewIntoPosition(DragView dragView, final View child, int duration,
                                         View anchorView) {
         ShortcutAndWidgetContainer parentChildren = (ShortcutAndWidgetContainer) child.getParent();
-        CellLayout.LayoutParams lp =  (CellLayout.LayoutParams) child.getLayoutParams();
+        CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
         parentChildren.measureChild(child);
 
         Rect r = new Rect();
@@ -255,7 +258,7 @@ public class DragLayer extends BaseDragLayer<Launcher> {
             toY += Math.round(toScale * tv.getPaddingTop());
             toY -= dragView.getMeasuredHeight() * (1 - toScale) / 2;
             if (dragView.getDragVisualizeOffset() != null) {
-                toY -=  Math.round(toScale * dragView.getDragVisualizeOffset().y);
+                toY -= Math.round(toScale * dragView.getDragVisualizeOffset().y);
             }
 
             toX -= (dragView.getMeasuredWidth() - Math.round(scale * child.getMeasuredWidth())) / 2;
@@ -294,24 +297,24 @@ public class DragLayer extends BaseDragLayer<Launcher> {
     /**
      * This method animates a view at the end of a drag and drop animation.
      *
-     * @param view The view to be animated. This view is drawn directly into DragLayer, and so
-     *        doesn't need to be a child of DragLayer.
-     * @param from The initial location of the view. Only the left and top parameters are used.
-     * @param to The final location of the view. Only the left and top parameters are used. This
-     *        location doesn't account for scaling, and so should be centered about the desired
-     *        final location (including scaling).
-     * @param finalAlpha The final alpha of the view, in case we want it to fade as it animates.
-     * @param finalScaleX The final scale of the view. The view is scaled about its center.
-     * @param finalScaleY The final scale of the view. The view is scaled about its center.
-     * @param duration The duration of the animation.
+     * @param view               The view to be animated. This view is drawn directly into DragLayer, and so
+     *                           doesn't need to be a child of DragLayer.
+     * @param from               The initial location of the view. Only the left and top parameters are used.
+     * @param to                 The final location of the view. Only the left and top parameters are used. This
+     *                           location doesn't account for scaling, and so should be centered about the desired
+     *                           final location (including scaling).
+     * @param finalAlpha         The final alpha of the view, in case we want it to fade as it animates.
+     * @param finalScaleX        The final scale of the view. The view is scaled about its center.
+     * @param finalScaleY        The final scale of the view. The view is scaled about its center.
+     * @param duration           The duration of the animation.
      * @param motionInterpolator The interpolator to use for the location of the view.
-     * @param alphaInterpolator The interpolator to use for the alpha of the view.
+     * @param alphaInterpolator  The interpolator to use for the alpha of the view.
      * @param onCompleteRunnable Optional runnable to run on animation completion.
-     * @param animationEndStyle Whether or not to fade out the view once the animation completes.
-     *        {@link #ANIMATION_END_DISAPPEAR} or {@link #ANIMATION_END_REMAIN_VISIBLE}.
-     * @param anchorView If not null, this represents the view which the animated view stays
-     *        anchored to in case scrolling is currently taking place. Note: currently this is
-     *        only used for the X dimension for the case of the workspace.
+     * @param animationEndStyle  Whether or not to fade out the view once the animation completes.
+     *                           {@link #ANIMATION_END_DISAPPEAR} or {@link #ANIMATION_END_REMAIN_VISIBLE}.
+     * @param anchorView         If not null, this represents the view which the animated view stays
+     *                           anchored to in case scrolling is currently taking place. Note: currently this is
+     *                           only used for the X dimension for the case of the workspace.
      */
     public void animateView(final DragView view, final Rect from, final Rect to,
                             final float finalAlpha, final float initScaleX, final float initScaleY,
@@ -367,7 +370,7 @@ public class DragLayer extends BaseDragLayer<Launcher> {
                 int y = (int) (fromTop + Math.round(((to.top - fromTop) * motionPercent)));
 
                 int anchorAdjust = mAnchorView == null ? 0 : (int) (mAnchorView.getScaleX() *
-                    (mAnchorViewInitialScrollX - mAnchorView.getScrollX()));
+                        (mAnchorViewInitialScrollX - mAnchorView.getScrollX()));
 
                 int xPos = x - mDropView.getScrollX() + anchorAdjust;
                 int yPos = y - mDropView.getScrollY();
@@ -412,11 +415,11 @@ public class DragLayer extends BaseDragLayer<Launcher> {
                     onCompleteRunnable.run();
                 }
                 switch (animationEndStyle) {
-                case ANIMATION_END_DISAPPEAR:
-                    clearAnimatedView();
-                    break;
-                case ANIMATION_END_REMAIN_VISIBLE:
-                    break;
+                    case ANIMATION_END_DISAPPEAR:
+                        clearAnimatedView();
+                        break;
+                    case ANIMATION_END_REMAIN_VISIBLE:
+                        break;
                 }
                 mDropAnim = null;
             }

@@ -28,7 +28,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Process;
 import android.os.UserHandle;
-import androidx.annotation.UiThread;
+import android.support.annotation.UiThread;
 import android.util.ArrayMap;
 import android.util.Log;
 
@@ -104,6 +104,10 @@ public class DrawableFactory {
         p.addArc(0, 0, PreloadIconDrawable.PATH_SIZE, PreloadIconDrawable.PATH_SIZE, -90, 360);
         return p;
     }
+
+//    public AllAppsBackgroundDrawable getAllAppsBackground(Context context) {
+//        return new AllAppsBackgroundDrawable(context);
+//    }
 
     /**
      * Returns a drawable that can be used as a badge for the user or null.

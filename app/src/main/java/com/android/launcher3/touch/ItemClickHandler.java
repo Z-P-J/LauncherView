@@ -15,13 +15,12 @@
  */
 package com.android.launcher3.touch;
 
-import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.android.launcher3.FolderInfo;
-import com.android.launcher3.ItemInfo;
+import com.android.launcher3.ItemInfoWithIcon;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.folder.Folder;
@@ -51,7 +50,7 @@ public class ItemClickHandler {
 
         Object tag = v.getTag();
         if (tag instanceof ShortcutInfo) {
-            onClickAppShortcut(v, (ShortcutInfo) tag, launcher);
+            onClickAppShortcut(v, (ItemInfoWithIcon) tag, launcher);
         } else if (tag instanceof FolderInfo) {
             if (v instanceof FolderIcon) {
                 onClickFolderIcon(v);
@@ -77,7 +76,7 @@ public class ItemClickHandler {
      *
      * @param v The view that was clicked. Must be a tagged with a {@link ShortcutInfo}.
      */
-    private static void onClickAppShortcut(View v, ShortcutInfo shortcut, Launcher launcher) {
-        Toast.makeText(launcher, "onClickAppShortcut", Toast.LENGTH_SHORT).show();
+    private static void onClickAppShortcut(View v, ItemInfoWithIcon shortcut, Launcher launcher) {
+        Toast.makeText(launcher, "onClickAppShortcut title=" + shortcut.title, Toast.LENGTH_SHORT).show();
     }
 }

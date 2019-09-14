@@ -117,7 +117,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
      * maintaining the restrictions of {@link #mMaxCountX} &amp; {@link #mMaxCountY}.
      */
     public static void calculateGridSize(int count, int countX, int countY, int maxCountX,
-            int maxCountY, int maxItemsPerPage, int[] out) {
+                                         int maxCountY, int maxItemsPerPage, int[] out) {
         boolean done;
         int gridCountX = countX;
         int gridCountY = countY;
@@ -274,13 +274,13 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
     public void setFixedSize(int width, int height) {
         width -= (getPaddingLeft() + getPaddingRight());
         height -= (getPaddingTop() + getPaddingBottom());
-        for (int i = getChildCount() - 1; i >= 0; i --) {
+        for (int i = getChildCount() - 1; i >= 0; i--) {
             ((CellLayout) getChildAt(i)).setFixedSize(width, height);
         }
     }
 
     public void removeItem(View v) {
-        for (int i = getChildCount() - 1; i >= 0; i --) {
+        for (int i = getChildCount() - 1; i >= 0; i--) {
             getPageAt(i).removeView(v);
         }
     }
@@ -296,10 +296,9 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
      * It essentially removes all views from all the pages and then adds them again in appropriate
      * page.
      *
-     * @param list the ordered list of children.
+     * @param list      the ordered list of children.
      * @param itemCount if greater than the total children count, empty spaces are left
-     * at the end, otherwise it is ignored.
-     *
+     *                  at the end, otherwise it is ignored.
      */
     public void arrangeChildren(ArrayList<View> list, int itemCount) {
         arrangeChildren(list, itemCount, true);
@@ -360,7 +359,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
                 }
             }
 
-            rank ++;
+            rank++;
             position++;
         }
 
@@ -388,8 +387,8 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
                 (getPageAt(0).getDesiredWidth() + getPaddingLeft() + getPaddingRight()) : 0;
     }
 
-    public int getDesiredHeight()  {
-        return  getPageCount() > 0 ?
+    public int getDesiredHeight() {
+        return getPageCount() > 0 ?
                 (getPageAt(0).getDesiredHeight() + getPaddingTop() + getPaddingBottom()) : 0;
     }
 
@@ -444,10 +443,11 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
 
     /**
      * Iterates over all its items in a reading order.
+     *
      * @return the view for which the operator returned true.
      */
     public View iterateOverItems(ItemOperator op) {
-        for (int k = 0 ; k < getChildCount(); k++) {
+        for (int k = 0; k < getChildCount(); k++) {
             CellLayout page = getPageAt(k);
             for (int j = 0; j < page.getCountY(); j++) {
                 for (int i = 0; i < page.getCountX(); i++) {
@@ -650,10 +650,10 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
                         }
                     };
                     v.animate()
-                        .translationXBy((direction > 0 ^ mIsRtl) ? -v.getWidth() : v.getWidth())
-                        .setDuration(REORDER_ANIMATION_DURATION)
-                        .setStartDelay(0)
-                        .withEndAction(endAction);
+                            .translationXBy((direction > 0 ^ mIsRtl) ? -v.getWidth() : v.getWidth())
+                            .setDuration(REORDER_ANIMATION_DURATION)
+                            .setStartDelay(0)
+                            .withEndAction(endAction);
                     mPendingAnimations.put(v, endAction);
                 }
             }

@@ -30,7 +30,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.Region;
 import android.graphics.Shader;
-import androidx.core.graphics.ColorUtils;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Property;
 import android.view.View;
 
@@ -54,8 +54,8 @@ public class PreviewBackground {
     // transparent. To achieve this, we keep the gradient to black for the range [0, 1) and
     // just at the edge quickly change it to transparent.
     private final RadialGradient mClipShader = new RadialGradient(0, 0, 1,
-            new int[] {Color.BLACK, Color.BLACK, Color.TRANSPARENT },
-            new float[] {0, 0.999f, 1},
+            new int[]{Color.BLACK, Color.BLACK, Color.TRANSPARENT},
+            new float[]{0, 0.999f, 1},
             Shader.TileMode.CLAMP);
 
     private final PorterDuffXfermode mShadowPorterDuffXfermode
@@ -146,8 +146,8 @@ public class PreviewBackground {
         float shadowRadius = radius + mStrokeWidth;
         int shadowColor = Color.argb(SHADOW_OPACITY, 0, 0, 0);
         mShadowShader = new RadialGradient(0, 0, 1,
-                new int[] {shadowColor, Color.TRANSPARENT},
-                new float[] {radius / shadowRadius, 1},
+                new int[]{shadowColor, Color.TRANSPARENT},
+                new float[]{radius / shadowRadius, 1},
                 Shader.TileMode.CLAMP);
 
         invalidate();
@@ -195,10 +195,6 @@ public class PreviewBackground {
     public int getBgColor() {
         int alpha = (int) Math.min(MAX_BG_OPACITY, BG_OPACITY * mColorMultiplier);
         return ColorUtils.setAlphaComponent(mBgColor, alpha);
-    }
-
-    public int getBadgeColor() {
-        return mBgColor;
     }
 
     public void drawBackground(Canvas canvas) {
@@ -298,7 +294,7 @@ public class PreviewBackground {
         mScale = originalScale;
     }
 
-    private void drawCircle(Canvas canvas,float deltaRadius) {
+    private void drawCircle(Canvas canvas, float deltaRadius) {
         float radius = getScaledRadius();
         canvas.drawCircle(radius + getOffsetX(), radius + getOffsetY(),
                 radius - deltaRadius, mPaint);

@@ -36,6 +36,10 @@ public class ItemInfo {
      */
     public long id = NO_ID;
 
+    /**
+     * One of {@link LauncherSettings.Favorites#ITEM_TYPE_APPLICATION},
+     * {@link LauncherSettings.Favorites#ITEM_TYPE_FOLDER},
+     */
     public int itemType;
 
     /**
@@ -129,12 +133,7 @@ public class ItemInfo {
     }
 
     public ComponentName getTargetComponent() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            return intent.getComponent();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     public void writeToValues(ContentWriter writer) {
@@ -180,7 +179,7 @@ public class ItemInfo {
     protected String dumpProperties() {
         return "id=" + id
                 + " type=" + LauncherSettings.Favorites.itemTypeToString(itemType)
-                + " container=" + LauncherSettings.Favorites.containerToString((int)container)
+                + " container=" + LauncherSettings.Favorites.containerToString((int) container)
                 + " screen=" + screenId
                 + " cell(" + cellX + "," + cellY + ")"
                 + " span(" + spanX + "," + spanY + ")"

@@ -39,12 +39,47 @@ public abstract class ItemInfoWithIcon extends ItemInfo {
     public boolean usingLowResIcon;
 
     /**
+     * Indicates that the icon is disabled due to safe mode restrictions.
+     */
+    public static final int FLAG_DISABLED_SAFEMODE = 1;
+
+    /**
+     * Indicates that the icon is disabled as the app is not available.
+     */
+    public static final int FLAG_DISABLED_NOT_AVAILABLE = 1 << 1;
+
+    /**
+     * Indicates that the icon is disabled as the app is suspended
+     */
+    public static final int FLAG_DISABLED_SUSPENDED = 1 << 2;
+
+    /**
+     * Indicates that the icon is disabled as the user is in quiet mode.
+     */
+    public static final int FLAG_DISABLED_QUIET_USER = 1 << 3;
+
+    /**
+     * Indicates that the icon is disabled as the publisher has disabled the actual shortcut.
+     */
+    public static final int FLAG_DISABLED_BY_PUBLISHER = 1 << 4;
+
+    /**
+     * Indicates that the icon is disabled as the user partition is currently locked.
+     */
+    public static final int FLAG_DISABLED_LOCKED_USER = 1 << 5;
+
+    public static final int FLAG_DISABLED_MASK = FLAG_DISABLED_SAFEMODE |
+            FLAG_DISABLED_NOT_AVAILABLE | FLAG_DISABLED_SUSPENDED |
+            FLAG_DISABLED_QUIET_USER | FLAG_DISABLED_BY_PUBLISHER | FLAG_DISABLED_LOCKED_USER;
+
+    /**
      * Status associated with the system state of the underlying item. This is calculated every
      * time a new info is created and not persisted on the disk.
      */
     public int runtimeStatusFlags = 0;
 
-    protected ItemInfoWithIcon() { }
+    protected ItemInfoWithIcon() {
+    }
 
     protected ItemInfoWithIcon(ItemInfoWithIcon info) {
         super(info);
@@ -60,6 +95,6 @@ public abstract class ItemInfoWithIcon extends ItemInfo {
 
     @Override
     public boolean isDisabled() {
-        return false;
+        return (runtimeStatusFlags & FLAG_DISABLED_MASK) != 0;
     }
 }

@@ -16,6 +16,8 @@
 
 package com.android.launcher3;
 
+import static android.view.MotionEvent.ACTION_DOWN;
+
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Rect;
@@ -25,8 +27,6 @@ import android.view.ViewGroup;
 
 import com.android.launcher3.CellLayout.ContainerType;
 
-import static android.view.MotionEvent.ACTION_DOWN;
-
 public class ShortcutAndWidgetContainer extends ViewGroup {
     static final String TAG = "ShortcutAndWidgetContainer";
 
@@ -34,7 +34,8 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
     // return an (x, y) value from helper functions. Do NOT use them to maintain other state.
     private final int[] mTmpCellXY = new int[2];
 
-    @ContainerType private final int mContainerType;
+    @ContainerType
+    private final int mContainerType;
     private final WallpaperManager mWallpaperManager;
 
     private int mCellWidth;
@@ -77,7 +78,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
         int count = getChildCount();
 
         int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightSpecSize =  MeasureSpec.getSize(heightMeasureSpec);
+        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
         setMeasuredDimension(widthSpecSize, heightSpecSize);
 
         for (int i = 0; i < count; i++) {
@@ -114,6 +115,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
         int cellPaddingX = mContainerType == CellLayout.WORKSPACE
                 ? profile.workspaceCellPaddingXPx
                 : (int) (profile.edgeMarginPx / 2f);
+        //TODO 如果hotseat要显示文字，则不用setPadding
         child.setPadding(cellPaddingX, cellPaddingY, cellPaddingX, 0);
         int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
         int childheightMeasureSpec = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);

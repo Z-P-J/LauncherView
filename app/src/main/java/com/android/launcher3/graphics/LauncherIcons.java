@@ -206,27 +206,8 @@ public class LauncherIcons implements AutoCloseable {
         return BitmapInfo.fromBitmap(result);
     }
 
-    /**
-     * Creates a normalized bitmap suitable for the all apps view. The bitmap is also visually
-     * normalized with other icons and has enough spacing to add shadow.
-     */
-    public Bitmap createScaledBitmapWithoutShadow(Drawable icon, int iconAppTargetSdk) {
-        RectF iconBounds = new RectF();
-        float[] scale = new float[1];
-        icon = normalizeAndWrapToAdaptiveIcon(icon, iconAppTargetSdk, iconBounds, scale);
-        return createIconBitmap(icon,
-                Math.min(scale[0], ShadowGenerator.getScaleForBounds(iconBounds)));
-    }
-
-    /**
-     * Sets the background color used for wrapped adaptive icon
-     */
-    public void setWrapperBackgroundColor(int color) {
-        mWrapperBackgroundColor = (Color.alpha(color) < 255) ? DEFAULT_WRAPPER_BACKGROUND : color;
-    }
-
     private Drawable normalizeAndWrapToAdaptiveIcon(Drawable icon, int iconAppTargetSdk,
-            RectF outIconBounds, float[] outScale) {
+                                                    RectF outIconBounds, float[] outScale) {
         float scale = 1f;
         if (Utilities.ATLEAST_OREO && iconAppTargetSdk >= Build.VERSION_CODES.O) {
             boolean[] outShape = new boolean[1];
@@ -312,8 +293,8 @@ public class LauncherIcons implements AutoCloseable {
                 Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(bitmap);
 
-        final int left = (textureWidth-width) / 2;
-        final int top = (textureHeight-height) / 2;
+        final int left = (textureWidth - width) / 2;
+        final int top = (textureHeight - height) / 2;
 
         mOldBounds.set(icon.getBounds());
         if (Utilities.ATLEAST_OREO && icon instanceof AdaptiveIconDrawable) {
@@ -321,7 +302,7 @@ public class LauncherIcons implements AutoCloseable {
             int size = Math.max(width, height);
             icon.setBounds(offset, offset, offset + size, offset + size);
         } else {
-            icon.setBounds(left, top, left+width, top+height);
+            icon.setBounds(left, top, left + width, top + height);
         }
         mCanvas.save();
         mCanvas.scale(scale, scale, textureWidth / 2, textureHeight / 2);

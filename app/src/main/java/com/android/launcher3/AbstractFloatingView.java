@@ -18,13 +18,12 @@ package com.android.launcher3;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import androidx.annotation.IntDef;
+import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
 import com.android.launcher3.util.TouchController;
 import com.android.launcher3.views.BaseDragLayer;
 
@@ -44,13 +43,14 @@ public abstract class AbstractFloatingView extends LinearLayout implements Touch
             TYPE_WIDGETS_FULL_SHEET,
             TYPE_ON_BOARD_POPUP,
             TYPE_DISCOVERY_BOUNCE,
-
             TYPE_QUICKSTEP_PREVIEW,
             TYPE_TASK_MENU,
             TYPE_OPTIONS_POPUP
     })
     @Retention(RetentionPolicy.SOURCE)
-    public @interface FloatingViewType {}
+    public @interface FloatingViewType {
+    }
+
     public static final int TYPE_FOLDER = 1 << 0;
     public static final int TYPE_ACTION_POPUP = 1 << 1;
     public static final int TYPE_WIDGETS_BOTTOM_SHEET = 1 << 2;
@@ -99,17 +99,11 @@ public abstract class AbstractFloatingView extends LinearLayout implements Touch
 
     public final void close(boolean animate) {
         animate &= !Utilities.isPowerSaverPreventingAnimation(getContext());
-        if (mIsOpen) {
-            BaseActivity.fromContext(getContext()).getUserEventDispatcher()
-                    .resetElapsedContainerMillis("container closed");
-        }
         handleClose(animate);
         mIsOpen = false;
     }
 
     protected abstract void handleClose(boolean animate);
-
-    public abstract void logActionCommand(int command);
 
     public final boolean isOpen() {
         return mIsOpen;
@@ -117,9 +111,10 @@ public abstract class AbstractFloatingView extends LinearLayout implements Touch
 
     protected abstract boolean isOfType(@FloatingViewType int type);
 
-    /** @return Whether the back is consumed. If false, Launcher will handle the back as well. */
+    /**
+     * @return Whether the back is consumed. If false, Launcher will handle the back as well.
+     */
     public boolean onBackPressed() {
-        logActionCommand(Action.Command.BACK);
         close(true);
         return true;
     }

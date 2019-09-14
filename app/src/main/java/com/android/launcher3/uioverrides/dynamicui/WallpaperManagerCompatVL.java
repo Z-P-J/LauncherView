@@ -15,6 +15,11 @@
  */
 package com.android.launcher3.uioverrides.dynamicui;
 
+import static android.app.WallpaperManager.FLAG_SYSTEM;
+
+import static com.android.launcher3.Utilities.getDevicePrefs;
+import static com.android.launcher3.graphics.ColorExtractor.findDominantColorByHue;
+
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
 import android.app.job.JobInfo;
@@ -37,7 +42,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.ParcelFileDescriptor;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
@@ -45,10 +50,6 @@ import com.android.launcher3.Utilities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static android.app.WallpaperManager.FLAG_SYSTEM;
-import static com.android.launcher3.Utilities.getDevicePrefs;
-import static com.android.launcher3.graphics.ColorExtractor.findDominantColorByHue;
 
 public class WallpaperManagerCompatVL extends WallpaperManagerCompat {
 
@@ -88,18 +89,18 @@ public class WallpaperManagerCompatVL extends WallpaperManagerCompat {
         // Register a receiver for results
         String permission = null;
         // Find a permission which only we can use.
-        try {
-            for (PermissionInfo info : context.getPackageManager().getPackageInfo(
-                    context.getPackageName(),
-                    PackageManager.GET_PERMISSIONS).permissions) {
-                if ((info.protectionLevel & PermissionInfo.PROTECTION_SIGNATURE) != 0) {
-                    permission = info.name;
-                }
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            // Something went wrong. ignore
-            Log.d(TAG, "Unable to get permission info", e);
-        }
+//        try {
+//            for (PermissionInfo info : context.getPackageManager().getPackageInfo(
+//                    context.getPackageName(),
+//                    PackageManager.GET_PERMISSIONS).permissions) {
+//                if ((info.protectionLevel & PermissionInfo.PROTECTION_SIGNATURE) != 0) {
+//                    permission = info.name;
+//                }
+//            }
+//        } catch (PackageManager.NameNotFoundException e) {
+//            // Something went wrong. ignore
+//            Log.d(TAG, "Unable to get permission info", e);
+//        }
         mContext.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

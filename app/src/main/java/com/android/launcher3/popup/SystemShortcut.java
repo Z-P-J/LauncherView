@@ -11,7 +11,7 @@ import com.android.launcher3.R;
 /**
  * Represents a system shortcut for a given app. The shortcut should have a static label and
  * icon, and an onClickListener that depends on the item that the shortcut services.
- *
+ * <p>
  * Example system shortcuts, defined as inner classes, include Widgets and AppInfo.
  */
 public abstract class SystemShortcut<T extends BaseDraggingActivity> extends ItemInfo {
@@ -33,7 +33,7 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
 
         @Override
         public View.OnClickListener getOnClickListener(final Launcher launcher,
-                final ItemInfo itemInfo) {
+                                                       final ItemInfo itemInfo) {
             return v -> Toast.makeText(launcher, "微件", Toast.LENGTH_SHORT).show();
         }
     }
@@ -46,14 +46,6 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
         @Override
         public View.OnClickListener getOnClickListener(
                 BaseDraggingActivity activity, ItemInfo itemInfo) {
-//            return (view) -> {
-//                Rect sourceBounds = activity.getViewBounds(view);
-//                Bundle opts = activity.getActivityLaunchOptionsAsBundle(view);
-//                new PackageManagerHelper(activity).startDetailsActivityForInfo(
-//                        itemInfo, sourceBounds, opts);
-//                activity.getUserEventDispatcher().logActionOnControl(Action.Touch.TAP,
-//                        ControlType.APPINFO_TARGET, view);
-//            };
             return v -> Toast.makeText(activity, "应用信息", Toast.LENGTH_SHORT).show();
         }
     }
@@ -66,29 +58,8 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
         @Override
         public View.OnClickListener getOnClickListener(
                 BaseDraggingActivity activity, ItemInfo itemInfo) {
-//            boolean supportsWebUI = (itemInfo instanceof ShortcutInfo) &&
-//                    ((ShortcutInfo) itemInfo).hasStatusFlag(ShortcutInfo.FLAG_SUPPORTS_WEB_UI);
-//            boolean isInstantApp = false;
-//            if (itemInfo instanceof com.android.launcher3.AppInfo) {
-//                com.android.launcher3.AppInfo appInfo = (com.android.launcher3.AppInfo) itemInfo;
-//                isInstantApp = InstantAppResolver.newInstance(activity).isInstantApp(appInfo);
-//            }
-//            boolean enabled = supportsWebUI || isInstantApp;
-//            if (!enabled) {
-//                return null;
-//            }
-//            return createOnClickListener(activity, itemInfo);
             return v -> Toast.makeText(activity, "安装", Toast.LENGTH_SHORT).show();
         }
-
-//        public View.OnClickListener createOnClickListener(
-//                BaseDraggingActivity activity, ItemInfo itemInfo) {
-//            return view -> {
-//                Intent intent = new PackageManagerHelper(view.getContext()).getMarketIntent(
-//                        itemInfo.getTargetComponent().getPackageName());
-//                activity.startActivitySafely(view, intent, itemInfo);
-//                AbstractFloatingView.closeAllOpenViews(activity);
-//            };
-//        }
     }
+
 }

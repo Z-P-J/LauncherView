@@ -4,7 +4,7 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
@@ -16,9 +16,16 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "../../../prebuilts/fullsdk-darwin/extras/android/m2repository" }
+        maven { url "../../../prebuilts/fullsdk-linux/extras/android/m2repository" }
+        mavenCentral()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
         google()
         jcenter()
-        
+        maven { url 'https://jitpack.io' }
     }
 }
 

@@ -19,10 +19,10 @@ package com.android.launcher3.graphics;
 import android.graphics.Outline;
 import android.graphics.Path;
 import android.graphics.drawable.shapes.PathShape;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 /**
- * Wrapper around {@link PathShape}
+ * Wrapper around {@link android.graphics.drawable.shapes.PathShape}
  * that creates a shape with a triangular path (pointing up or down).
  */
 public class TriangleShape extends PathShape {

@@ -33,7 +33,7 @@ import com.android.launcher3.popup.PopupContainerWithArrow;
 import com.android.launcher3.touch.ItemClickHandler;
 
 /**
- * A {@link FrameLayout} that contains a {@link DeepShortcutView}.
+ * A {@link android.widget.FrameLayout} that contains a {@link DeepShortcutView}.
  * This lets us animate the DeepShortcutView (icon and text) separately from the background.
  */
 public class DeepShortcutView extends FrameLayout {
@@ -79,6 +79,11 @@ public class DeepShortcutView extends FrameLayout {
     public void setWillDrawIcon(boolean willDraw) {
         mIconView.setVisibility(willDraw ? View.VISIBLE : View.INVISIBLE);
     }
+
+    public boolean willDrawIcon() {
+        return mIconView.getVisibility() == View.VISIBLE;
+    }
+
     /**
      * Returns the position of the center of the icon relative to the container.
      */
@@ -96,18 +101,17 @@ public class DeepShortcutView extends FrameLayout {
         mPillRect.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
     }
 
-    /**
-     * Returns the shortcut info that is suitable to be added on the homescreen
-     */
-    public ShortcutInfo getFinalInfo() {
+//    /**
+//     * Returns the shortcut info that is suitable to be added on the homescreen
+//     */
+//    public ShortcutInfo getFinalInfo() {
 //        final ShortcutInfo badged = new ShortcutInfo(mInfo);
 //        // Queue an update task on the worker thread. This ensures that the badged
 //        // shortcut eventually gets its icon updated.
 //        Launcher.getLauncher(getContext()).getModel()
 //                .updateAndBindShortcutInfo(badged, mDetail);
 //        return badged;
-        return null;
-    }
+//    }
 
     public View getIconView() {
         return mIconView;

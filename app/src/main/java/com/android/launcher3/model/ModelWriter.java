@@ -60,7 +60,7 @@ public class ModelWriter {
     private final boolean mVerifyChanges;
 
     public ModelWriter(Context context, LauncherModel model, BgDataModel dataModel,
-            boolean hasVerticalHotseat, boolean verifyChanges) {
+                       boolean hasVerticalHotseat, boolean verifyChanges) {
         mContext = context;
         mModel = model;
         mBgDataModel = dataModel;
@@ -108,7 +108,6 @@ public class ModelWriter {
                 ShortcutInfo modelShortcut = (ShortcutInfo) modelItem;
                 ShortcutInfo shortcut = (ShortcutInfo) item;
                 if (modelShortcut.title.toString().equals(shortcut.title.toString()) &&
-                        modelShortcut.intent.filterEquals(shortcut.intent) &&
                         modelShortcut.id == shortcut.id &&
                         modelShortcut.itemType == shortcut.itemType &&
                         modelShortcut.container == shortcut.container &&
@@ -141,7 +140,7 @@ public class ModelWriter {
      * Move an item in the DB to a new <container, screen, cellX, cellY>
      */
     public void moveItemInDatabase(final ItemInfo item,
-            long container, long screenId, int cellX, int cellY) {
+                                   long container, long screenId, int cellX, int cellY) {
         updateItemInfoProps(item, container, screenId, cellX, cellY);
 
         final ContentWriter writer = new ContentWriter(mContext)
@@ -182,7 +181,7 @@ public class ModelWriter {
      * Move and/or resize item in the DB to a new <container, screen, cellX, cellY, spanX, spanY>
      */
     public void modifyItemInDatabase(final ItemInfo item,
-            long container, long screenId, int cellX, int cellY, int spanX, int spanY) {
+                                     long container, long screenId, int cellX, int cellY, int spanX, int spanY) {
         updateItemInfoProps(item, container, screenId, cellX, cellY);
         item.spanX = spanX;
         item.spanY = spanY;
@@ -213,7 +212,7 @@ public class ModelWriter {
      * cellY fields of the item. Also assigns an ID to the item.
      */
     public void addItemToDatabase(final ItemInfo item,
-            long container, long screenId, int cellX, int cellY) {
+                                  long container, long screenId, int cellX, int cellY) {
         updateItemInfoProps(item, container, screenId, cellX, cellY);
 
         final ContentWriter writer = new ContentWriter(mContext);

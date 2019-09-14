@@ -27,7 +27,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.core.graphics.ColorUtils;
+import android.support.v4.graphics.ColorUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Property;
@@ -39,28 +39,23 @@ import android.view.ViewConfiguration;
 import android.view.ViewDebug;
 import android.widget.TextView;
 
-import com.android.launcher3.IconCache.IconLoadRequest;
-import com.android.launcher3.IconCache.ItemInfoUpdateReceiver;
 import com.android.launcher3.Launcher.OnResumeCallback;
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.graphics.DrawableFactory;
 import com.android.launcher3.graphics.IconPalette;
-import com.android.launcher3.graphics.PreloadIconDrawable;
-
-import java.text.NumberFormat;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan
  * because we want to make the bubble taller than the text and TextView's clip is
  * too aggressive.
  */
-public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, OnResumeCallback {
+public class BubbleTextView extends TextView implements OnResumeCallback {
 
     private static final int DISPLAY_WORKSPACE = 0;
     private static final int DISPLAY_ALL_APPS = 1;
     private static final int DISPLAY_FOLDER = 2;
 
-    private static final int[] STATE_PRESSED = new int[] {android.R.attr.state_pressed};
+    private static final int[] STATE_PRESSED = new int[]{android.R.attr.state_pressed};
 
 
     private static final Property<BubbleTextView, Float> BADGE_SCALE_PROPERTY
@@ -121,8 +116,6 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     @ViewDebug.ExportedProperty(category = "launcher")
     private boolean mDisableRelayout = false;
 
-    private IconLoadRequest mIconLoadRequest;
-
     public BubbleTextView(Context context) {
         this(context, null, 0);
     }
@@ -144,7 +137,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
         int display = a.getInteger(R.styleable.BubbleTextView_iconDisplay, DISPLAY_WORKSPACE);
         int defaultIconSize = grid.iconSizePx;
         if (display == DISPLAY_WORKSPACE) {
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, grid.iconTextSizePx);
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, grid.folderChildTextSizePx);
             setCompoundDrawablePadding(grid.iconDrawablePaddingPx);
         } else if (display == DISPLAY_ALL_APPS) {
             setTextSize(TypedValue.COMPLEX_UNIT_PX, grid.allAppsIconTextSizePx);
@@ -191,9 +184,6 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     public void applyFromShortcutInfo(ShortcutInfo info, boolean promiseStateChanged) {
         applyIconAndLabel(info);
         setTag(info);
-        if (promiseStateChanged || (info.hasPromiseIconUi())) {
-            applyPromiseState(promiseStateChanged);
-        }
     }
 
     private void applyIconAndLabel(ItemInfoWithIcon info) {
@@ -207,13 +197,6 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
                     ? getContext().getString(R.string.disabled_app_label, info.contentDescription)
                     : info.contentDescription);
         }
-    }
-
-    /**
-     * Overrides the default long press timeout.
-     */
-    public void setLongPressTimeout(int longPressTimeout) {
-        mLongPressHelper.setLongPressTimeout(longPressTimeout);
     }
 
     @Override
@@ -240,7 +223,9 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
         return drawableState;
     }
 
-    /** Returns the icon for this view. */
+    /**
+     * Returns the icon for this view.
+     */
     public Drawable getIcon() {
         return mIcon;
     }
@@ -314,7 +299,6 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        drawBadgeIfNecessary(canvas);
     }
 
     public void forceHideBadge(boolean forceHideBadge) {
@@ -392,6 +376,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
 
     /**
      * Creates an animator to fade the text in or out.
+     *
      * @param fadeIn Whether the text should fade in or fade out.
      */
     public ObjectAnimator createTextAlphaAnimator(boolean fadeIn) {
@@ -407,43 +392,6 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     }
 
     public void applyPromiseState(boolean promiseStateChanged) {
-        if (getTag() instanceof ShortcutInfo) {
-            PreloadIconDrawable preloadDrawable = applyProgressLevel(100);
-            if (preloadDrawable != null && promiseStateChanged) {
-                preloadDrawable.maybePerformFinishedAnimation();
-            }
-        }
-    }
-
-    public PreloadIconDrawable applyProgressLevel(int progressLevel) {
-        if (getTag() instanceof ItemInfoWithIcon) {
-            ItemInfoWithIcon info = (ItemInfoWithIcon) getTag();
-            if (progressLevel >= 100) {
-                setContentDescription(info.contentDescription != null
-                        ? info.contentDescription : "");
-            } else if (progressLevel > 0) {
-                setContentDescription(getContext()
-                        .getString(R.string.app_downloading_title, info.title,
-                                NumberFormat.getPercentInstance().format(progressLevel * 0.01)));
-            } else {
-                setContentDescription(getContext()
-                        .getString(R.string.app_waiting_download_title, info.title));
-            }
-            if (mIcon != null) {
-                final PreloadIconDrawable preloadDrawable;
-                if (mIcon instanceof PreloadIconDrawable) {
-                    preloadDrawable = (PreloadIconDrawable) mIcon;
-                    preloadDrawable.setLevel(progressLevel);
-                } else {
-                    preloadDrawable = DrawableFactory.get(getContext())
-                            .newPendingIcon(info, getContext());
-                    preloadDrawable.setLevel(progressLevel);
-                    setIcon(preloadDrawable);
-                }
-                return preloadDrawable;
-            }
-        }
-        return null;
     }
 
     /**
@@ -484,40 +432,19 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     }
 
     /**
-     * Applies the item info if it is same as what the view is pointing to currently.
-     */
-    @Override
-    public void reapplyItemInfo(ItemInfoWithIcon info) {
-        if (getTag() == info) {
-            mIconLoadRequest = null;
-            mDisableRelayout = true;
-
-            // Optimization: Starting in N, pre-uploads the bitmap to RenderThread.
-            info.iconBitmap.prepareToDraw();
-
-            if (info instanceof ShortcutInfo) {
-                applyFromShortcutInfo((ShortcutInfo) info);
-                mActivity.invalidateParent(info);
-            }
-
-            mDisableRelayout = false;
-        }
-    }
-
-    /**
      * Verifies that the current icon is high-res otherwise posts a request to load the icon.
      */
     public void verifyHighRes() {
-        if (mIconLoadRequest != null) {
-            mIconLoadRequest.cancel();
-            mIconLoadRequest = null;
-        }
+//        if (mIconLoadRequest != null) {
+//            mIconLoadRequest.cancel();
+//            mIconLoadRequest = null;
+//        }
         if (getTag() instanceof ItemInfoWithIcon) {
             ItemInfoWithIcon info = (ItemInfoWithIcon) getTag();
-            if (info.usingLowResIcon) {
-                mIconLoadRequest = LauncherAppState.getInstance(getContext()).getIconCache()
-                        .updateIconInBackground(BubbleTextView.this, info);
-            }
+//            if (info.usingLowResIcon) {
+//                mIconLoadRequest = LauncherAppState.getInstance(getContext()).getIconCache()
+//                        .updateIconInBackground(BubbleTextView.this, info);
+//            }
         }
     }
 

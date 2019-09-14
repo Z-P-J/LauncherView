@@ -41,7 +41,6 @@ import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.dragndrop.DragView;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 
@@ -66,12 +65,22 @@ public abstract class ButtonDropTarget extends TextView
     private int mBottomDragPadding;
     protected DropTargetBar mDropTargetBar;
 
-    /** Whether this drop target is active for the current drag */
+    /**
+     * Whether this drop target is active for the current drag
+     */
     protected boolean mActive;
-    /** An item must be dragged at least this many pixels before this drop target is enabled. */
+    /**
+     * Whether an accessible drag is in progress
+     */
+    private boolean mAccessibleDrag;
+    /**
+     * An item must be dragged at least this many pixels before this drop target is enabled.
+     */
     private final int mDragDistanceThreshold;
 
-    /** The paint applied to the drag view on hover */
+    /**
+     * The paint applied to the drag view on hover
+     */
     protected int mHoverColor = 0;
 
     protected CharSequence mText;
@@ -152,7 +161,7 @@ public abstract class ButtonDropTarget extends TextView
                 y = -getMeasuredHeight();
                 message.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
                 if (mToolTipLocation == TOOLTIP_LEFT) {
-                    x = - getMeasuredWidth() - message.getMeasuredWidth() / 2;
+                    x = -getMeasuredWidth() - message.getMeasuredWidth() / 2;
                 } else {
                     x = getMeasuredWidth() / 2 + message.getMeasuredWidth() / 2;
                 }
@@ -229,7 +238,8 @@ public abstract class ButtonDropTarget extends TextView
         setTextColor(mOriginalTextColor);
         setVisibility(mActive ? View.VISIBLE : View.GONE);
 
-        setOnClickListener(null);
+        mAccessibleDrag = options.isAccessibleDrag;
+        setOnClickListener(mAccessibleDrag ? this : null);
     }
 
     @Override
@@ -241,7 +251,8 @@ public abstract class ButtonDropTarget extends TextView
 
     @Override
     public boolean isDropEnabled() {
-        return mActive && (mLauncher.getDragController().getDistanceDragged() >= mDragDistanceThreshold);
+        return mActive && (mAccessibleDrag ||
+                mLauncher.getDragController().getDistanceDragged() >= mDragDistanceThreshold);
     }
 
     @Override
@@ -275,10 +286,16 @@ public abstract class ButtonDropTarget extends TextView
                 DragLayer.ANIMATION_END_DISAPPEAR, null);
     }
 
+    @Override
+    public void prepareAccessibilityDrop() {
+    }
+
+    public abstract void onAccessibilityDrop(View view, ItemInfo item);
+
     public abstract void completeDrop(DragObject d);
 
     @Override
-    public void getHitRectRelativeToDragLayer(Rect outRect) {
+    public void getHitRectRelativeToDragLayer(android.graphics.Rect outRect) {
         super.getHitRect(outRect);
         outRect.bottom += mBottomDragPadding;
 
@@ -313,7 +330,7 @@ public abstract class ButtonDropTarget extends TextView
         }
 
         final int top = to.top + (getMeasuredHeight() - height) / 2;
-        final int bottom = top +  height;
+        final int bottom = top + height;
 
         to.set(left, top, right, bottom);
 
@@ -359,6 +376,4 @@ public abstract class ButtonDropTarget extends TextView
                 TextUtils.TruncateAt.END);
         return !mText.equals(displayedText);
     }
-
-    public abstract Target getDropTargetForLogging();
 }

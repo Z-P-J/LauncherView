@@ -16,10 +16,12 @@
 
 package com.android.launcher3;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -27,12 +29,16 @@ import android.os.Looper;
 import android.os.Process;
 import android.os.UserHandle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.launcher3.model.BgDataModel;
 import com.android.launcher3.model.LoaderResults;
 import com.android.launcher3.model.LoaderTask;
 import com.android.launcher3.model.ModelWriter;
 import com.android.launcher3.provider.LauncherDbUtils;
+import com.android.launcher3.util.ComponentKey;
+import com.android.launcher3.util.ItemInfoMatcher;
+import com.android.launcher3.util.MultiHashMap;
 import com.android.launcher3.util.Preconditions;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.ViewOnDrawExecutor;
@@ -46,41 +52,56 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
 
+import static com.android.launcher3.LauncherAppState.ACTION_FORCE_ROLOAD;
+import static com.android.launcher3.config.FeatureFlags.IS_DOGFOOD_BUILD;
+
 /**
  * Maintains in-memory state of the Launcher. It is expected that there should be only one
  * LauncherModel object held in a static. Also provide APIs for updating the database state
  * for the Launcher.
  */
-public class LauncherModel {
+public class LauncherModel extends BroadcastReceiver {
     private static final boolean DEBUG_RECEIVER = false;
 
     static final String TAG = "Launcher.Model";
 
     private final MainThreadExecutor mUiExecutor = new MainThreadExecutor();
-    @Thunk final LauncherAppState mApp;
-    @Thunk final Object mLock = new Object();
+    @Thunk
+    final LauncherAppState mApp;
+    @Thunk
+    final Object mLock = new Object();
     @Thunk
     LoaderTask mLoaderTask;
-    @Thunk boolean mIsLoaderTaskRunning;
+    @Thunk
+    boolean mIsLoaderTaskRunning;
 
-    @Thunk static final HandlerThread sWorkerThread = new HandlerThread("launcher-loader");
+    @Thunk
+    static final HandlerThread sWorkerThread = new HandlerThread("launcher-loader");
+
     static {
         sWorkerThread.start();
     }
-    @Thunk static final Handler sWorker = new Handler(sWorkerThread.getLooper());
+
+    @Thunk
+    static final Handler sWorker = new Handler(sWorkerThread.getLooper());
 
     // Indicates whether the current model data is valid or not.
     // We start off with everything not loaded. After that, we assume that
     // our monitoring of the package manager provides all updates and we never
     // need to do a requery. This is only ever touched from the loader thread.
     private boolean mModelLoaded;
-    public boolean isModelLoaded() {
-        synchronized (mLock) {
-            return mModelLoaded && mLoaderTask == null;
-        }
-    }
 
-    @Thunk WeakReference<Callbacks> mCallbacks;
+//    public boolean isModelLoaded() {
+//        synchronized (mLock) {
+//            return mModelLoaded && mLoaderTask == null;
+//        }
+//    }
+
+    @Thunk
+    WeakReference<Callbacks> mCallbacks;
+
+    // < only access in worker thread >
+
 
     /**
      * All the static data should be accessed on the background thread, A lock should be acquired
@@ -92,26 +113,42 @@ public class LauncherModel {
         void rebindModel();
 
         int getCurrentWorkspaceScreen();
+
         void clearPendingBinds();
+
         void startBinding();
+
         void bindItems(List<ItemInfo> shortcuts, boolean forceAnimateIcons);
+
         void bindScreens(ArrayList<Long> orderedScreenIds);
+
         void finishFirstPageBind(ViewOnDrawExecutor executor);
+
         void finishBindingItems();
+
         void bindAppsAdded(ArrayList<Long> newScreens,
                            ArrayList<ItemInfo> addNotAnimated,
                            ArrayList<ItemInfo> addAnimated);
+
         void bindShortcutsChanged(ArrayList<ShortcutInfo> updated, UserHandle user);
+
+        void bindWorkspaceComponentsRemoved(ItemInfoMatcher matcher);
+
         void onPageBoundSynchronously(int page);
+
         void executeOnNextDraw(ViewOnDrawExecutor executor);
+
+        void bindDeepShortcutMap(MultiHashMap<ComponentKey, String> deepShortcutMap);
     }
 
-    LauncherModel(LauncherAppState app, IconCache iconCache) {
+    LauncherModel(LauncherAppState app) {
         mApp = app;
     }
 
-    /** Runs the specified runnable immediately if called from the worker thread, otherwise it is
-     * posted on the worker thread handler. */
+    /**
+     * Runs the specified runnable immediately if called from the worker thread, otherwise it is
+     * posted on the worker thread handler.
+     */
     private static void runOnWorkerThread(Runnable r) {
         if (sWorkerThread.getThreadId() == Process.myTid()) {
             r.run();
@@ -135,7 +172,6 @@ public class LauncherModel {
                 ShortcutInfo modelShortcut = (ShortcutInfo) modelItem;
                 ShortcutInfo shortcut = (ShortcutInfo) item;
                 if (modelShortcut.title.toString().equals(shortcut.title.toString()) &&
-                        modelShortcut.intent.filterEquals(shortcut.intent) &&
                         modelShortcut.id == shortcut.id &&
                         modelShortcut.itemType == shortcut.itemType &&
                         modelShortcut.container == shortcut.container &&
@@ -236,6 +272,30 @@ public class LauncherModel {
     }
 
     /**
+     * Call from the handler for ACTION_PACKAGE_ADDED, ACTION_PACKAGE_REMOVED and
+     * ACTION_PACKAGE_CHANGED.
+     */
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (DEBUG_RECEIVER) Log.d(TAG, "onReceive intent=" + intent);
+
+        final String action = intent.getAction();
+        if (Intent.ACTION_LOCALE_CHANGED.equals(action)) {
+            // If we have changed locale we need to clear out the labels in all apps/workspace.
+            forceReload();
+        } else if (Intent.ACTION_MANAGED_PROFILE_ADDED.equals(action)
+                || Intent.ACTION_MANAGED_PROFILE_REMOVED.equals(action)) {
+            forceReload();
+        } else if (Intent.ACTION_MANAGED_PROFILE_AVAILABLE.equals(action) ||
+                Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE.equals(action) ||
+                Intent.ACTION_MANAGED_PROFILE_UNLOCKED.equals(action)) {
+
+        } else if (IS_DOGFOOD_BUILD && ACTION_FORCE_ROLOAD.equals(action)) {
+            forceReload();
+        }
+    }
+
+    /**
      * Reloads the workspace items from the DB and re-binds the workspace. This should generally
      * not be called as DB updates are automatically followed by UI update
      */
@@ -260,6 +320,7 @@ public class LauncherModel {
 
     /**
      * Starts the loader. Tries to bind {@params synchronousBindPage} synchronously if possible.
+     *
      * @return true if the page could be bound synchronously.
      */
     public boolean startLoader(int synchronousBindPage) {
@@ -273,12 +334,16 @@ public class LauncherModel {
 
                 // If there is already one running, tell it to stop.
                 stopLoader();
-                LoaderResults loaderResults = new LoaderResults(mApp, sBgDataModel,
-                        synchronousBindPage, mCallbacks);
+                LoaderResults loaderResults = new LoaderResults(mApp, sBgDataModel, synchronousBindPage, mCallbacks);
                 if (mModelLoaded && !mIsLoaderTaskRunning) {
                     // Divide the set of loaded items into those that we are binding synchronously,
                     // and everything else that is to be bound normally (asynchronously).
                     loaderResults.bindWorkspace();
+                    // For now, continue posting the binding of AllApps as there are other
+                    // issues that arise from that.
+//                    loaderResults.bindAllApps();
+//                    loaderResults.bindDeepShortcuts();
+//                    loaderResults.bindWidgets();
                     return true;
                 } else {
                     startLoaderForResults(loaderResults);
@@ -302,6 +367,7 @@ public class LauncherModel {
     }
 
     public void startLoaderForResults(LoaderResults results) {
+        Log.d(TAG, "startLoaderForResults");
         synchronized (mLock) {
             stopLoader();
             mLoaderTask = new LoaderTask(mApp, sBgDataModel, results);
@@ -357,39 +423,6 @@ public class LauncherModel {
 
     public LoaderTransaction beginLoader(LoaderTask task) throws CancellationException {
         return new LoaderTransaction(task);
-    }
-
-    /**
-     * A task to be executed on the current callbacks on the UI thread.
-     * If there is no current callbacks, the task is ignored.
-     */
-    public interface CallbackTask {
-
-        void execute(Callbacks callbacks);
-    }
-
-    /**
-     * A runnable which changes/updates the data model of the launcher based on certain events.
-     */
-    public interface ModelUpdateTask extends Runnable {
-
-        /**
-         * Called before the task is posted to initialize the internal state.
-         */
-        void init(LauncherAppState app, LauncherModel model,
-                  BgDataModel dataModel, Executor uiExecutor);
-
-    }
-
-    public void dumpState(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
-        if (args.length > 0 && TextUtils.equals(args[0], "--all")) {
-//            writer.println(prefix + "All apps list: size=" + mBgAllAppsList.data.size());
-//            for (AppInfo info : mBgAllAppsList.data) {
-//                writer.println(prefix + "   title=\"" + info.title + "\" iconBitmap=" + info.iconBitmap
-//                        + " componentName=" + info.componentName.getPackageName());
-//            }
-        }
-        sBgDataModel.dump(prefix, fd, writer, args);
     }
 
     public Callbacks getCallback() {

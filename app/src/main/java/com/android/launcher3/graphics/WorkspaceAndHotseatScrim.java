@@ -16,6 +16,9 @@
 
 package com.android.launcher3.graphics;
 
+import static android.content.Intent.ACTION_SCREEN_OFF;
+import static android.content.Intent.ACTION_USER_PRESENT;
+
 import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,7 +34,7 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import androidx.core.graphics.ColorUtils;
+import android.support.v4.graphics.ColorUtils;
 import android.util.DisplayMetrics;
 import android.util.Property;
 import android.view.View;
@@ -43,9 +46,6 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.uioverrides.WallpaperColorInfo;
 import com.android.launcher3.util.Themes;
-
-import static android.content.Intent.ACTION_SCREEN_OFF;
-import static android.content.Intent.ACTION_USER_PRESENT;
 
 /**
  * View scrim which draws behind hotseat and workspace
@@ -162,7 +162,7 @@ public class WorkspaceAndHotseatScrim implements
         onExtractedColorsChanged(mWallpaperColorInfo);
     }
 
-    public void setWorkspace(Workspace workspace)  {
+    public void setWorkspace(Workspace workspace) {
         mWorkspace = workspace;
     }
 

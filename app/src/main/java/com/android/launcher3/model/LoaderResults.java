@@ -28,9 +28,7 @@ import com.android.launcher3.MainThreadExecutor;
 import com.android.launcher3.PagedView;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.LooperIdleLock;
-import com.android.launcher3.util.MultiHashMap;
 import com.android.launcher3.util.ViewOnDrawExecutor;
 
 import java.lang.ref.WeakReference;
@@ -195,8 +193,10 @@ public class LoaderResults {
     }
 
 
-    /** Filters the set of items who are directly or indirectly (via another container) on the
-     * specified screen. */
+    /**
+     * Filters the set of items who are directly or indirectly (via another container) on the
+     * specified screen.
+     */
     public static <T extends ItemInfo> void filterCurrentWorkspaceItems(long currentScreenId,
                                                                         ArrayList<T> allWorkspaceItems,
                                                                         ArrayList<T> currentScreenItems,
@@ -242,8 +242,10 @@ public class LoaderResults {
         }
     }
 
-    /** Sorts the set of items by hotseat, workspace (spatially from top to bottom, left to
-     * right) */
+    /**
+     * Sorts the set of items by hotseat, workspace (spatially from top to bottom, left to
+     * right)
+     */
     private void sortWorkspaceItemsSpatially(ArrayList<ItemInfo> workspaceItems) {
         final InvariantDeviceProfile profile = mApp.getInvariantDeviceProfile();
         final int screenCols = profile.numColumns;
@@ -281,19 +283,19 @@ public class LoaderResults {
     }
 
     private void bindWorkspaceItems(final ArrayList<ItemInfo> workspaceItems,
-            final Executor executor) {
+                                    final Executor executor) {
 
         // Bind the workspace items
         int N = workspaceItems.size();
         for (int i = 0; i < N; i += ITEMS_CHUNK) {
             final int start = i;
-            final int chunkSize = (i+ITEMS_CHUNK <= N) ? ITEMS_CHUNK : (N-i);
+            final int chunkSize = (i + ITEMS_CHUNK <= N) ? ITEMS_CHUNK : (N - i);
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
                     Callbacks callbacks = mCallbacks.get();
                     if (callbacks != null) {
-                        callbacks.bindItems(workspaceItems.subList(start, start+chunkSize), false);
+                        callbacks.bindItems(workspaceItems.subList(start, start + chunkSize), false);
                     }
                 }
             };

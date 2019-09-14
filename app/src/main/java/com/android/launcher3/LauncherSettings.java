@@ -26,7 +26,9 @@ import android.provider.BaseColumns;
  * Settings related utilities.
  */
 public class LauncherSettings {
-    /** Columns required on table staht will be subject to backup and restore. */
+    /**
+     * Columns required on table staht will be subject to backup and restore.
+     */
     interface ChangeLogColumns extends BaseColumns {
         /**
          * The time of the last update to this row.
@@ -63,11 +65,6 @@ public class LauncherSettings {
         int ITEM_TYPE_APPLICATION = 0;
 
         /**
-         * The gesture is an application created shortcut
-         */
-        int ITEM_TYPE_SHORTCUT = 1;
-
-        /**
          * The icon package name in Intent.ShortcutIconResource
          * <P>Type: TEXT</P>
          */
@@ -88,7 +85,7 @@ public class LauncherSettings {
 
     /**
      * Workspace Screens.
-     *
+     * <p>
      * Tracks the order of workspace screens.
      */
     public static final class WorkspaceScreens implements ChangeLogColumns {
@@ -125,7 +122,6 @@ public class LauncherSettings {
          * The content:// style URL for a given row, identified by its id.
          *
          * @param id The row id.
-         *
          * @return The unique content URL for the specified row.
          */
         public static Uri getContentUri(long id) {
@@ -145,19 +141,25 @@ public class LauncherSettings {
         public static final int CONTAINER_DESKTOP = -100;
         public static final int CONTAINER_HOTSEAT = -101;
 
-        static final String containerToString(int container) {
+        static String containerToString(int container) {
             switch (container) {
-                case CONTAINER_DESKTOP: return "desktop";
-                case CONTAINER_HOTSEAT: return "hotseat";
-                default: return String.valueOf(container);
+                case CONTAINER_DESKTOP:
+                    return "desktop";
+                case CONTAINER_HOTSEAT:
+                    return "hotseat";
+                default:
+                    return String.valueOf(container);
             }
         }
 
-        static final String itemTypeToString(int type) {
-            switch(type) {
-                case ITEM_TYPE_APPLICATION: return "APP";
-                case ITEM_TYPE_FOLDER: return "FOLDER";
-                default: return String.valueOf(type);
+        static String itemTypeToString(int type) {
+            switch (type) {
+                case ITEM_TYPE_APPLICATION:
+                    return "APP";
+                case ITEM_TYPE_FOLDER:
+                    return "FOLDER";
+                default:
+                    return String.valueOf(type);
             }
         }
 
@@ -195,7 +197,7 @@ public class LauncherSettings {
 
         /**
          * The profile id of the item in the cell.
-         * <P>
+         * <p>
          * Type: INTEGER
          * </P>
          */
@@ -238,7 +240,7 @@ public class LauncherSettings {
          */
         public static final String OPTIONS = "options";
 
-        public static void addTableToDb(SQLiteDatabase db, boolean optional) {
+        public static void addTableToDb(SQLiteDatabase db, long myProfileId, boolean optional) {
             String ifNotExists = optional ? " IF NOT EXISTS " : "";
             db.execSQL("CREATE TABLE " + ifNotExists + TABLE_NAME + " (" +
                     "_id INTEGER PRIMARY KEY," +
@@ -258,7 +260,7 @@ public class LauncherSettings {
                     "appWidgetProvider TEXT," +
                     "modified INTEGER NOT NULL DEFAULT 0," +
                     "restored INTEGER NOT NULL DEFAULT 0," +
-                    "profileId INTEGER DEFAULT " + 0 + "," +
+                    "profileId INTEGER DEFAULT " + myProfileId + "," +
                     "rank INTEGER NOT NULL DEFAULT 0," +
                     "options INTEGER NOT NULL DEFAULT 0" +
                     ");");

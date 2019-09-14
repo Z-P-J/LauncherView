@@ -16,6 +16,10 @@
 
 package com.android.launcher3.folder;
 
+import static com.android.launcher3.BubbleTextView.TEXT_ALPHA_PROPERTY;
+import static com.android.launcher3.LauncherAnimUtils.SCALE_PROPERTY;
+import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -26,7 +30,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
-import androidx.core.graphics.ColorUtils;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Property;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -41,16 +45,13 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.PropertyResetListener;
 import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;
 import com.android.launcher3.dragndrop.DragLayer;
+import com.android.launcher3.util.Themes;
 
 import java.util.List;
 
-import static com.android.launcher3.BubbleTextView.TEXT_ALPHA_PROPERTY;
-import static com.android.launcher3.LauncherAnimUtils.SCALE_PROPERTY;
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
-
 /**
  * Manages the opening and closing animations for a {@link Folder}.
- *
+ * <p>
  * All of the animations are done in the Folder.
  * ie. When the user taps on the FolderIcon, we immediately hide the FolderIcon and show the Folder
  * in its place before starting the animation.
@@ -152,9 +153,7 @@ public class FolderAnimationManager {
         final float yDistance = initialY - lp.y;
 
         // Set up the Folder background.
-        final int finalColor = Color.parseColor("#e9ffffff");
-//        Themes.getAttrColor(mContext, android.R.attr.colorPrimary);
-        //Color.parseColor("#80ffffff")
+        final int finalColor = Themes.getAttrColor(mContext, android.R.attr.colorPrimary);
         final int initialColor =
                 ColorUtils.setAlphaComponent(finalColor, mPreviewBackground.getBackgroundAlpha());
         mFolderBackground.setColor(mIsOpening ? initialColor : finalColor);
@@ -234,7 +233,7 @@ public class FolderAnimationManager {
      * Animate the items on the current page.
      */
     private void addPreviewItemAnimators(AnimatorSet animatorSet, final float folderScale,
-            int previewItemOffsetX, int previewItemOffsetY) {
+                                         int previewItemOffsetX, int previewItemOffsetY) {
         ClippedFolderIconLayoutRule rule = mFolderIcon.getLayoutRule();
         boolean isOnFirstPage = mFolder.mContent.getCurrentPage() == 0;
         final List<BubbleTextView> itemsInPreview = isOnFirstPage

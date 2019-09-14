@@ -22,8 +22,9 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.graphics.Point;
-import androidx.annotation.VisibleForTesting;
+import android.support.annotation.VisibleForTesting;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Xml;
 import android.view.Display;
 import android.view.WindowManager;
@@ -101,7 +102,7 @@ public class InvariantDeviceProfile {
     }
 
     private InvariantDeviceProfile(String n, float w, float h, int r, int c, int fr, int fc,
-            float is, float lis, float its, int hs, int dlId, int dmlId) {
+                                   float is, float lis, float its, int hs, int dlId, int dmlId) {
         name = n;
         minWidthDps = w;
         minHeightDps = h;
@@ -135,9 +136,10 @@ public class InvariantDeviceProfile {
         ArrayList<InvariantDeviceProfile> closestProfiles = findClosestDeviceProfiles(
                 minWidthDps, minHeightDps, getPredefinedDeviceProfiles(context));
         InvariantDeviceProfile interpolatedDeviceProfileOut =
-                invDistWeightedInterpolate(minWidthDps,  minHeightDps, closestProfiles);
+                invDistWeightedInterpolate(minWidthDps, minHeightDps, closestProfiles);
 
         InvariantDeviceProfile closestProfile = closestProfiles.get(0);
+        Log.d("InvariantDeviceProfile", "closestProfile=" + closestProfile);
         numRows = closestProfile.numRows;
         numColumns = closestProfile.numColumns;
         numHotseatIcons = closestProfile.numHotseatIcons;
@@ -151,10 +153,6 @@ public class InvariantDeviceProfile {
         iconBitmapSize = Utilities.pxFromDp(iconSize, dm);
         iconTextSize = interpolatedDeviceProfileOut.iconTextSize;
         fillResIconDpi = getLauncherIconDensity(iconBitmapSize);
-
-        // If the partner customization apk contains any grid overrides, apply them
-        // Supported overrides: numRows, numColumns, iconSize
-        applyPartnerDeviceProfileOverrides(context, dm);
 
         Point realSize = new Point();
         display.getRealSize(realSize);
@@ -210,15 +208,44 @@ public class InvariantDeviceProfile {
                     a.recycle();
                 }
             }
-        } catch (IOException|XmlPullParserException e) {
+        } catch (IOException | XmlPullParserException e) {
             throw new RuntimeException(e);
         }
         return profiles;
+//        ArrayList<InvariantDeviceProfile> predefinedDeviceProfiles = new ArrayList<>();
+//        // width, height, #rows, #columns, #folder rows, #folder columns,
+//        // iconSize, iconTextSize, #hotseat, #hotseatIconSize, defaultLayoutId.
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Super Short Stubby",
+////                255, 300,     2, 3, 2, 3, 3, 48, 13, 3, 48, R.xml.default_workspace_4x4));
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Shorter Stubby",
+////                255, 400,     3, 3, 3, 3, 3, 48, 13, 3, 48, R.xml.default_workspace_4x4));
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Short Stubby",
+////                275, 420,     3, 4, 3, 4, 4, 48, 13, 5, 48, R.xml.default_workspace_4x4));
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Stubby",
+////                255, 450,     3, 4, 3, 4, 4, 48, 13, 5, 48, R.xml.default_workspace_4x4));
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus S",
+////                296, 491.33f, 4, 4, 4, 4, 4, 48, 13, 5, 48, R.xml.default_workspace_4x4));
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 4",
+////                335, 567,     4, 4, 4, 4, 4, DEFAULT_ICON_SIZE_DP, 13, 5, 56, R.xml.default_workspace_4x4));
+////        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 5",
+////                359, 567,     4, 4, 4, 4, 4, DEFAULT_ICON_SIZE_DP, 13, 5, 56, R.xml.default_workspace_4x4));
+//        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Large Phone",
+//                406, 694,     5, 5, 4, 4, 4, 64, 14.4f,  5, 56, R.xml.default_workspace_5x5));
+//        // The tablet profile is odd in that the landscape orientation
+//        // also includes the nav bar on the side
+//        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 7",
+//                575, 904,     5, 6, 4, 5, 4, 72, 14.4f,  7, 60, R.xml.default_workspace_5x6));
+//        // Larger tablet profiles always have system bars on the top & bottom
+//        predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 10",
+//                727, 1207,    5, 6, 4, 5, 4, 76, 14.4f,  7, 64, R.xml.default_workspace_5x6));
+//        predefinedDeviceProfiles.add(new InvariantDeviceProfile("20-inch Tablet",
+//                1527, 2527,   7, 7, 6, 6, 4, 100, 20,  7, 72, R.xml.default_workspace_4x4));
+//        return predefinedDeviceProfiles;
     }
 
     private int getLauncherIconDensity(int requiredSize) {
         // Densities typically defined by an app.
-        int[] densityBuckets = new int[] {
+        int[] densityBuckets = new int[]{
                 DisplayMetrics.DENSITY_LOW,
                 DisplayMetrics.DENSITY_MEDIUM,
                 DisplayMetrics.DENSITY_TV,
@@ -240,19 +267,8 @@ public class InvariantDeviceProfile {
         return density;
     }
 
-    /**
-     * Apply any Partner customization grid overrides.
-     *
-     * Currently we support: all apps row / column count.
-     */
-    private void applyPartnerDeviceProfileOverrides(Context context, DisplayMetrics dm) {
-        Partner p = Partner.get(context.getPackageManager());
-        if (p != null) {
-            p.applyInvariantDeviceProfileOverrides(this, dm);
-        }
-    }
-
-    @Thunk float dist(float x0, float y0, float x1, float y1) {
+    @Thunk
+    float dist(float x0, float y0, float x1, float y1) {
         return (float) Math.hypot(x1 - x0, y1 - y0);
     }
 
@@ -292,7 +308,7 @@ public class InvariantDeviceProfile {
             weights += w;
             out.add(p.multiply(w));
         }
-        return out.multiply(1.0f/weights);
+        return out.multiply(1.0f / weights);
     }
 
     private void add(InvariantDeviceProfile p) {
@@ -344,8 +360,8 @@ public class InvariantDeviceProfile {
         // We will use these two data points to extrapolate how much the wallpaper parallax effect
         // to span (ie travel) at any aspect ratio:
 
-        final float ASPECT_RATIO_LANDSCAPE = 16/10f;
-        final float ASPECT_RATIO_PORTRAIT = 10/16f;
+        final float ASPECT_RATIO_LANDSCAPE = 16 / 10f;
+        final float ASPECT_RATIO_PORTRAIT = 10 / 16f;
         final float WALLPAPER_WIDTH_TO_SCREEN_RATIO_LANDSCAPE = 1.5f;
         final float WALLPAPER_WIDTH_TO_SCREEN_RATIO_PORTRAIT = 1.2f;
 
@@ -361,4 +377,27 @@ public class InvariantDeviceProfile {
         return x * aspectRatio + y;
     }
 
+    @Override
+    public String toString() {
+        return "InvariantDeviceProfile{" +
+                "name='" + name + '\'' +
+                ", minWidthDps=" + minWidthDps +
+                ", minHeightDps=" + minHeightDps +
+                ", numRows=" + numRows +
+                ", numColumns=" + numColumns +
+                ", numFolderRows=" + numFolderRows +
+                ", numFolderColumns=" + numFolderColumns +
+                ", iconSize=" + iconSize +
+                ", landscapeIconSize=" + landscapeIconSize +
+                ", iconBitmapSize=" + iconBitmapSize +
+                ", fillResIconDpi=" + fillResIconDpi +
+                ", iconTextSize=" + iconTextSize +
+                ", numHotseatIcons=" + numHotseatIcons +
+                ", defaultLayoutId=" + defaultLayoutId +
+                ", demoModeLayoutId=" + demoModeLayoutId +
+                ", landscapeProfile=" + landscapeProfile +
+                ", portraitProfile=" + portraitProfile +
+                ", defaultWallpaperSize=" + defaultWallpaperSize +
+                '}';
+    }
 }

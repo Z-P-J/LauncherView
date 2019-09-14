@@ -36,7 +36,7 @@
         <item name="popupColorTertiary">#E0E0E0</item> <!-- Gray 300 -->
         <item name="isMainColorDark">false</item>
         <item name="isWorkspaceDarkText">false</item>
-        <item name="workspaceTextColor">#ffffff</item>
+        <item name="workspaceTextColor">@android:color/white</item>
         <item name="workspaceShadowColor">#B0000000</item>
         <item name="workspaceAmbientShadowColor">#33000000</item>
         <item name="workspaceKeyShadowColor">#44000000</item>
@@ -113,7 +113,7 @@
         <item name="android:alpha">0</item>
         <item name="android:elevation">3dp</item>
         <item name="android:saveEnabled">false</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 

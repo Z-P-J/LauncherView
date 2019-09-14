@@ -22,7 +22,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
 import com.android.launcher3.AbstractFloatingView;
@@ -98,42 +97,6 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
     }
 
     @Override
-    public boolean onRequestSendAccessibilityEvent(View child, AccessibilityEvent event) {
-        // Shortcuts can appear above folder
-        View topView = AbstractFloatingView.getTopOpenViewWithType(mActivity,
-                AbstractFloatingView.TYPE_ACCESSIBLE);
-        if (topView != null) {
-            if (child == topView) {
-                return super.onRequestSendAccessibilityEvent(child, event);
-            }
-            // Skip propagating onRequestSendAccessibilityEvent for all other children
-            // which are not topView
-            return false;
-        }
-        return super.onRequestSendAccessibilityEvent(child, event);
-    }
-
-    @Override
-    public void addChildrenForAccessibility(ArrayList<View> childrenForAccessibility) {
-        View topView = AbstractFloatingView.getTopOpenViewWithType(mActivity,
-                AbstractFloatingView.TYPE_ACCESSIBLE);
-        if (topView != null) {
-            // Only add the top view as a child for accessibility when it is open
-            addAccessibleChildToList(topView, childrenForAccessibility);
-        } else {
-            super.addChildrenForAccessibility(childrenForAccessibility);
-        }
-    }
-
-    protected void addAccessibleChildToList(View child, ArrayList<View> outList) {
-        if (child.isImportantForAccessibility()) {
-            outList.add(child);
-        } else {
-            child.addChildrenForAccessibility(outList);
-        }
-    }
-
-    @Override
     public void onViewRemoved(View child) {
         super.onViewRemoved(child);
         if (child instanceof AbstractFloatingView) {
@@ -170,7 +133,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
      * Determine the rect of the descendant in this DragLayer's coordinates
      *
      * @param descendant The descendant whose coordinates we want to find.
-     * @param r The rect into which to place the results.
+     * @param r          The rect into which to place the results.
      * @return The factor by which this descendant is scaled relative to this DragLayer.
      */
     public float getDescendantRectRelativeToSelf(View descendant, Rect r) {
@@ -198,16 +161,16 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
      * Given a coordinate relative to the descendant, find the coordinate in this DragLayer's
      * coordinates.
      *
-     * @param descendant The descendant to which the passed coordinate is relative.
-     * @param coord The coordinate that we want mapped.
+     * @param descendant        The descendant to which the passed coordinate is relative.
+     * @param coord             The coordinate that we want mapped.
      * @param includeRootScroll Whether or not to account for the scroll of the root descendant:
-     *          sometimes this is relevant as in a child's coordinates within the root descendant.
+     *                          sometimes this is relevant as in a child's coordinates within the root descendant.
      * @return The factor by which this descendant is scaled relative to this DragLayer. Caution
-     *         this scale factor is assumed to be equal in X and Y, and so if at any point this
-     *         assumption fails, we will need to return a pair of scale factors.
+     * this scale factor is assumed to be equal in X and Y, and so if at any point this
+     * assumption fails, we will need to return a pair of scale factors.
      */
     public float getDescendantCoordRelativeToSelf(View descendant, int[] coord,
-            boolean includeRootScroll) {
+                                                  boolean includeRootScroll) {
         return Utilities.getDescendantCoordRelativeToAncestor(descendant, this,
                 coord, includeRootScroll);
     }

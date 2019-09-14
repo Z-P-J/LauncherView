@@ -28,8 +28,6 @@ import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.dragndrop.DragLayer;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
 import com.android.launcher3.views.OptionsPopupView;
 
 import static android.view.MotionEvent.ACTION_CANCEL;
@@ -158,9 +156,6 @@ public class WorkspaceTouchListener implements OnTouchListener, Runnable {
 
                 mWorkspace.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
                         HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
-                mLauncher.getUserEventDispatcher().logActionOnContainer(Action.Touch.LONGPRESS,
-                        Action.Direction.NONE, ContainerType.WORKSPACE,
-                        mWorkspace.getCurrentPage());
                 OptionsPopupView.showDefaultOptions(mLauncher, mTouchDownPoint.x, mTouchDownPoint.y);
             } else {
                 cancelLongPress();

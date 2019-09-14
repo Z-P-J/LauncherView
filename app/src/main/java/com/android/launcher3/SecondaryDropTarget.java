@@ -2,32 +2,40 @@ package com.android.launcher3;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.UserHandle;
+import android.util.ArrayMap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.launcher3.Launcher.OnResumeCallback;
 import com.android.launcher3.dragndrop.DragOptions;
-import com.android.launcher3.logging.LoggerUtils;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Themes;
+
+import java.net.URISyntaxException;
 
 /**
  * Drop target which provides a secondary option for an item.
- *    For app targets: shows as uninstall
- *    For configurable widgets: shows as setup
+ * For app targets: shows as uninstall
+ * For configurable widgets: shows as setup
  */
 public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmListener {
 
     private static final String TAG = "SecondaryDropTarget";
-
-    public static final int UNINSTALL = R.id.action_uninstall;
     public static final int RECONFIGURE = R.id.action_reconfigure;
+    public static final int REMOVE = R.id.action_remove;
+    public static final int UNINSTALL = R.id.action_uninstall;
+
+    private static final long CACHE_EXPIRE_TIMEOUT = 5000;
+    private final ArrayMap<UserHandle, Boolean> mUninstallDisabledCache = new ArrayMap<>(1);
 
     private final Alarm mCacheExpireAlarm;
 
     protected int mCurrentAccessibilityAction = -1;
+
     public SecondaryDropTarget(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -64,25 +72,19 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
 
     @Override
     public void onAlarm(Alarm alarm) {
-
-    }
-
-    @Override
-    public Target getDropTargetForLogging() {
-        Target t = LoggerUtils.newTarget(Target.Type.CONTROL);
-        t.controlType = mCurrentAccessibilityAction == UNINSTALL ? ControlType.UNINSTALL_TARGET
-                : ControlType.SETTINGS_BUTTON;
-        return t;
+        mUninstallDisabledCache.clear();
     }
 
     @Override
     protected boolean supportsDrop(ItemInfo info) {
-        setupUi(UNINSTALL);
-
-        if (info instanceof ItemInfoWithIcon) {
-            return true;
-        }
         return false;
+    }
+
+    /**
+     * @return the component name that should be uninstalled or null.
+     */
+    private ComponentName getUninstallTarget(ItemInfo item) {
+        return null;
     }
 
     @Override
@@ -94,10 +96,11 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
 
     @Override
     public void completeDrop(final DragObject d) {
-        ComponentName target = performDropAction(null, d.dragInfo);
+        ComponentName target = performDropAction(getViewUnderDrag(d.dragInfo), d.dragInfo);
         if (d.dragSource instanceof DeferredOnComplete) {
             DeferredOnComplete deferred = (DeferredOnComplete) d.dragSource;
             if (target != null) {
+                deferred.mPackageName = target.getPackageName();
                 mLauncher.setOnResumeCallback(deferred);
             } else {
                 deferred.sendFailure();
@@ -105,17 +108,46 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
         }
     }
 
+    private View getViewUnderDrag(ItemInfo info) {
+//        if (info instanceof LauncherAppWidgetInfo && info.container == CONTAINER_DESKTOP &&
+//                mLauncher.getWorkspace().getDragInfo() != null) {
+//            return mLauncher.getWorkspace().getDragInfo().cell;
+//        }
+        return null;
+    }
+
     /**
      * Performs the drop action and returns the target component for the dragObject or null if
      * the action was not performed.
      */
     protected ComponentName performDropAction(View view, ItemInfo info) {
-//        if (mCurrentAccessibilityAction == RECONFIGURE) {
-//            return null;
-//        }
+        if (mCurrentAccessibilityAction == RECONFIGURE) {
+            return null;
+        }
+        // else: mCurrentAccessibilityAction == UNINSTALL
 
-        Toast.makeText(mLauncher, "卸载", Toast.LENGTH_SHORT).show();
-        return null;
+        ComponentName cn = getUninstallTarget(info);
+        if (cn == null) {
+            // System applications cannot be installed. For now, show a toast explaining that.
+            // We may give them the option of disabling apps this way.
+            Toast.makeText(mLauncher, R.string.uninstall_system_app_text, Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        try {
+            Intent i = Intent.parseUri(mLauncher.getString(R.string.delete_package_intent), 0)
+                    .setData(Uri.fromParts("package", cn.getPackageName(), cn.getClassName()))
+                    .putExtra(Intent.EXTRA_USER, info.user);
+            mLauncher.startActivity(i);
+            return cn;
+        } catch (URISyntaxException e) {
+            Log.e(TAG, "Failed to parse intent to start uninstall activity for item=" + info);
+            return null;
+        }
+    }
+
+    @Override
+    public void onAccessibilityDrop(View view, ItemInfo item) {
+        performDropAction(view, item);
     }
 
     /**
@@ -125,35 +157,34 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
     private class DeferredOnComplete implements DragSource, OnResumeCallback {
 
         private final DragSource mOriginal;
+        private final Context mContext;
 
+        private String mPackageName;
         private DragObject mDragObject;
 
         public DeferredOnComplete(DragSource original, Context context) {
             mOriginal = original;
+            mContext = context;
         }
 
         @Override
         public void onDropCompleted(View target, DragObject d,
-                boolean success) {
+                                    boolean success) {
             mDragObject = d;
         }
 
-        @Override
-        public void fillInLogContainerData(View v, ItemInfo info, Target target,
-                                           Target targetParent) {
-            mOriginal.fillInLogContainerData(v, info, target, targetParent);
-        }
+//        @Override
+//        public void fillInLogContainerData(View v, ItemInfo info, Target target,
+//                Target targetParent) {
+//            mOriginal.fillInLogContainerData(v, info, target, targetParent);
+//        }
 
         @Override
         public void onLauncherResume() {
-//            if (成功) {
-//                mDragObject.dragSource = mOriginal;
-//                mOriginal.onDropCompleted(SecondaryDropTarget.this, mDragObject, true);
-//            }
             sendFailure();
         }
 
-        void sendFailure() {
+        public void sendFailure() {
             mDragObject.dragSource = mOriginal;
             mDragObject.cancelled = true;
             mOriginal.onDropCompleted(SecondaryDropTarget.this, mDragObject, false);

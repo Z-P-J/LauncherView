@@ -21,23 +21,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorWrapper;
-import android.graphics.BitmapFactory;
 import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 
-import com.android.launcher3.IconCache;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherSettings;
-import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.graphics.LauncherIcons;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.LongArrayMap;
 
@@ -54,7 +49,6 @@ public class LoaderCursor extends CursorWrapper {
     public final LongSparseArray<UserHandle> allUsers = new LongSparseArray<>();
 
     private final Context mContext;
-    private final IconCache mIconCache;
     private final InvariantDeviceProfile mIDP;
 
     private final ArrayList<Long> itemsToRemove = new ArrayList<>();
@@ -87,7 +81,6 @@ public class LoaderCursor extends CursorWrapper {
     public LoaderCursor(Cursor c, LauncherAppState app) {
         super(c);
         mContext = app.getContext();
-        mIconCache = app.getIconCache();
         mIDP = app.getInvariantDeviceProfile();
 
         // Init column indices
@@ -123,8 +116,7 @@ public class LoaderCursor extends CursorWrapper {
     }
 
     public Intent parseIntent() {
-//        String intentDescription = getString(intentIndex);
-        String intentDescription = "#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10200000;component=com.android.launcher3/.Launcher;end";
+        String intentDescription = getString(intentIndex);
         try {
             return TextUtils.isEmpty(intentDescription) ?
                     null : Intent.parseUri(intentDescription, 0);
@@ -134,56 +126,17 @@ public class LoaderCursor extends CursorWrapper {
         }
     }
 
-    public ShortcutInfo loadSimpleShortcut() {
-        final ShortcutInfo info = new ShortcutInfo();
-        // Non-app shortcuts are only supported for current user.
-        info.user = user;
-        info.itemType = itemType;
-        info.title = getTitle();
-        // the fallback icon
-        if (!loadIcon(info)) {
-            mIconCache.getDefaultIcon(info.user).applyTo(info);
-        }
-
-        // TODO: If there's an explicit component and we can't install that, delete it.
-
-        return info;
-    }
-
-    /**
-     * Loads the icon from the cursor and updates the {@param info} if the icon is an app resource.
-     */
-    protected boolean loadIcon(ShortcutInfo info) {
-
-        // Failed to load from resource, try loading from DB.
-        byte[] data = getBlob(iconIndex);
-        try (LauncherIcons li = LauncherIcons.obtain(mContext)) {
-            li.createIconBitmap(BitmapFactory.decodeByteArray(data, 0, data.length)).applyTo(info);
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to load icon for info " + info, e);
-            return false;
-        }
-    }
-
-    /**
-     * Returns the title or empty string
-     */
-    private String getTitle() {
-        String title = getString(titleIndex);
-        return TextUtils.isEmpty(title) ? "" : Utilities.trim(title);
-    }
-
     /**
      * Marks the current item for removal
      */
     public void markDeleted(String reason) {
-        FileLog.e(TAG, reason);
+        Log.e(TAG, reason);
         itemsToRemove.add(id);
     }
 
     /**
      * Removes any items marked for removal.
+     *
      * @return true is any item was removed.
      */
     public boolean commitDeleted() {
@@ -205,10 +158,6 @@ public class LoaderCursor extends CursorWrapper {
             restoredRows.add(id);
             restoreFlag = 0;
         }
-    }
-
-    public boolean hasRestoreFlag(int flagMask) {
-        return (restoreFlag & flagMask) != 0;
     }
 
     public void commitRestoredItems() {
@@ -236,8 +185,6 @@ public class LoaderCursor extends CursorWrapper {
         info.screenId = getInt(screenIndex);
         info.cellX = getInt(cellXIndex);
         info.cellY = getInt(cellYIndex);
-        info.spanX = 1;
-        info.spanY = 1;
     }
 
     /**
