@@ -29,7 +29,6 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.android.launcher3.CellLayout.ContainerType;
-import com.android.launcher3.graphics.IconNormalizer;
 
 public class DeviceProfile {
 
@@ -337,8 +336,14 @@ public class DeviceProfile {
         }
 
         // Folder icon
-        folderIconSizePx = IconNormalizer.getNormalizedCircleSize(iconSizePx);
+        folderIconSizePx = getNormalizedCircleSize(iconSizePx);
         folderIconOffsetYPx = (iconSizePx - folderIconSizePx) / 2;
+    }
+
+    private static final float MAX_CIRCLE_AREA_FACTOR = 380.0f / 576;
+    public static int getNormalizedCircleSize(int size) {
+        float area = size * size * MAX_CIRCLE_AREA_FACTOR;
+        return (int) Math.round(Math.sqrt((4 * area) / Math.PI));
     }
 
     private void updateAvailableFolderCellDimensions(DisplayMetrics dm, Resources res) {

@@ -46,10 +46,8 @@ import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.anim.PropertyListBuilder;
-import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.folder.PreviewBackground;
 import com.android.launcher3.graphics.DragPreviewProvider;
 import com.android.launcher3.util.CellAndSpan;
@@ -57,6 +55,7 @@ import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.ParcelableSparseArray;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
+import com.qianxun.browser.database.HomepageManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -520,9 +519,6 @@ public class CellLayout extends ViewGroup {
         try {
             dispatchRestoreInstanceState(states);
         } catch (IllegalArgumentException ex) {
-            if (FeatureFlags.IS_DOGFOOD_BUILD) {
-                throw ex;
-            }
             // Mismatched viewId / viewType preventing restore. Skip restore on production builds.
             Log.e(TAG, "Ignoring an error while restoring a view instance state", ex);
         }
@@ -2034,11 +2030,11 @@ public class CellLayout extends ViewGroup {
         mTmpOccupied.copyTo(mOccupied);
 
         long screenId = mLauncher.getWorkspace().getIdForScreen(this);
-        int container = Favorites.CONTAINER_DESKTOP;
+        int container = ItemInfo.CONTAINER_DESKTOP;
 
         if (mContainerType == HOTSEAT) {
             screenId = -1;
-            container = Favorites.CONTAINER_HOTSEAT;
+            container = ItemInfo.CONTAINER_HOTSEAT;
         }
 
         int childCount = mShortcutsAndWidgets.getChildCount();
@@ -2059,7 +2055,7 @@ public class CellLayout extends ViewGroup {
                 info.spanY = lp.cellVSpan;
 
                 if (requiresDbUpdate) {
-                    mLauncher.getModelWriter().modifyItemInDatabase(info, container, screenId,
+                    HomepageManager.getInstance().modifyItemInDatabase(info, container, screenId,
                             info.cellX, info.cellY, info.spanX, info.spanY);
                 }
             }

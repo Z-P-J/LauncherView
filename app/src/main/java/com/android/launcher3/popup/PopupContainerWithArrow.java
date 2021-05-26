@@ -46,6 +46,7 @@ import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.touch.ItemLongClickListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -127,15 +128,8 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
             icon.clearFocus();
             return null;
         }
-        ItemInfo itemInfo = (ItemInfo) icon.getTag();
-//        if (!DeepShortcutManager.supportsShortcuts(itemInfo)) {
-//            return null;
-//        }
 
-        PopupDataProvider popupDataProvider = launcher.getPopupDataProvider();
-//        List<String> shortcutIds = popupDataProvider.getShortcutIdsForItem(itemInfo);
-        List<SystemShortcut> systemShortcuts = popupDataProvider
-                .getEnabledSystemShortcutsForItem(itemInfo);
+        List<SystemShortcut> systemShortcuts = Arrays.asList(SYSTEM_SHORTCUTS);
 
         final PopupContainerWithArrow container =
                 (PopupContainerWithArrow) launcher.getLayoutInflater().inflate(
@@ -143,6 +137,12 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         container.populateAndShow(icon, new ArrayList<>(), systemShortcuts);
         return container;
     }
+
+    private static final SystemShortcut[] SYSTEM_SHORTCUTS = new SystemShortcut[]{
+            new SystemShortcut.AppInfo(),
+            new SystemShortcut.Widgets(),
+            new SystemShortcut.Install()
+    };
 
     @Override
     protected void onInflationComplete(boolean isReversed) {
@@ -162,7 +162,6 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
     private void populateAndShow(final BubbleTextView originalIcon, final List<String> shortcutIds, List<SystemShortcut> systemShortcuts) {
         mOriginalIcon = originalIcon;
 
@@ -189,20 +188,11 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
         reorderAndShow(viewsToFlip);
 
-        ItemInfo originalItemInfo = (ItemInfo) originalIcon.getTag();
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            setAccessibilityPaneTitle(getTitleForAccessibility());
-        }
-
         mLauncher.getDragController().addDragListener(this);
         mOriginalIcon.forceHideBadge(true);
 
         // All views are added. Animate layout from now on.
         setLayoutTransition(new LayoutTransition());
-    }
-
-    private String getTitleForAccessibility() {
-        return getContext().getString(R.string.action_deep_shortcut);
     }
 
     @Override

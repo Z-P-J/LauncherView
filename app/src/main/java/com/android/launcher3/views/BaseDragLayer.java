@@ -48,7 +48,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
     protected final T mActivity;
     private final MultiValueAlpha mMultiValueAlpha;
 
-    protected TouchController[] mControllers;
+    protected TouchController mController;
     protected TouchController mActiveController;
     private TouchCompleteListener mTouchCompleteListener;
 
@@ -87,11 +87,9 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
             return true;
         }
 
-        for (TouchController controller : mControllers) {
-            if (controller.onControllerInterceptTouchEvent(ev)) {
-                mActiveController = controller;
-                return true;
-            }
+        if (mController.onControllerInterceptTouchEvent(ev)) {
+            mActiveController = mController;
+            return true;
         }
         return false;
     }

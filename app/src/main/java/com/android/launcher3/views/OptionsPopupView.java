@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.ControlType;
 import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
 import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
@@ -155,6 +156,7 @@ public class OptionsPopupView extends ArrowPopup
      */
     public static boolean startWallpaperPicker(View v) {
         Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
+        Launcher.fromContext(v.getContext()).getStateManager().goToState(LauncherState.SPRING_LOADED);
         return true;
     }
 

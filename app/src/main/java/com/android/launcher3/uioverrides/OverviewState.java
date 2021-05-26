@@ -15,10 +15,10 @@
  */
 package com.android.launcher3.uioverrides;
 
-import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
-
 import com.android.launcher3.ContainerType;
 import com.android.launcher3.LauncherState;
+
+import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
 
 /**
  * Definition for overview state

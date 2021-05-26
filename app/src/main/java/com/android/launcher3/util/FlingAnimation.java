@@ -1,7 +1,5 @@
 package com.android.launcher3.util;
 
-import static com.android.launcher3.LauncherState.NORMAL;
-
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
@@ -15,6 +13,8 @@ import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragView;
+
+import static com.android.launcher3.LauncherState.NORMAL;
 
 public class FlingAnimation implements AnimatorUpdateListener, Runnable {
 

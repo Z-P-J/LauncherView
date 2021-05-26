@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.android.launcher3.util.UiThreadHelper;
+import com.zpj.utils.KeyboardUtils;
 
 
 /**
@@ -106,7 +106,8 @@ public class ExtendedEditText extends EditText {
     }
 
     public void dispatchBackKey() {
-        UiThreadHelper.hideKeyboardAsync(getContext(), getWindowToken());
+//        UiThreadHelper.hideKeyboardAsync(getContext(), getWindowToken());
+        KeyboardUtils.hideSoftInputKeyboard(this);
         if (mBackKeyListener != null) {
             mBackKeyListener.onBackKey();
         }
@@ -135,6 +136,7 @@ public class ExtendedEditText extends EditText {
                 nextFocus.requestFocus();
             }
         }
-        UiThreadHelper.hideKeyboardAsync(getContext(), getWindowToken());
+        KeyboardUtils.hideSoftInputKeyboard(this);
+//        UiThreadHelper.hideKeyboardAsync(getContext(), getWindowToken());
     }
 }

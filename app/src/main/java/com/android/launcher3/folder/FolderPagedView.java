@@ -46,6 +46,7 @@ import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.pageindicators.PageIndicatorDots;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
+import com.qianxun.browser.database.HomepageManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -345,7 +346,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
                     info.cellY = newY;
                     info.rank = rank;
                     if (saveChanges) {
-                        mFolder.mLauncher.getModelWriter().addOrMoveItemInDatabase(info,
+                        HomepageManager.getInstance().addOrMoveItemInDatabase(info,
                                 mFolder.mInfo.id, 0, info.cellX, info.cellY);
                     }
                 }

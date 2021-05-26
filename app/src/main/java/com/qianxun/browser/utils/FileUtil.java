@@ -1,56 +1,15 @@
 package com.qianxun.browser.utils;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class FileUtil {
 
-    public static String readAssetFile(Context context, String str) throws IOException {
-        String str2 = "";
-        InputStream inputStream = null;
-        try {
-            inputStream = context.getAssets().open(str);
-            byte[] bArr = new byte[8092];
-            while (true) {
-                int read = inputStream.read(bArr);
-                if (read <= 0) {
-                    break;
-                }
-                str2 = new StringBuilder(String.valueOf(str2)).append(new String(bArr, 0, read)).toString();
-            }
-            return str2;
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        }
-    }
-
-    public static String readAssetFile(String str) throws IOException {
-        return readAssetFile(ContextHelper.getAppContext(), str);
-    }
-
-    public static Bitmap getImageFromAssetsFile(Context context, String fileName) {
-        Bitmap image = null;
-        AssetManager am = context.getResources().getAssets();
-        try {
-            InputStream is = am.open(fileName);
-            image = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return image;
-    }
 
     public static void writeToData(String fileName, String content) throws Exception {
         FileOutputStream outStream = ContextHelper.getAppContext().openFileOutput(fileName, Context.MODE_PRIVATE);

@@ -17,12 +17,7 @@
 package com.android.launcher3;
 
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.os.Process;
-import android.os.UserHandle;
-
-import com.android.launcher3.util.ContentWriter;
 
 /**
  * Represents an item in the launcher.
@@ -37,14 +32,14 @@ public class ItemInfo {
     public long id = NO_ID;
 
     /**
-     * One of {@link LauncherSettings.Favorites#ITEM_TYPE_APPLICATION},
-     * {@link LauncherSettings.Favorites#ITEM_TYPE_FOLDER},
+     * One of {@link ItemInfo#ITEM_TYPE_APPLICATION},
+     * {@link ItemInfo#ITEM_TYPE_FOLDER},
      */
     public int itemType;
 
     /**
      * The id of the container that holds this item. For the desktop, this will be
-     * {@link LauncherSettings.Favorites#CONTAINER_DESKTOP}. For the all applications folder it
+     * {@link ItemInfo#CONTAINER_DESKTOP}. For the all applications folder it
      * will be {@link #NO_ID} (since it is not stored in the settings DB). For user folders
      * it will be the id of the folder.
      */
@@ -52,8 +47,8 @@ public class ItemInfo {
 
     /**
      * Indicates the screen in which the shortcut appears if the container types is
-     * {@link LauncherSettings.Favorites#CONTAINER_DESKTOP}. (i.e., ignore if the container type is
-     * {@link LauncherSettings.Favorites#CONTAINER_HOTSEAT})
+     * {@link ItemInfo#CONTAINER_DESKTOP}. (i.e., ignore if the container type is
+     * {@link ItemInfo#CONTAINER_HOTSEAT})
      */
     public long screenId = -1;
 
@@ -97,21 +92,20 @@ public class ItemInfo {
      */
     public CharSequence title;
 
+    public String url;
+
     /**
      * Content description of the item.
      */
     public CharSequence contentDescription;
 
-    public UserHandle user;
-
     public ItemInfo() {
-        user = Process.myUserHandle();
     }
 
     ItemInfo(ItemInfo info) {
         copyFrom(info);
         // tempdebug:
-        LauncherModel.checkItemInfo(this);
+        LauncherLoader.checkItemInfo(this);
     }
 
     public void copyFrom(ItemInfo info) {
@@ -124,7 +118,6 @@ public class ItemInfo {
         screenId = info.screenId;
         itemType = info.itemType;
         container = info.container;
-        user = info.user;
         contentDescription = info.contentDescription;
     }
 
@@ -136,41 +129,6 @@ public class ItemInfo {
         return null;
     }
 
-    public void writeToValues(ContentWriter writer) {
-        writer.put(LauncherSettings.Favorites.ITEM_TYPE, itemType)
-                .put(LauncherSettings.Favorites.CONTAINER, container)
-                .put(LauncherSettings.Favorites.SCREEN, screenId)
-                .put(LauncherSettings.Favorites.CELLX, cellX)
-                .put(LauncherSettings.Favorites.CELLY, cellY)
-                .put(LauncherSettings.Favorites.SPANX, spanX)
-                .put(LauncherSettings.Favorites.SPANY, spanY)
-                .put(LauncherSettings.Favorites.RANK, rank);
-    }
-
-    public void readFromValues(ContentValues values) {
-        itemType = values.getAsInteger(LauncherSettings.Favorites.ITEM_TYPE);
-        container = values.getAsLong(LauncherSettings.Favorites.CONTAINER);
-        screenId = values.getAsLong(LauncherSettings.Favorites.SCREEN);
-        cellX = values.getAsInteger(LauncherSettings.Favorites.CELLX);
-        cellY = values.getAsInteger(LauncherSettings.Favorites.CELLY);
-        spanX = values.getAsInteger(LauncherSettings.Favorites.SPANX);
-        spanY = values.getAsInteger(LauncherSettings.Favorites.SPANY);
-        rank = values.getAsInteger(LauncherSettings.Favorites.RANK);
-    }
-
-    /**
-     * Write the fields of this item to the DB
-     */
-    public void onAddToDatabase(ContentWriter writer) {
-        if (screenId == Workspace.EXTRA_EMPTY_SCREEN_ID) {
-            // We should never persist an item on the extra empty screen.
-            throw new RuntimeException("Screen id should not be EXTRA_EMPTY_SCREEN_ID");
-        }
-
-        writeToValues(writer);
-        writer.put(LauncherSettings.Favorites.PROFILE_ID);
-    }
-
     @Override
     public final String toString() {
         return getClass().getSimpleName() + "(" + dumpProperties() + ")";
@@ -178,15 +136,41 @@ public class ItemInfo {
 
     protected String dumpProperties() {
         return "id=" + id
-                + " type=" + LauncherSettings.Favorites.itemTypeToString(itemType)
-                + " container=" + LauncherSettings.Favorites.containerToString((int) container)
+                + " type=" + itemTypeToString(itemType)
+                + " container=" + containerToString((int) container)
                 + " screen=" + screenId
                 + " cell(" + cellX + "," + cellY + ")"
                 + " span(" + spanX + "," + spanY + ")"
                 + " minSpan(" + minSpanX + "," + minSpanY + ")"
                 + " rank=" + rank
-                + " user=" + user
                 + " title=" + title;
+    }
+
+    public static final int CONTAINER_DESKTOP = -100;
+    public static final int CONTAINER_HOTSEAT = -101;
+
+    static String containerToString(int container) {
+        switch (container) {
+            case CONTAINER_DESKTOP:
+                return "desktop";
+            case CONTAINER_HOTSEAT:
+                return "hotseat";
+            default:
+                return String.valueOf(container);
+        }
+    }
+
+    public static final int ITEM_TYPE_APPLICATION = 0;
+    public static final int ITEM_TYPE_FOLDER = 2;
+    static String itemTypeToString(int type) {
+        switch (type) {
+            case ITEM_TYPE_APPLICATION:
+                return "APP";
+            case ITEM_TYPE_FOLDER:
+                return "FOLDER";
+            default:
+                return String.valueOf(type);
+        }
     }
 
     /**
@@ -194,5 +178,13 @@ public class ItemInfo {
      */
     public boolean isDisabled() {
         return false;
+    }
+
+    public int getViewIdForItem() {
+        // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+        // This cast is safe as long as the id < 0x00FFFFFF
+        // Since we jail all the dynamically generated views, there should be no clashes
+        // with any other views.
+        return (int) id;
     }
 }

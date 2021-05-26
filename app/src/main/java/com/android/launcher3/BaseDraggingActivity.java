@@ -74,11 +74,11 @@ public abstract class BaseDraggingActivity extends BaseActivity {
 
     public abstract View getRootView();
 
-    public static BaseDraggingActivity fromContext(Context context) {
-        if (context instanceof BaseDraggingActivity) {
-            return (BaseDraggingActivity) context;
+    public static Launcher fromContext(Context context) {
+        if (context instanceof Launcher) {
+            return (Launcher) context;
         }
-        return ((BaseDraggingActivity) ((ContextWrapper) context).getBaseContext());
+        return ((Launcher) ((ContextWrapper) context).getBaseContext());
     }
 
     @Override

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.v4.content.ContextCompat;
 
-import com.android.launcher3.base.App;
-
 
 /**
  * Created by yh on 2016/2/18.

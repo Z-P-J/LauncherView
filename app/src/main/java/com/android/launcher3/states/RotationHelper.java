@@ -15,20 +15,19 @@
  */
 package com.android.launcher3.states;
 
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED;
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_NOSENSOR;
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-import static android.util.DisplayMetrics.DENSITY_DEVICE_STABLE;
-
-import static com.android.launcher3.Utilities.ATLEAST_NOUGAT;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 
 import com.android.launcher3.R;
-import com.android.launcher3.Utilities;
+import com.zpj.utils.PrefsHelper;
+
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED;
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_NOSENSOR;
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+import static android.util.DisplayMetrics.DENSITY_DEVICE_STABLE;
+import static com.android.launcher3.Utilities.ATLEAST_NOUGAT;
 
 /**
  * Utility class to manage launcher rotation
@@ -54,14 +53,11 @@ public class RotationHelper implements OnSharedPreferenceChangeListener {
     public static final int REQUEST_LOCK = 2;
 
     private final Activity mActivity;
-    private final SharedPreferences mPrefs;
 
     private final boolean mIgnoreAutoRotateSettings;
     private boolean mAutoRotateEnabled;
 
-    /**
-     * Rotation request made by {@link InternalStateHandler}. This supersedes any other request.
-     */
+
     private int mStateHandlerRequest = REQUEST_NONE;
     /**
      * Rotation request made by a Launcher State
@@ -80,18 +76,15 @@ public class RotationHelper implements OnSharedPreferenceChangeListener {
         // On large devices we do not handle auto-rotate differently.
         mIgnoreAutoRotateSettings = mActivity.getResources().getBoolean(R.bool.allow_rotation);
         if (!mIgnoreAutoRotateSettings) {
-            mPrefs = Utilities.getPrefs(mActivity);
-            mPrefs.registerOnSharedPreferenceChangeListener(this);
-            mAutoRotateEnabled = mPrefs.getBoolean(ALLOW_ROTATION_PREFERENCE_KEY,
+            PrefsHelper.with().registerOnChangeListener(this);
+            mAutoRotateEnabled = PrefsHelper.with().getBoolean(ALLOW_ROTATION_PREFERENCE_KEY,
                     getAllowRotationDefaultValue());
-        } else {
-            mPrefs = null;
         }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        mAutoRotateEnabled = mPrefs.getBoolean(ALLOW_ROTATION_PREFERENCE_KEY,
+        mAutoRotateEnabled = sharedPreferences.getBoolean(ALLOW_ROTATION_PREFERENCE_KEY,
                 getAllowRotationDefaultValue());
         notifyChange();
     }
@@ -120,9 +113,7 @@ public class RotationHelper implements OnSharedPreferenceChangeListener {
     public void destroy() {
         if (!mDestroyed) {
             mDestroyed = true;
-            if (mPrefs != null) {
-                mPrefs.unregisterOnSharedPreferenceChangeListener(this);
-            }
+            PrefsHelper.with().unregisterOnChangeListener(this);
         }
     }
 

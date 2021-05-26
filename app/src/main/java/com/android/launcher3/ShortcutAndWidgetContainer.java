@@ -16,9 +16,6 @@
 
 package com.android.launcher3;
 
-import static android.view.MotionEvent.ACTION_DOWN;
-
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Rect;
 import android.view.MotionEvent;
@@ -26,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.launcher3.CellLayout.ContainerType;
+
+import static android.view.MotionEvent.ACTION_DOWN;
 
 public class ShortcutAndWidgetContainer extends ViewGroup {
     static final String TAG = "ShortcutAndWidgetContainer";
@@ -36,7 +35,6 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     @ContainerType
     private final int mContainerType;
-    private final WallpaperManager mWallpaperManager;
 
     private int mCellWidth;
     private int mCellHeight;
@@ -49,7 +47,6 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
     public ShortcutAndWidgetContainer(Context context, @ContainerType int containerType) {
         super(context);
         mLauncher = Launcher.getLauncher(context);
-        mWallpaperManager = WallpaperManager.getInstance(context);
         mContainerType = containerType;
     }
 
@@ -140,13 +137,6 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
                 if (lp.dropped) {
                     lp.dropped = false;
-
-                    final int[] cellXY = mTmpCellXY;
-                    getLocationOnScreen(cellXY);
-                    mWallpaperManager.sendWallpaperCommand(getWindowToken(),
-                            WallpaperManager.COMMAND_DROP,
-                            cellXY[0] + childLeft + lp.width / 2,
-                            cellXY[1] + childTop + lp.height / 2, 0, null);
                 }
             }
         }

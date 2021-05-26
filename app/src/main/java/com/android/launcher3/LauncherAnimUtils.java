@@ -168,10 +168,4 @@ public class LauncherAnimUtils {
                 }
             };
 
-    /**
-     * Increase the duration if we prevented the fling, as we are going against a high velocity.
-     */
-    public static int blockedFlingDurationFactor(float velocity) {
-        return (int) Utilities.boundToRange(Math.abs(velocity) / 2, 2f, 6f);
-    }
 }

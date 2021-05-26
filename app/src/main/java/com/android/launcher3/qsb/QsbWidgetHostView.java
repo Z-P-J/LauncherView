@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 
 /**

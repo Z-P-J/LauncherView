@@ -15,9 +15,6 @@
  */
 package com.android.launcher3.states;
 
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
-import static com.android.launcher3.states.RotationHelper.REQUEST_LOCK;
-
 import android.graphics.Rect;
 
 import com.android.launcher3.ContainerType;
@@ -25,6 +22,9 @@ import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.Workspace;
+
+import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
+import static com.android.launcher3.states.RotationHelper.REQUEST_LOCK;
 
 /**
  * Definition for spring loaded state used during drag and drop.

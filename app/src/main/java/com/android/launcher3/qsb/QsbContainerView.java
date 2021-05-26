@@ -38,8 +38,8 @@ import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
-import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.util.WidgetUtil;
+import com.zpj.utils.PrefsHelper;
 
 /**
  * A frame layout which contains a QSB. This internally uses fragment to bind the view, which
@@ -151,7 +151,7 @@ public class QsbContainerView extends FrameLayout {
             opts.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, size.right);
             opts.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, size.bottom);
 
-            int widgetId = Utilities.getPrefs(activity).getInt(QSB_WIDGET_ID, -1);
+            int widgetId = PrefsHelper.with().getInt(QSB_WIDGET_ID, -1);
             AppWidgetProviderInfo widgetInfo = widgetManager.getAppWidgetInfo(widgetId);
             boolean isWidgetBound = (widgetInfo != null) &&
                     widgetInfo.provider.equals(mWidgetInfo.provider);
@@ -198,7 +198,7 @@ public class QsbContainerView extends FrameLayout {
         }
 
         private void saveWidgetId(int widgetId) {
-            Utilities.getPrefs(getActivity()).edit().putInt(QSB_WIDGET_ID, widgetId).apply();
+            PrefsHelper.with().putInt(QSB_WIDGET_ID, widgetId);
         }
 
         @Override
@@ -250,7 +250,7 @@ public class QsbContainerView extends FrameLayout {
         }
 
         public boolean isQsbEnabled() {
-            return FeatureFlags.QSB_ON_FIRST_SCREEN;
+            return true;
         }
     }
 

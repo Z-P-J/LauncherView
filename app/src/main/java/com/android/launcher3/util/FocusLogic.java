@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.ShortcutAndWidgetContainer;
-import com.android.launcher3.config.FeatureFlags;
 
 import java.util.Arrays;
 
@@ -203,8 +202,7 @@ public class FocusLogic {
         ViewGroup hotseatParent = hotseatLayout.getShortcutsAndWidgets();
 
         boolean isHotseatHorizontal = !dp.isVerticalBarLayout();
-        boolean moreIconsInHotseatThanWorkspace = !FeatureFlags.NO_ALL_APPS_ICON &&
-                (isHotseatHorizontal
+        boolean moreIconsInHotseatThanWorkspace = (isHotseatHorizontal
                         ? hotseatLayout.getCountX() > iconLayout.getCountX()
                         : hotseatLayout.getCountY() > iconLayout.getCountY());
 

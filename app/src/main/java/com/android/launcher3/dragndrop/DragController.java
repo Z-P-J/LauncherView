@@ -16,28 +16,27 @@
 
 package com.android.launcher3.dragndrop;
 
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
-import com.android.launcher3.ShortcutInfo;
-import com.android.launcher3.util.ItemInfoMatcher;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.TouchController;
-import com.android.launcher3.util.UiThreadHelper;
 
 import java.util.ArrayList;
 
@@ -48,6 +47,9 @@ import static com.android.launcher3.LauncherState.NORMAL;
  * Class for initiating a drag within a view or across multiple views.
  */
 public class DragController implements DragDriver.EventListener, TouchController {
+
+    private static final String TAG = "DragController";
+
     private static final boolean PROFILE_DRAWING_DURING_DRAG = false;
 
     @Thunk
@@ -152,12 +154,14 @@ public class DragController implements DragDriver.EventListener, TouchController
     public DragView startDrag(Bitmap b, int dragLayerX, int dragLayerY,
                               DragSource source, ItemInfo dragInfo, Point dragOffset, Rect dragRegion,
                               float initialDragViewScale, float dragViewScaleOnDrop, DragOptions options) {
+        Log.d(TAG, "startDrag");
         if (PROFILE_DRAWING_DURING_DRAG) {
             android.os.Debug.startMethodTracing("Launcher");
         }
 
         // Hide soft keyboard, if visible
-        UiThreadHelper.hideKeyboardAsync(mLauncher, mWindowToken);
+        InputMethodManager imm = (InputMethodManager) mLauncher.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mWindowToken, 0);
 
         mOptions = options;
         if (mOptions.systemDndStartPoint != null) {
@@ -183,7 +187,6 @@ public class DragController implements DragDriver.EventListener, TouchController
                 ? res.getDimensionPixelSize(R.dimen.pre_drag_view_scale) : 0f;
         final DragView dragView = mDragObject.dragView = new DragView(mLauncher, b, registrationX,
                 registrationY, initialDragViewScale, dragViewScaleOnDrop, scaleDps);
-        dragView.setItemInfo(dragInfo);
         mDragObject.dragComplete = false;
         if (mOptions.isAccessibleDrag) {
             // For an accessible drag, we assume the view is being dragged from the center.
@@ -280,19 +283,6 @@ public class DragController implements DragDriver.EventListener, TouchController
         }
 
         mDragObject.dragSource.onDropCompleted(dropTarget, mDragObject, accepted);
-    }
-
-    public void onAppsRemoved(ItemInfoMatcher matcher) {
-        // Cancel the current drag if we are removing an app that we are dragging
-        if (mDragObject != null) {
-            ItemInfo dragInfo = mDragObject.dragInfo;
-            if (dragInfo instanceof ShortcutInfo) {
-                ComponentName cn = dragInfo.getTargetComponent();
-                if (cn != null && matcher.matches(dragInfo, cn)) {
-                    cancelDrag();
-                }
-            }
-        }
     }
 
     private void endDrag() {

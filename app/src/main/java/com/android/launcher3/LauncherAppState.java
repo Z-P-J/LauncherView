@@ -16,45 +16,21 @@
 
 package com.android.launcher3;
 
-import android.content.ContentProviderClient;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
-import android.os.Looper;
 import android.util.Log;
 
-import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.util.Preconditions;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
 public class LauncherAppState {
-
-    public static final String ACTION_FORCE_ROLOAD = "force-reload-launcher";
 
     // We do not need any synchronization for this variable as its only written on UI thread.
     private static LauncherAppState INSTANCE;
 
-    private final Context mContext;
-    private final LauncherModel mModel;
     private final InvariantDeviceProfile mInvariantDeviceProfile;
 
     public static LauncherAppState getInstance(final Context context) {
         if (INSTANCE == null) {
-            if (Looper.myLooper() == Looper.getMainLooper()) {
-                INSTANCE = new LauncherAppState(context.getApplicationContext());
-            } else {
-                try {
-                    return new MainThreadExecutor().submit(new Callable<LauncherAppState>() {
-                        @Override
-                        public LauncherAppState call() throws Exception {
-                            return LauncherAppState.getInstance(context);
-                        }
-                    }).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
+            synchronized (LauncherAppState.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new LauncherAppState(context.getApplicationContext());
                 }
             }
         }
@@ -65,53 +41,9 @@ public class LauncherAppState {
         return INSTANCE;
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
     private LauncherAppState(Context context) {
-        if (getLocalProvider(context) == null) {
-            throw new RuntimeException(
-                    "Initializing LauncherAppState in the absence of LauncherProvider");
-        }
-        Log.v(Launcher.TAG, "LauncherAppState initiated");
-        Preconditions.assertUIThread();
-        mContext = context;
-
-        mInvariantDeviceProfile = new InvariantDeviceProfile(mContext);
-        mModel = new LauncherModel(this);
-
-        // Register intent receivers
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_LOCALE_CHANGED);
-        // For handling managed profiles
-        filter.addAction(Intent.ACTION_MANAGED_PROFILE_ADDED);
-        filter.addAction(Intent.ACTION_MANAGED_PROFILE_REMOVED);
-        filter.addAction(Intent.ACTION_MANAGED_PROFILE_AVAILABLE);
-        filter.addAction(Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE);
-        filter.addAction(Intent.ACTION_MANAGED_PROFILE_UNLOCKED);
-
-        if (FeatureFlags.IS_DOGFOOD_BUILD) {
-            filter.addAction(ACTION_FORCE_ROLOAD);
-        }
-
-        mContext.registerReceiver(mModel, filter);
-    }
-
-    /**
-     * Call from Application.onTerminate(), which is not guaranteed to ever be called.
-     */
-    public void onTerminate() {
-        mContext.unregisterReceiver(mModel);
-    }
-
-    LauncherModel setLauncher(Launcher launcher) {
-        mModel.initialize(launcher);
-        return mModel;
-    }
-
-    public LauncherModel getModel() {
-        return mModel;
+        Log.v("LauncherAppState", "LauncherAppState initiated");
+        mInvariantDeviceProfile = new InvariantDeviceProfile(context);
     }
 
     public InvariantDeviceProfile getInvariantDeviceProfile() {
@@ -123,28 +55,5 @@ public class LauncherAppState {
      */
     public static InvariantDeviceProfile getIDP(Context context) {
         return LauncherAppState.getInstance(context).getInvariantDeviceProfile();
-    }
-
-    private static LauncherProvider getLocalProvider(Context context) {
-        // modify by codemx.cn --20190322--------start
-        LauncherProvider provider = null;
-        try {
-            ContentProviderClient client = context.getContentResolver()
-                    .acquireContentProviderClient(LauncherProvider.AUTHORITY);
-            if (client != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//>24
-                    client.close();
-                } else {
-                    client.release();
-                }
-                provider = (LauncherProvider) client.getLocalContentProvider();
-            } else {
-                Log.e("TAG", " can't get ContentProviderClient--- ");
-            }
-        } catch (Exception e) {
-            Log.e("TAG", e.getMessage());
-        }
-        return provider;
-        // modify by codemx.cn --20190322--------end
     }
 }

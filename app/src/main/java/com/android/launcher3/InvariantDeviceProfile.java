@@ -16,7 +16,6 @@
 
 package com.android.launcher3;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -29,7 +28,6 @@ import android.util.Xml;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.util.Thunk;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -118,7 +116,6 @@ public class InvariantDeviceProfile {
         demoModeLayoutId = dmlId;
     }
 
-    @TargetApi(23)
     public InvariantDeviceProfile(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
@@ -325,9 +322,6 @@ public class InvariantDeviceProfile {
     }
 
     public int getAllAppsButtonRank() {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && FeatureFlags.NO_ALL_APPS_ICON) {
-            throw new IllegalAccessError("Accessing all apps rank when all-apps is disabled");
-        }
         return numHotseatIcons / 2;
     }
 

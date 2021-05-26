@@ -16,9 +16,6 @@
 
 package com.android.launcher3.graphics;
 
-import static android.content.Intent.ACTION_SCREEN_OFF;
-import static android.content.Intent.ACTION_USER_PRESENT;
-
 import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -44,14 +41,16 @@ import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.Workspace;
-import com.android.launcher3.uioverrides.WallpaperColorInfo;
 import com.android.launcher3.util.Themes;
+
+import static android.content.Intent.ACTION_SCREEN_OFF;
+import static android.content.Intent.ACTION_USER_PRESENT;
 
 /**
  * View scrim which draws behind hotseat and workspace
  */
 public class WorkspaceAndHotseatScrim implements
-        View.OnAttachStateChangeListener, WallpaperColorInfo.OnChangeListener {
+        View.OnAttachStateChangeListener {
 
     public static Property<WorkspaceAndHotseatScrim, Float> SCRIM_PROGRESS =
             new Property<WorkspaceAndHotseatScrim, Float>(Float.TYPE, "scrimProgress") {
@@ -115,7 +114,6 @@ public class WorkspaceAndHotseatScrim implements
 
     private final Rect mHighlightRect = new Rect();
     private final Launcher mLauncher;
-    private final WallpaperColorInfo mWallpaperColorInfo;
     private final View mRoot;
 
     private Workspace mWorkspace;
@@ -144,12 +142,11 @@ public class WorkspaceAndHotseatScrim implements
     public WorkspaceAndHotseatScrim(View view) {
         mRoot = view;
         mLauncher = Launcher.getLauncher(view.getContext());
-        mWallpaperColorInfo = WallpaperColorInfo.getInstance(mLauncher);
 
         mMaskHeight = Utilities.pxFromDp(ALPHA_MASK_BITMAP_DP,
                 view.getResources().getDisplayMetrics());
 
-        mHasSysUiScrim = !mWallpaperColorInfo.supportsDarkText();
+        mHasSysUiScrim = false;
         if (mHasSysUiScrim) {
             mTopScrim = Themes.getAttrDrawable(view.getContext(), R.attr.workspaceStatusBarScrim);
             mBottomMask = createDitheredAlphaMask();
@@ -159,7 +156,6 @@ public class WorkspaceAndHotseatScrim implements
         }
 
         view.addOnAttachStateChangeListener(this);
-        onExtractedColorsChanged(mWallpaperColorInfo);
     }
 
     public void setWorkspace(Workspace workspace) {
@@ -226,8 +222,6 @@ public class WorkspaceAndHotseatScrim implements
 
     @Override
     public void onViewAttachedToWindow(View view) {
-        mWallpaperColorInfo.addOnChangeListener(this);
-        onExtractedColorsChanged(mWallpaperColorInfo);
 
         if (mHasSysUiScrim) {
             IntentFilter filter = new IntentFilter(ACTION_SCREEN_OFF);
@@ -238,22 +232,8 @@ public class WorkspaceAndHotseatScrim implements
 
     @Override
     public void onViewDetachedFromWindow(View view) {
-        mWallpaperColorInfo.removeOnChangeListener(this);
         if (mHasSysUiScrim) {
             mRoot.getContext().unregisterReceiver(mReceiver);
-        }
-    }
-
-    @Override
-    public void onExtractedColorsChanged(WallpaperColorInfo wallpaperColorInfo) {
-        // for super light wallpaper it needs to be darken for contrast to workspace
-        // for dark wallpapers the text is white so darkening works as well
-        mBottomMaskPaint.setColor(ColorUtils.compositeColors(DARK_SCRIM_COLOR,
-                wallpaperColorInfo.getMainColor()));
-        reapplySysUiAlpha();
-        mFullScrimColor = wallpaperColorInfo.getMainColor();
-        if (mScrimAlpha > 0) {
-            invalidate();
         }
     }
 

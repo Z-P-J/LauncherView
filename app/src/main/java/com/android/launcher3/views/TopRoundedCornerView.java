@@ -21,7 +21,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
 
 import com.android.launcher3.R;
 import com.android.launcher3.util.Themes;

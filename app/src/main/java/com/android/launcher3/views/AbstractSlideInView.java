@@ -15,8 +15,6 @@
  */
 package com.android.launcher3.views;
 
-import static com.android.launcher3.anim.Interpolators.scrollInterpolatorForVelocity;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -34,6 +32,8 @@ import com.android.launcher3.LauncherAnimUtils;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.touch.SwipeDetector;
+
+import static com.android.launcher3.anim.Interpolators.scrollInterpolatorForVelocity;
 
 /**
  * Extension of AbstractFloatingView with common methods for sliding in from bottom

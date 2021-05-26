@@ -30,6 +30,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.ColorUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Property;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -187,6 +188,10 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
     }
 
     private void applyIconAndLabel(ItemInfoWithIcon info) {
+//        if (info.iconBitmap == null) {
+//            info.iconBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_home);
+//        }
+        Log.d("BubbleTextView", "icon=" + info.iconBitmap);
         FastBitmapDrawable iconDrawable = DrawableFactory.get(getContext()).newIcon(info);
         mBadgeColor = IconPalette.getMutedColor(info.iconColor, 0.54f);
 
@@ -202,7 +207,7 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
     @Override
     public void setTag(Object tag) {
         if (tag != null) {
-            LauncherModel.checkItemInfo((ItemInfo) tag);
+            LauncherLoader.checkItemInfo((ItemInfo) tag);
         }
         super.setTag(tag);
     }
@@ -353,7 +358,7 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
         // Text should be visible everywhere but the hotseat.
         Object tag = getParent() instanceof FolderIcon ? ((View) getParent()).getTag() : getTag();
         ItemInfo info = tag instanceof ItemInfo ? (ItemInfo) tag : null;
-        return info == null || info.container != LauncherSettings.Favorites.CONTAINER_HOTSEAT;
+        return info == null || info.container != ItemInfo.CONTAINER_HOTSEAT;
     }
 
     public void setTextVisibility(boolean visible) {

@@ -26,14 +26,15 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Process;
 import android.view.View;
 
 import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
-import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.folder.FolderIcon;
-import com.android.launcher3.util.UiThreadHelper;
 
 import java.nio.ByteBuffer;
 
@@ -53,6 +54,8 @@ public class DragPreviewProvider {
 
     private OutlineGeneratorCallback mOutlineGeneratorCallback;
     public Bitmap generatedDragOutline;
+    private Handler mHandler;
+    private HandlerThread mHandlerThread;
 
     public DragPreviewProvider(View view) {
         this(view, view.getContext());
@@ -131,12 +134,21 @@ public class DragPreviewProvider {
     }
 
     public final void generateDragOutline(Bitmap preview) {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && mOutlineGeneratorCallback != null) {
-            throw new RuntimeException("Drag outline generated twice");
-        }
-
         mOutlineGeneratorCallback = new OutlineGeneratorCallback(preview);
-        new Handler(UiThreadHelper.getBackgroundLooper()).post(mOutlineGeneratorCallback);
+        if (mHandler == null) {
+            mHandler = new Handler(getBackgroundLooper());
+        }
+        mHandler.post(mOutlineGeneratorCallback);
+//        new Handler(getBackgroundLooper()).post(mOutlineGeneratorCallback);
+    }
+
+    public Looper getBackgroundLooper() {
+        if (mHandlerThread == null) {
+            mHandlerThread =
+                    new HandlerThread("DragPreviewProvider", Process.THREAD_PRIORITY_FOREGROUND);
+            mHandlerThread.start();
+        }
+        return mHandlerThread.getLooper();
     }
 
     protected static Rect getDrawableBounds(Drawable d) {

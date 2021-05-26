@@ -16,10 +16,7 @@
 
 package com.android.launcher3;
 
-import android.os.Process;
-
-import com.android.launcher3.model.ModelWriter;
-import com.android.launcher3.util.ContentWriter;
+import com.qianxun.browser.database.HomepageManager;
 
 import java.util.ArrayList;
 
@@ -27,18 +24,6 @@ import java.util.ArrayList;
  * Represents a folder containing shortcuts or apps.
  */
 public class FolderInfo extends ItemInfo {
-
-    public static final int NO_FLAGS = 0x00000000;
-
-    /**
-     * The folder is locked in sorted mode
-     */
-    public static final int FLAG_ITEMS_SORTED = 0x00000001;
-
-    /**
-     * It is a work folder
-     */
-    public static final int FLAG_WORK_FOLDER = 0x00000002;
 
     /**
      * The multi-page animation has run for this folder
@@ -52,11 +37,10 @@ public class FolderInfo extends ItemInfo {
      */
     public ArrayList<ShortcutInfo> contents = new ArrayList<ShortcutInfo>();
 
-    ArrayList<FolderListener> listeners = new ArrayList<FolderListener>();
+    private final ArrayList<FolderListener> listeners = new ArrayList<FolderListener>();
 
     public FolderInfo() {
-        itemType = LauncherSettings.Favorites.ITEM_TYPE_FOLDER;
-        user = Process.myUserHandle();
+        itemType = ItemInfo.ITEM_TYPE_FOLDER;
     }
 
     /**
@@ -100,14 +84,6 @@ public class FolderInfo extends ItemInfo {
         }
     }
 
-    @Override
-    public void onAddToDatabase(ContentWriter writer) {
-        super.onAddToDatabase(writer);
-        writer.put(LauncherSettings.Favorites.TITLE, title)
-                .put(LauncherSettings.Favorites.OPTIONS, options);
-
-    }
-
     public void addListener(FolderListener listener) {
         listeners.add(listener);
     }
@@ -129,35 +105,47 @@ public class FolderInfo extends ItemInfo {
     }
 
     public interface FolderListener {
-        public void onAdd(ShortcutInfo item, int rank);
+        void onAdd(ShortcutInfo item, int rank);
 
-        public void onRemove(ShortcutInfo item);
+        void onRemove(ShortcutInfo item);
 
-        public void onTitleChanged(CharSequence title);
+        void onTitleChanged(CharSequence title);
 
-        public void onItemsChanged(boolean animate);
+        void onItemsChanged(boolean animate);
 
-        public void prepareAutoUpdate();
+        void prepareAutoUpdate();
     }
 
     public boolean hasOption(int optionFlag) {
         return (options & optionFlag) != 0;
     }
 
-    /**
-     * @param option    flag to set or clear
-     * @param isEnabled whether to set or clear the flag
-     * @param writer    if not null, save changes to the db.
-     */
-    public void setOption(int option, boolean isEnabled, ModelWriter writer) {
+//    /**
+//     * @param option    flag to set or clear
+//     * @param isEnabled whether to set or clear the flag
+//     * @param writer    if not null, save changes to the db.
+//     */
+//    public void setOption(int option, boolean isEnabled, ModelWriter writer) {
+//        int oldOptions = options;
+//        if (isEnabled) {
+//            options |= option;
+//        } else {
+//            options &= ~option;
+//        }
+//        if (writer != null && oldOptions != options) {
+//            writer.updateItemInDatabase(this);
+//        }
+//    }
+
+    public void setOption(int option, boolean isEnabled) {
         int oldOptions = options;
         if (isEnabled) {
             options |= option;
         } else {
             options &= ~option;
         }
-        if (writer != null && oldOptions != options) {
-            writer.updateItemInDatabase(this);
+        if (oldOptions != options) {
+            HomepageManager.updateItemInDatabase(this);
         }
     }
 }

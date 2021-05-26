@@ -19,7 +19,6 @@ package com.android.launcher3;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.res.Configuration;
 import android.support.annotation.IntDef;
 
 import com.android.launcher3.DeviceProfile.OnDeviceProfileChangeListener;
@@ -114,11 +113,6 @@ public abstract class BaseActivity extends Activity {
     }
 
     @Override
-    public void onMultiWindowModeChanged(boolean isInMultiWindowMode, Configuration newConfig) {
-        super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
-    }
-
-    @Override
     protected void onStop() {
         mActivityFlags &= ~ACTIVITY_STATE_STARTED & ~ACTIVITY_STATE_USER_ACTIVE;
         mForceInvisible = 0;
@@ -139,13 +133,6 @@ public abstract class BaseActivity extends Activity {
 
     public boolean isStarted() {
         return (mActivityFlags & ACTIVITY_STATE_STARTED) != 0;
-    }
-
-    /**
-     * isResumed in already defined as a hidden final method in Activity.java
-     */
-    public boolean hasBeenResumed() {
-        return (mActivityFlags & ACTIVITY_STATE_RESUMED) != 0;
     }
 
     public void addOnDeviceProfileChangeListener(OnDeviceProfileChangeListener listener) {

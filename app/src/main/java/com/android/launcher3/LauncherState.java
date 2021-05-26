@@ -20,7 +20,6 @@ import android.view.animation.Interpolator;
 import com.android.launcher3.states.SpringLoadedState;
 import com.android.launcher3.uioverrides.AllAppsState;
 import com.android.launcher3.uioverrides.OverviewState;
-import com.android.launcher3.uioverrides.UiFactory;
 
 import java.util.Arrays;
 
@@ -203,7 +202,6 @@ public class LauncherState {
     /**
      * Fraction shift in the vertical translation UI and related properties
      *
-     * @see com.android.launcher3.allapps.AllAppsTransitionController
      */
     public float getVerticalProgress(Launcher launcher) {
         return 1f;
@@ -240,7 +238,6 @@ public class LauncherState {
      */
     public void onStateTransitionEnd(Launcher launcher) {
         if (this == NORMAL) {
-            UiFactory.resetOverview(launcher);
             // Clear any rotation locks when going to normal state
             launcher.getRotationHelper().setCurrentStateRequest(REQUEST_NONE);
         }

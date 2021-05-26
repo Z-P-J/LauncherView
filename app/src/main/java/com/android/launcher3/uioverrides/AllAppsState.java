@@ -15,15 +15,14 @@
  */
 package com.android.launcher3.uioverrides;
 
-import static com.android.launcher3.LauncherAnimUtils.ALL_APPS_TRANSITION_MS;
-import static com.android.launcher3.allapps.DiscoveryBounce.HOME_BOUNCE_SEEN;
-import static com.android.launcher3.anim.Interpolators.DEACCEL_2;
-
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.ContainerType;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
+
+import static com.android.launcher3.LauncherAnimUtils.ALL_APPS_TRANSITION_MS;
+import static com.android.launcher3.anim.Interpolators.DEACCEL_2;
 
 /**
  * Definition for AllApps state
@@ -47,10 +46,6 @@ public class AllAppsState extends LauncherState {
 
     @Override
     public void onStateEnabled(Launcher launcher) {
-        if (!launcher.getSharedPrefs().getBoolean(HOME_BOUNCE_SEEN, false)) {
-            launcher.getSharedPrefs().edit().putBoolean(HOME_BOUNCE_SEEN, true).apply();
-        }
-
         AbstractFloatingView.closeAllOpenViews(launcher);
         dispatchWindowStateChanged(launcher);
     }
@@ -68,7 +63,7 @@ public class AllAppsState extends LauncherState {
     @Override
     public float[] getWorkspaceScaleAndTranslation(Launcher launcher) {
         return new float[]{1f, 0,
-                -launcher.getAllAppsController().getShiftRange() * PARALLAX_COEFFICIENT};
+                -launcher.getDeviceProfile().heightPx * PARALLAX_COEFFICIENT};
     }
 
     @Override

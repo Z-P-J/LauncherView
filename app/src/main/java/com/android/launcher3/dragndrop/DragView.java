@@ -22,7 +22,6 @@ import android.animation.FloatArrayEvaluator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.annotation.TargetApi;
-import android.content.pm.LauncherActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -32,29 +31,19 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.animation.FloatPropertyCompat;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
 import android.view.View;
 
-import com.android.launcher3.FastBitmapDrawable;
-import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAnimUtils;
-import com.android.launcher3.LauncherAppState;
-import com.android.launcher3.LauncherModel;
-import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.Interpolators;
-import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.graphics.LauncherIcons;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 
@@ -185,92 +174,6 @@ public class DragView extends View {
         setElevation(getResources().getDimension(R.dimen.drag_elevation));
     }
 
-    /**
-     * Initialize {@code #mIconDrawable} if the item can be represented using
-     * an {@link AdaptiveIconDrawable} or {@link FolderAdaptiveIcon}.
-     */
-    @TargetApi(Build.VERSION_CODES.O)
-    public void setItemInfo(final ItemInfo info) {
-        if (!(FeatureFlags.LAUNCHER3_SPRING_ICONS && Utilities.ATLEAST_OREO)) {
-            return;
-        }
-        if (info.itemType != LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
-                info.itemType != LauncherSettings.Favorites.ITEM_TYPE_FOLDER) {
-            return;
-        }
-        // Load the adaptive icon on a background thread and add the view in ui thread.
-        final Looper workerLooper = LauncherModel.getWorkerLooper();
-        new Handler(workerLooper).postAtFrontOfQueue(new Runnable() {
-            @Override
-            public void run() {
-                LauncherAppState appState = LauncherAppState.getInstance(mLauncher);
-                Object[] outObj = new Object[1];
-                final Drawable dr = getFullDrawable(info, appState, outObj);
-
-                if (dr instanceof AdaptiveIconDrawable) {
-                    int w = mBitmap.getWidth();
-                    int h = mBitmap.getHeight();
-                    int blurMargin = (int) mLauncher.getResources()
-                            .getDimension(R.dimen.blur_size_medium_outline) / 2;
-
-                    Rect bounds = new Rect(0, 0, w, h);
-                    bounds.inset(blurMargin, blurMargin);
-
-                    LauncherIcons li = LauncherIcons.obtain(mLauncher);
-                    Utilities.scaleRectAboutCenter(bounds,
-                            li.getNormalizer().getScale(dr, null, null, null));
-                    li.recycle();
-                    AdaptiveIconDrawable adaptiveIcon = (AdaptiveIconDrawable) dr;
-
-                    // Shrink very tiny bit so that the clip path is smaller than the original bitmap
-                    // that has anti aliased edges and shadows.
-                    Rect shrunkBounds = new Rect(bounds);
-                    Utilities.scaleRectAboutCenter(shrunkBounds, 0.98f);
-                    adaptiveIcon.setBounds(shrunkBounds);
-                    final Path mask = adaptiveIcon.getIconMask();
-
-                    mTranslateX = new SpringFloatValue(DragView.this,
-                            w * AdaptiveIconDrawable.getExtraInsetFraction());
-                    mTranslateY = new SpringFloatValue(DragView.this,
-                            h * AdaptiveIconDrawable.getExtraInsetFraction());
-
-                    bounds.inset(
-                            (int) (-bounds.width() * AdaptiveIconDrawable.getExtraInsetFraction()),
-                            (int) (-bounds.height() * AdaptiveIconDrawable.getExtraInsetFraction())
-                    );
-                    mBgSpringDrawable = adaptiveIcon.getBackground();
-                    if (mBgSpringDrawable == null) {
-                        mBgSpringDrawable = new ColorDrawable(Color.TRANSPARENT);
-                    }
-                    mBgSpringDrawable.setBounds(bounds);
-                    mFgSpringDrawable = adaptiveIcon.getForeground();
-                    if (mFgSpringDrawable == null) {
-                        mFgSpringDrawable = new ColorDrawable(Color.TRANSPARENT);
-                    }
-                    mFgSpringDrawable.setBounds(bounds);
-
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Assign the variable on the UI thread to avoid race conditions.
-                            mScaledMaskPath = mask;
-
-                            // Do not draw the background in case of folder as its translucent
-                            mDrawBitmap = !(dr instanceof FolderAdaptiveIcon);
-
-                            if (info.isDisabled()) {
-                                FastBitmapDrawable d = new FastBitmapDrawable((Bitmap) null);
-                                d.setIsDisabled(true);
-                                mBaseFilter = (ColorMatrixColorFilter) d.getColorFilter();
-                            }
-                            updateColorFilter();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
     @TargetApi(Build.VERSION_CODES.O)
     private void updateColorFilter() {
         if (mCurrentFilter == null) {
@@ -301,27 +204,27 @@ public class DragView extends View {
         invalidate();
     }
 
-    /**
-     * Returns the full drawable for {@param info}.
-     *
-     * @param outObj this is set to the internal data associated with {@param info},
-     *               eg {@link LauncherActivityInfo} or {@link }.
-     */
-    private Drawable getFullDrawable(ItemInfo info, LauncherAppState appState, Object[] outObj) {
-        if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION) {
-            return null;
-        } else if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_FOLDER) {
-            FolderAdaptiveIcon icon = FolderAdaptiveIcon.createFolderAdaptiveIcon(
-                    mLauncher, info.id, new Point(mBitmap.getWidth(), mBitmap.getHeight()));
-            if (icon == null) {
-                return null;
-            }
-            outObj[0] = icon;
-            return icon;
-        } else {
-            return null;
-        }
-    }
+//    /**
+//     * Returns the full drawable for {@param info}.
+//     *
+//     * @param outObj this is set to the internal data associated with {@param info},
+//     *               eg {@link LauncherActivityInfo} or {@link }.
+//     */
+//    private Drawable getFullDrawable(ItemInfo info, LauncherAppState appState, Object[] outObj) {
+//        if (info.itemType == ItemInfo.ITEM_TYPE_APPLICATION) {
+//            return null;
+//        } else if (info.itemType == ItemInfo.ITEM_TYPE_FOLDER) {
+//            FolderAdaptiveIcon icon = FolderAdaptiveIcon.createFolderAdaptiveIcon(
+//                    mLauncher, info.id, new Point(mBitmap.getWidth(), mBitmap.getHeight()));
+//            if (icon == null) {
+//                return null;
+//            }
+//            outObj[0] = icon;
+//            return icon;
+//        } else {
+//            return null;
+//        }
+//    }
 
     /**
      * For apps icons and shortcut icons that have badges, this method creates a drawable that can

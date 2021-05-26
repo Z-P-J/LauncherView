@@ -16,20 +16,6 @@
 
 package com.android.launcher3;
 
-import static android.view.View.VISIBLE;
-import static com.android.launcher3.LauncherState.ALL_APPS;
-import static com.android.launcher3.LauncherState.NORMAL;
-import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_OVERVIEW_FADE;
-import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_OVERVIEW_SCALE;
-import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_FADE;
-import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_SCALE;
-import static com.android.launcher3.anim.Interpolators.ACCEL;
-import static com.android.launcher3.anim.Interpolators.DEACCEL;
-import static com.android.launcher3.anim.Interpolators.DEACCEL_1_7;
-import static com.android.launcher3.anim.Interpolators.OVERSHOOT_1_2;
-import static com.android.launcher3.anim.Interpolators.clampToProgress;
-import static com.android.launcher3.anim.PropertySetter.NO_ANIM_PROPERTY_SETTER;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -42,11 +28,22 @@ import com.android.launcher3.anim.AnimatorPlaybackController;
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.PropertySetter;
 import com.android.launcher3.anim.PropertySetter.AnimatedPropertySetter;
-import com.android.launcher3.uioverrides.UiFactory;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
+
+import static android.view.View.VISIBLE;
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_OVERVIEW_FADE;
+import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_OVERVIEW_SCALE;
+import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_FADE;
+import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_SCALE;
+import static com.android.launcher3.anim.Interpolators.ACCEL;
+import static com.android.launcher3.anim.Interpolators.DEACCEL;
+import static com.android.launcher3.anim.Interpolators.DEACCEL_1_7;
+import static com.android.launcher3.anim.Interpolators.OVERSHOOT_1_2;
+import static com.android.launcher3.anim.Interpolators.clampToProgress;
+import static com.android.launcher3.anim.PropertySetter.NO_ANIM_PROPERTY_SETTER;
 
 /**
  * TODO: figure out what kind of tests we can write for this
@@ -113,9 +110,7 @@ public class LauncherStateManager {
     private final AnimationConfig mConfig = new AnimationConfig();
     private final Handler mUiHandler;
     private final Launcher mLauncher;
-    private final ArrayList<StateListener> mListeners = new ArrayList<>();
 
-    private StateHandler[] mStateHandlers;
     private LauncherState mState = NORMAL;
 
     private LauncherState mLastStableState = NORMAL;
@@ -130,21 +125,6 @@ public class LauncherStateManager {
 
     public LauncherState getState() {
         return mState;
-    }
-
-    public StateHandler[] getStateHandlers() {
-        if (mStateHandlers == null) {
-            mStateHandlers = UiFactory.getStateHandler(mLauncher);
-        }
-        return mStateHandlers;
-    }
-
-    public void addStateListener(StateListener listener) {
-        mListeners.add(listener);
-    }
-
-    public void removeStateListener(StateListener listener) {
-        mListeners.remove(listener);
     }
 
     /**
@@ -195,9 +175,7 @@ public class LauncherStateManager {
             cancelAnimation();
         }
         if (mConfig.mCurrentAnimation == null) {
-            for (StateHandler handler : getStateHandlers()) {
-                handler.setState(mState);
-            }
+            mLauncher.getWorkspace().setState(mState);
         }
     }
 
@@ -230,13 +208,8 @@ public class LauncherStateManager {
 
         if (!animated) {
             onStateTransitionStart(state);
-            for (StateHandler handler : getStateHandlers()) {
-                handler.setState(state);
-            }
+            mLauncher.getWorkspace().setState(mState);
 
-            for (int i = mListeners.size() - 1; i >= 0; i--) {
-                mListeners.get(i).onStateSetImmediately(state);
-            }
             onStateTransitionEnd(state);
 
             // Run any queued runnable
@@ -274,9 +247,6 @@ public class LauncherStateManager {
             builder.setInterpolator(ANIM_WORKSPACE_FADE, OVERSHOOT_1_2);
             builder.setInterpolator(ANIM_OVERVIEW_SCALE, OVERSHOOT_1_2);
             builder.setInterpolator(ANIM_OVERVIEW_FADE, OVERSHOOT_1_2);
-
-            // Start from a higher overview scale, but only if we're invisible so we don't jump.
-            UiFactory.prepareToShowOverview(mLauncher);
         } else if (fromState.overviewUi && toState == NORMAL) {
             builder.setInterpolator(ANIM_WORKSPACE_SCALE, DEACCEL);
             builder.setInterpolator(ANIM_WORKSPACE_FADE, ACCEL);
@@ -299,45 +269,11 @@ public class LauncherStateManager {
         }
     }
 
-    /**
-     * Creates a {@link AnimatorPlaybackController} that can be used for a controlled
-     * state transition.
-     *
-     * @param state    the final state for the transition.
-     * @param duration intended duration for normal playback. Use higher duration for better
-     *                 accuracy.
-     */
-    public AnimatorPlaybackController createAnimationToNewWorkspace(
-            LauncherState state, long duration) {
-        return createAnimationToNewWorkspace(state, duration, LauncherStateManager.ANIM_ALL);
-    }
-
-    public AnimatorPlaybackController createAnimationToNewWorkspace(
-            LauncherState state, long duration, @AnimationComponents int animComponents) {
-        return createAnimationToNewWorkspace(state, new AnimatorSetBuilder(), duration, null,
-                animComponents);
-    }
-
-    public AnimatorPlaybackController createAnimationToNewWorkspace(LauncherState state,
-                                                                    AnimatorSetBuilder builder, long duration, Runnable onCancelRunnable,
-                                                                    @AnimationComponents int animComponents) {
-        mConfig.reset();
-        mConfig.userControlled = true;
-        mConfig.animComponents = animComponents;
-        mConfig.duration = duration;
-        mConfig.playbackController = AnimatorPlaybackController.wrap(
-                createAnimationToNewWorkspaceInternal(state, builder, null), duration,
-                onCancelRunnable);
-        return mConfig.playbackController;
-    }
-
     protected AnimatorSet createAnimationToNewWorkspaceInternal(final LauncherState state,
                                                                 AnimatorSetBuilder builder, final Runnable onCompleteRunnable) {
-
-        for (StateHandler handler : getStateHandlers()) {
-            builder.startTag(handler);
-            handler.setStateWithAnimation(state, builder, mConfig);
-        }
+        Workspace workspace = mLauncher.getWorkspace();
+        builder.startTag(workspace);
+        workspace.setStateWithAnimation(state, builder, mConfig);
 
         final AnimatorSet animation = builder.build();
         animation.addListener(new AnimationSuccessListener() {
@@ -346,9 +282,6 @@ public class LauncherStateManager {
             public void onAnimationStart(Animator animation) {
                 // Change the internal state only when the transition actually starts
                 onStateTransitionStart(state);
-                for (int i = mListeners.size() - 1; i >= 0; i--) {
-                    mListeners.get(i).onStateTransitionStart(state);
-                }
             }
 
             @Override
@@ -364,9 +297,6 @@ public class LauncherStateManager {
                     onCompleteRunnable.run();
                 }
                 onStateTransitionEnd(state);
-                for (int i = mListeners.size() - 1; i >= 0; i--) {
-                    mListeners.get(i).onStateTransitionComplete(state);
-                }
             }
         });
         mConfig.setAnimation(animation, state);
@@ -382,7 +312,6 @@ public class LauncherStateManager {
             // Only disable clipping if needed, otherwise leave it as previous value.
             mLauncher.getWorkspace().setClipChildren(false);
         }
-        UiFactory.onLauncherStateOrResumeChanged(mLauncher);
     }
 
     private void onStateTransitionEnd(LauncherState state) {
@@ -400,13 +329,11 @@ public class LauncherStateManager {
             setRestState(null);
         }
 
-        UiFactory.onLauncherStateOrResumeChanged(mLauncher);
-
         mLauncher.getDragLayer().requestFocus();
     }
 
     public void onWindowFocusChanged() {
-        UiFactory.onLauncherStateOrFocusChanged(mLauncher);
+
     }
 
     public LauncherState getLastState() {
@@ -576,15 +503,4 @@ public class LauncherStateManager {
                                    AnimatorSetBuilder builder, AnimationConfig config);
     }
 
-    public interface StateListener {
-
-        /**
-         * Called when the state is set without an animation.
-         */
-        void onStateSetImmediately(LauncherState state);
-
-        void onStateTransitionStart(LauncherState toState);
-
-        void onStateTransitionComplete(LauncherState finalState);
-    }
 }

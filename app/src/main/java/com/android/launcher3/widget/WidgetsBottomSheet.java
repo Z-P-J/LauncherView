@@ -16,18 +16,13 @@
 
 package com.android.launcher3.widget;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.animation.AnimationUtils;
 
 import com.android.launcher3.Insettable;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
-import com.android.launcher3.R;
 import com.android.launcher3.anim.Interpolators;
 
 /**

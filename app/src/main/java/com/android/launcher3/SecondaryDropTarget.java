@@ -2,20 +2,15 @@ package com.android.launcher3;
 
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.UserHandle;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.launcher3.Launcher.OnResumeCallback;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.util.Themes;
-
-import java.net.URISyntaxException;
 
 /**
  * Drop target which provides a secondary option for an item.
@@ -121,28 +116,8 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
      * the action was not performed.
      */
     protected ComponentName performDropAction(View view, ItemInfo info) {
-        if (mCurrentAccessibilityAction == RECONFIGURE) {
-            return null;
-        }
-        // else: mCurrentAccessibilityAction == UNINSTALL
-
-        ComponentName cn = getUninstallTarget(info);
-        if (cn == null) {
-            // System applications cannot be installed. For now, show a toast explaining that.
-            // We may give them the option of disabling apps this way.
-            Toast.makeText(mLauncher, R.string.uninstall_system_app_text, Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        try {
-            Intent i = Intent.parseUri(mLauncher.getString(R.string.delete_package_intent), 0)
-                    .setData(Uri.fromParts("package", cn.getPackageName(), cn.getClassName()))
-                    .putExtra(Intent.EXTRA_USER, info.user);
-            mLauncher.startActivity(i);
-            return cn;
-        } catch (URISyntaxException e) {
-            Log.e(TAG, "Failed to parse intent to start uninstall activity for item=" + info);
-            return null;
-        }
+        Toast.makeText(mLauncher, "TODO performDropAction info=" + info.title, Toast.LENGTH_SHORT).show();
+        return null;
     }
 
     @Override
