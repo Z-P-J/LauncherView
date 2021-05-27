@@ -39,7 +39,7 @@ public class AnimatorSetBuilder {
     protected final ArrayList<Animator> mAnims = new ArrayList<>();
 
     private final SparseArray<Interpolator> mInterpolators = new SparseArray<>();
-    private List<Runnable> mOnFinishRunnables = new ArrayList<>();
+    private final List<Runnable> mOnFinishRunnables = new ArrayList<>();
 
     /**
      * Associates a tag with all the animations added after this call.

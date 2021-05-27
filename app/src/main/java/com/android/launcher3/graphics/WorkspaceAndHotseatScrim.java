@@ -78,7 +78,7 @@ public class WorkspaceAndHotseatScrim implements
                 }
             };
 
-    private static Property<WorkspaceAndHotseatScrim, Float> SYSUI_ANIM_MULTIPLIER =
+    private static final Property<WorkspaceAndHotseatScrim, Float> SYSUI_ANIM_MULTIPLIER =
             new Property<WorkspaceAndHotseatScrim, Float>(Float.TYPE, "sysUiAnimMultiplier") {
                 @Override
                 public Float get(WorkspaceAndHotseatScrim scrim) {

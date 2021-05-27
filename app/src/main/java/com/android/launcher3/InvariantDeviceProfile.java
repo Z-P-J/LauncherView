@@ -41,17 +41,17 @@ import java.util.Comparator;
 public class InvariantDeviceProfile {
 
     // This is a static that we use for the default icon size on a 4/5-inch phone
-    private static float DEFAULT_ICON_SIZE_DP = 60;
+    private static final float DEFAULT_ICON_SIZE_DP = 60;
 
     private static final float ICON_SIZE_DEFINED_IN_APP_DP = 48;
 
     // Constants that affects the interpolation curve between statically defined device profile
     // buckets.
-    private static float KNEARESTNEIGHBOR = 3;
-    private static float WEIGHT_POWER = 5;
+    private static final float KNEARESTNEIGHBOR = 3;
+    private static final float WEIGHT_POWER = 5;
 
     // used to offset float not being able to express extremely small weights in extreme cases.
-    private static float WEIGHT_EFFICIENT = 100000f;
+    private static final float WEIGHT_EFFICIENT = 100000f;
 
     // Profile-defining invariant properties
     String name;

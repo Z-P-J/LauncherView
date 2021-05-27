@@ -43,7 +43,7 @@ import static com.android.launcher3.folder.FolderIcon.DROP_IN_ANIMATION_DURATION
  */
 public class PreviewItemManager {
 
-    private FolderIcon mIcon;
+    private final FolderIcon mIcon;
 
     // These variables are all associated with the drawing of the preview; they are stored
     // as member variables for shared usage and to avoid computation on each frame
@@ -53,9 +53,9 @@ public class PreviewItemManager {
     private Drawable mReferenceDrawable = null;
 
     // These hold the first page preview items
-    private ArrayList<PreviewItemDrawingParams> mFirstPageParams = new ArrayList<>();
+    private final ArrayList<PreviewItemDrawingParams> mFirstPageParams = new ArrayList<>();
     // These hold the current page preview items. It is empty if the current page is the first page.
-    private ArrayList<PreviewItemDrawingParams> mCurrentPageParams = new ArrayList<>();
+    private final ArrayList<PreviewItemDrawingParams> mCurrentPageParams = new ArrayList<>();
 
     private float mCurrentPageItemsTransX = 0;
     private boolean mShouldSlideInFirstPage;

@@ -17,7 +17,7 @@ public class FileUtil {
         outStream.close();
     }
 
-    public static String readFromData(String fileNmae) throws FileNotFoundException, IOException {
+    public static String readFromData(String fileNmae) throws IOException {
         FileInputStream inStream = null;
         inStream = ContextHelper.getAppContext().openFileInput(fileNmae);
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();//输出到内存

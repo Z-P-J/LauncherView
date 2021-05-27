@@ -26,7 +26,7 @@ import android.support.annotation.NonNull;
  * that creates a shape with a triangular path (pointing up or down).
  */
 public class TriangleShape extends PathShape {
-    private Path mTriangularPath;
+    private final Path mTriangularPath;
 
     public TriangleShape(Path path, float stdWidth, float stdHeight) {
         super(path, stdWidth, stdHeight);

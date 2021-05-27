@@ -62,7 +62,7 @@ public abstract class ButtonDropTarget extends TextView
 
     protected final Launcher mLauncher;
 
-    private int mBottomDragPadding;
+    private final int mBottomDragPadding;
     protected DropTargetBar mDropTargetBar;
 
     /**

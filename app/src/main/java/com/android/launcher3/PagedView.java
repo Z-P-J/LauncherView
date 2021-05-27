@@ -148,7 +148,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
     // Similar to the platform implementation of isLayoutValid();
     protected boolean mIsLayoutValid;
 
-    private int[] mTmpIntPair = new int[2];
+    private final int[] mTmpIntPair = new int[2];
 
     public PagedView(Context context) {
         this(context, null);

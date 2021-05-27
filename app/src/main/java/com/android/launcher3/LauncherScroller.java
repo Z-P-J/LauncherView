@@ -50,7 +50,7 @@ public class LauncherScroller {
     private float mDeltaY;
     private boolean mFinished;
     private TimeInterpolator mInterpolator;
-    private boolean mFlywheel;
+    private final boolean mFlywheel;
 
     private float mVelocity;
     private float mCurrVelocity;
@@ -62,7 +62,7 @@ public class LauncherScroller {
     private static final int SCROLL_MODE = 0;
     private static final int FLING_MODE = 1;
 
-    private static float DECELERATION_RATE = (float) (Math.log(0.78) / Math.log(0.9));
+    private static final float DECELERATION_RATE = (float) (Math.log(0.78) / Math.log(0.9));
     private static final float INFLEXION = 0.35f; // Tension lines cross at (INFLEXION, 1)
     private static final float START_TENSION = 0.5f;
     private static final float END_TENSION = 1.0f;
@@ -77,7 +77,7 @@ public class LauncherScroller {
     private final float mPpi;
 
     // A context-specific coefficient adjusted to physical values.
-    private float mPhysicalCoeff;
+    private final float mPhysicalCoeff;
 
     static {
         float x_min = 0.0f;
@@ -119,7 +119,7 @@ public class LauncherScroller {
 
     }
 
-    private static float sViscousFluidScale;
+    private static final float sViscousFluidScale;
     private static float sViscousFluidNormalize;
 
     public void setInterpolator(TimeInterpolator interpolator) {

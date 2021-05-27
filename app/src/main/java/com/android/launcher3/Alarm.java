@@ -27,7 +27,7 @@ public class Alarm implements Runnable {
     // We use this to avoid having multiple pending callbacks
     private boolean mWaitingForCallback;
 
-    private Handler mHandler;
+    private final Handler mHandler;
     private OnAlarmListener mAlarmListener;
     private boolean mAlarmPending = false;
 

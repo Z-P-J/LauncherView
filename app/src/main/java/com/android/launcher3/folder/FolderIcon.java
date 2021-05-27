@@ -96,17 +96,17 @@ public class FolderIcon extends FrameLayout implements FolderListener {
     ClippedFolderIconLayoutRule mPreviewLayoutRule;
     private PreviewItemManager mPreviewItemManager;
     private PreviewItemDrawingParams mTmpParams = new PreviewItemDrawingParams(0, 0, 0, 0);
-    private List<BubbleTextView> mCurrentPreviewItems = new ArrayList<>();
+    private final List<BubbleTextView> mCurrentPreviewItems = new ArrayList<>();
 
     boolean mAnimating = false;
-    private Rect mTempBounds = new Rect();
+    private final Rect mTempBounds = new Rect();
 
     private float mSlop;
 
-    private Alarm mOpenAlarm = new Alarm();
+    private final Alarm mOpenAlarm = new Alarm();
 
     private float mBadgeScale;
-    private Point mTempSpaceForBadgeOffset = new Point();
+    private final Point mTempSpaceForBadgeOffset = new Point();
 
     private static final Property<FolderIcon, Float> BADGE_SCALE_PROPERTY
             = new Property<FolderIcon, Float>(Float.TYPE, "badgeScale") {

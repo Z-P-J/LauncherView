@@ -107,8 +107,8 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
     private int mBadgeColor;
     private float mBadgeScale;
     private boolean mForceHideBadge;
-    private Point mTempSpaceForBadgeOffset = new Point();
-    private Rect mTempIconBounds = new Rect();
+    private final Point mTempSpaceForBadgeOffset = new Point();
+    private final Rect mTempIconBounds = new Rect();
 
     @ViewDebug.ExportedProperty(category = "launcher")
     private boolean mStayPressed;

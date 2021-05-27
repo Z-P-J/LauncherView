@@ -54,10 +54,10 @@ public class DragController implements DragDriver.EventListener, TouchController
 
     @Thunk
     Launcher mLauncher;
-    private FlingToDeleteHelper mFlingToDeleteHelper;
+    private final FlingToDeleteHelper mFlingToDeleteHelper;
 
     // temporaries to avoid gc thrash
-    private Rect mRectTemp = new Rect();
+    private final Rect mRectTemp = new Rect();
     private final int[] mCoordinatesTemp = new int[2];
 
     /**
@@ -86,8 +86,8 @@ public class DragController implements DragDriver.EventListener, TouchController
     /**
      * Who can receive drop events
      */
-    private ArrayList<DropTarget> mDropTargets = new ArrayList<>();
-    private ArrayList<DragListener> mListeners = new ArrayList<>();
+    private final ArrayList<DropTarget> mDropTargets = new ArrayList<>();
+    private final ArrayList<DragListener> mListeners = new ArrayList<>();
 
     /**
      * The window token used as the parent for the DragView.
@@ -99,14 +99,14 @@ public class DragController implements DragDriver.EventListener, TouchController
     private DropTarget mLastDropTarget;
 
     @Thunk
-    int mLastTouch[] = new int[2];
+    int[] mLastTouch = new int[2];
     @Thunk
     long mLastTouchUpTime = -1;
     @Thunk
     int mDistanceSinceScroll = 0;
 
-    private int mTmpPoint[] = new int[2];
-    private Rect mDragLayerRect = new Rect();
+    private final int[] mTmpPoint = new int[2];
+    private final Rect mDragLayerRect = new Rect();
 
     private boolean mIsInPreDrag;
 

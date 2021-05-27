@@ -32,7 +32,7 @@ public class WidgetsBottomSheet extends BaseWidgetSheet implements Insettable {
 
     private static final int DEFAULT_CLOSE_DURATION = 200;
     private ItemInfo mOriginalItemInfo;
-    private Rect mInsets;
+    private final Rect mInsets;
 
     public WidgetsBottomSheet(Context context, AttributeSet attrs) {
         this(context, attrs, 0);

@@ -25,8 +25,6 @@
 
     <color name="focused_background">#80c6c5c5</color>
 
-    <color name="default_shadow_color_no_alpha">#FF000000</color>
-
     <color name="spring_loaded_panel_color">#40FFFFFF</color>
     <color name="spring_loaded_highlighted_panel_border_color">#FFF</color>
 
@@ -36,6 +34,4 @@
     <color name="icon_background">#E0E0E0</color> <!-- Gray 300 -->
     <color name="legacy_icon_background">#FFFFFF</color>
 
-    <color name="all_apps_bg_hand_fill">#E5E5E5</color>
-    <color name="all_apps_bg_hand_fill_dark">#9AA0A6</color>
 </resources>

@@ -54,7 +54,7 @@ public class LauncherLoader {
 
     private static final int ITEMS_CHUNK = 6; // batch size for the workspace icons
 
-    private Context mContext;
+    private final Context mContext;
     @Thunk
     final LauncherAppState mApp;
     @Thunk

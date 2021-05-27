@@ -31,10 +31,10 @@ import com.android.launcher3.util.Thunk;
  * interpolator in the same direction.
  */
 public class InterruptibleInOutAnimator {
-    private long mOriginalDuration;
-    private float mOriginalFromValue;
-    private float mOriginalToValue;
-    private ValueAnimator mAnimator;
+    private final long mOriginalDuration;
+    private final float mOriginalFromValue;
+    private final float mOriginalToValue;
+    private final ValueAnimator mAnimator;
 
     private boolean mFirstRun = true;
 

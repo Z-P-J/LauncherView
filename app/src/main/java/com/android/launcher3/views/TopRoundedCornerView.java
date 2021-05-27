@@ -32,7 +32,7 @@ public class TopRoundedCornerView extends SpringRelativeLayout {
 
     private final RectF mRect = new RectF();
     private final Path mClipPath = new Path();
-    private float[] mRadii;
+    private final float[] mRadii;
 
     private final Paint mNavBarScrimPaint;
     private int mNavBarScrimHeight = 0;

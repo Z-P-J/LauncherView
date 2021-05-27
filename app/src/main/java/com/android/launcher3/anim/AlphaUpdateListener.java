@@ -28,7 +28,7 @@ public class AlphaUpdateListener extends AnimationSuccessListener
         implements AnimatorUpdateListener {
     private static final float ALPHA_CUTOFF_THRESHOLD = 0.01f;
 
-    private View mView;
+    private final View mView;
 
     public AlphaUpdateListener(View v) {
         mView = v;

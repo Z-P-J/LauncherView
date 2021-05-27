@@ -41,7 +41,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     private int mCountX;
 
-    private Launcher mLauncher;
+    private final Launcher mLauncher;
     private boolean mInvertIfRtl = false;
 
     public ShortcutAndWidgetContainer(Context context, @ContainerType int containerType) {

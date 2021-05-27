@@ -42,7 +42,7 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
     private static final int TOTAL_SCROLL_ANIMATOR_INDEX = 2;
     private static final int ANIMATOR_COUNT = 3;
 
-    private ValueAnimator[] mAnimators = new ValueAnimator[ANIMATOR_COUNT];
+    private final ValueAnimator[] mAnimators = new ValueAnimator[ANIMATOR_COUNT];
 
     private final Handler mDelayedLineFadeHandler = new Handler(Looper.getMainLooper());
     private final Launcher mLauncher;
@@ -57,7 +57,7 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
     private float mNumPagesFloat;
     private int mCurrentScroll;
     private int mTotalScroll;
-    private Paint mLinePaint;
+    private final Paint mLinePaint;
     private final int mLineHeight;
 
     private static final Property<WorkspacePageIndicator, Integer> PAINT_ALPHA
@@ -102,7 +102,7 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
         }
     };
 
-    private Runnable mHideLineRunnable = () -> animateLineToAlpha(0);
+    private final Runnable mHideLineRunnable = () -> animateLineToAlpha(0);
 
     public WorkspacePageIndicator(Context context) {
         this(context, null);

@@ -59,8 +59,8 @@ public class DragView extends View {
     @Thunk
     static float sDragAlpha = 1f;
 
-    private boolean mDrawBitmap = true;
-    private Bitmap mBitmap;
+    private final boolean mDrawBitmap = true;
+    private final Bitmap mBitmap;
     private Bitmap mCrossFadeBitmap;
     @Thunk
     Paint mPaint;

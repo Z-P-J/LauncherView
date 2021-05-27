@@ -64,8 +64,7 @@ abstract class BaseWidgetSheet extends AbstractSlideInView
 
     @Override
     public final boolean onLongClick(View v) {
-        if (!ItemLongClickListener.canStartDrag(mLauncher)) return false;
-        return true;
+        return ItemLongClickListener.canStartDrag(mLauncher);
     }
 
     protected void setTranslationShift(float translationShift) {

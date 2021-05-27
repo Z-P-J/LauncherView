@@ -263,8 +263,7 @@ public class HomepageManager {
         ArrayList<Long> unusedScreens = new ArrayList<>(mWorkspaceScreens);
         for (ItemInfo item : itemsIdMap) {
             long screenId = item.screenId;
-            if (item.container == ItemInfo.CONTAINER_DESKTOP &&
-                    unusedScreens.contains(screenId)) {
+            if (item.container == ItemInfo.CONTAINER_DESKTOP) {
                 unusedScreens.remove(screenId);
             }
         }

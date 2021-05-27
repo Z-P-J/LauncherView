@@ -57,15 +57,15 @@ import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_I
  */
 public class FolderAnimationManager {
 
-    private Folder mFolder;
-    private FolderPagedView mContent;
-    private GradientDrawable mFolderBackground;
+    private final Folder mFolder;
+    private final FolderPagedView mContent;
+    private final GradientDrawable mFolderBackground;
 
-    private FolderIcon mFolderIcon;
-    private PreviewBackground mPreviewBackground;
+    private final FolderIcon mFolderIcon;
+    private final PreviewBackground mPreviewBackground;
 
-    private Context mContext;
-    private Launcher mLauncher;
+    private final Context mContext;
+    private final Launcher mLauncher;
 
     private final boolean mIsOpening;
 

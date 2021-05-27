@@ -30,7 +30,7 @@ import com.android.launcher3.keyboard.FocusIndicatorHelper.SimpleFocusIndicatorH
  */
 public class FocusedItemDecorator extends ItemDecoration {
 
-    private FocusIndicatorHelper mHelper;
+    private final FocusIndicatorHelper mHelper;
 
     public FocusedItemDecorator(View container) {
         mHelper = new SimpleFocusIndicatorHelper(container);

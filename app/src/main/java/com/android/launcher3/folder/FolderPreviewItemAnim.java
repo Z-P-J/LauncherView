@@ -26,9 +26,9 @@ import com.android.launcher3.LauncherAnimUtils;
  */
 class FolderPreviewItemAnim {
 
-    private static PreviewItemDrawingParams sTmpParams = new PreviewItemDrawingParams(0, 0, 0, 0);
+    private static final PreviewItemDrawingParams sTmpParams = new PreviewItemDrawingParams(0, 0, 0, 0);
 
-    private ValueAnimator mValueAnimator;
+    private final ValueAnimator mValueAnimator;
 
     float finalScale;
     float finalTransX;

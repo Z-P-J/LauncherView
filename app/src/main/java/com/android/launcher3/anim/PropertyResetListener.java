@@ -26,8 +26,8 @@ import android.util.Property;
  */
 public class PropertyResetListener<T, V> extends AnimatorListenerAdapter {
 
-    private Property<T, V> mPropertyToReset;
-    private V mResetToValue;
+    private final Property<T, V> mPropertyToReset;
+    private final V mResetToValue;
 
     public PropertyResetListener(Property<T, V> propertyToReset, V resetToValue) {
         mPropertyToReset = propertyToReset;

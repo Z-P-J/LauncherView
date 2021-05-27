@@ -13,7 +13,7 @@ public class ClippedFolderIconLayoutRule {
     public static final int EXIT_INDEX = -2;
     public static final int ENTER_INDEX = -3;
 
-    private float[] mTmpPoint = new float[2];
+    private final float[] mTmpPoint = new float[2];
 
     private float mAvailableSpace;
     private float mRadius;
