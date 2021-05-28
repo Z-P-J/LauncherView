@@ -30,7 +30,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.os.StrictMode;
 import android.os.UserHandle;
 import android.support.annotation.Nullable;
 import android.text.method.TextKeyListener;
@@ -77,18 +76,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherLoader.Cal
     public static final int NEW_SHORTCUT_BOUNCE_DURATION = 450;
     public static final int NEW_SHORTCUT_STAGGER_DELAY = 85;
 
-    static final boolean DEBUG_STRICT_MODE = false;
-
-    private static final int REQUEST_CREATE_SHORTCUT = 1;
-    private static final int REQUEST_CREATE_APPWIDGET = 5;
-
     private static final float BOUNCE_ANIMATION_TENSION = 1.3f;
-
-    /**
-     * IntentStarter uses request codes starting with this. This must be greater than all activity
-     * request codes used internally.
-     */
-    protected static final int REQUEST_LAST = 100;
 
     // Type: int
     private static final String RUNTIME_STATE_CURRENT_SCREEN = "launcher.current_screen";
@@ -143,20 +131,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherLoader.Cal
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (DEBUG_STRICT_MODE) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectDiskReads()
-                    .detectDiskWrites()
-                    .detectNetwork()   // or .detectAll() for all detectable problems
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectLeakedSqlLiteObjects()
-                    .detectLeakedClosableObjects()
-                    .penaltyLog()
-                    .penaltyDeath()
-                    .build());
-        }
 
         super.onCreate(savedInstanceState);
 
@@ -546,8 +520,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherLoader.Cal
         TextKeyListener.getInstance().release();
 
         LauncherAnimUtils.onDestroyActivity();
-
-        clearPendingBinds();
     }
 
     public DragController getDragController() {
@@ -730,15 +702,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherLoader.Cal
         } else {
             return 0;
         }
-    }
-
-    /**
-     * Clear any pending bind callbacks. This is called when is loader is planning to
-     * perform a full rebind from scratch.
-     */
-    @Override
-    public void clearPendingBinds() {
-
     }
 
     /**

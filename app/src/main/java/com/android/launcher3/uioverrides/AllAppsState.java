@@ -16,7 +16,6 @@
 package com.android.launcher3.uioverrides;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.ContainerType;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
@@ -41,7 +40,7 @@ public class AllAppsState extends LauncherState {
     };
 
     public AllAppsState(int id) {
-        super(id, ContainerType.ALLAPPS, ALL_APPS_TRANSITION_MS, STATE_FLAGS);
+        super(id, ALL_APPS_TRANSITION_MS, STATE_FLAGS);
     }
 
     @Override

@@ -32,8 +32,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Property;
 import android.util.SparseArray;
 
-import com.android.launcher3.graphics.BitmapInfo;
-
 import static com.android.launcher3.anim.Interpolators.ACCEL;
 
 public class FastBitmapDrawable extends Drawable {
@@ -91,10 +89,6 @@ public class FastBitmapDrawable extends Drawable {
 
     public FastBitmapDrawable(Bitmap b) {
         this(b, Color.TRANSPARENT);
-    }
-
-    public FastBitmapDrawable(BitmapInfo info) {
-        this(info.icon, info.color);
     }
 
     public FastBitmapDrawable(ItemInfoWithIcon info) {

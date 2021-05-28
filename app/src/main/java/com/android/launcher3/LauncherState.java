@@ -72,7 +72,7 @@ public class LauncherState {
     /**
      * TODO: Create a separate class for NORMAL state.
      */
-    public static final LauncherState NORMAL = new LauncherState(0, ContainerType.WORKSPACE, 0,
+    public static final LauncherState NORMAL = new LauncherState(0, 0,
             FLAG_DISABLE_RESTORE | FLAG_WORKSPACE_ICONS_CAN_BE_DRAGGED | FLAG_HIDE_BACK_BUTTON |
                     FLAG_HAS_SYS_UI_SCRIM);
 
@@ -86,11 +86,6 @@ public class LauncherState {
 //    public static final LauncherState OPTIONS = new OptionsState(5);
 
     public final int ordinal;
-
-    /**
-     * Used for containerType in {
-     */
-    public final int containerType;
 
     /**
      * True if the state can be persisted across activity restarts.
@@ -147,8 +142,7 @@ public class LauncherState {
 
     public final boolean hasSysUiScrim;
 
-    public LauncherState(int id, int containerType, int transitionDuration, int flags) {
-        this.containerType = containerType;
+    public LauncherState(int id, int transitionDuration, int flags) {
         this.transitionDuration = transitionDuration;
 
         this.hasWorkspacePageBackground = (flags & FLAG_PAGE_BACKGROUNDS) != 0;

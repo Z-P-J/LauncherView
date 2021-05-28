@@ -17,7 +17,6 @@ package com.android.launcher3.states;
 
 import android.graphics.Rect;
 
-import com.android.launcher3.ContainerType;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
@@ -36,7 +35,7 @@ public class SpringLoadedState extends LauncherState {
             FLAG_DISABLE_PAGE_CLIPPING | FLAG_PAGE_BACKGROUNDS | FLAG_HIDE_BACK_BUTTON;
 
     public SpringLoadedState(int id) {
-        super(id, ContainerType.OVERVIEW, SPRING_LOADED_TRANSITION_MS, STATE_FLAGS);
+        super(id, SPRING_LOADED_TRANSITION_MS, STATE_FLAGS);
     }
 
     @Override

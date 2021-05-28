@@ -27,7 +27,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Toast;
 
-import com.android.launcher3.ControlType;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
@@ -69,9 +68,6 @@ public class OptionsPopupView extends ArrowPopup
         OptionItem item = mItemMap.get(view);
         if (item == null) {
             return false;
-        }
-        if (item.mControlTypeForLog > 0) {
-
         }
         if (item.mClickListener.onLongClick(view)) {
             close(true);
@@ -123,18 +119,18 @@ public class OptionsPopupView extends ArrowPopup
     public static void showDefaultOptions(Launcher launcher, float x, float y) {
         float halfSize = launcher.getResources().getDimension(R.dimen.options_menu_thumb_size) / 2;
         if (x < 0 || y < 0) {
-            x = launcher.getDragLayer().getWidth() / 2;
-            y = launcher.getDragLayer().getHeight() / 2;
+            x = launcher.getDragLayer().getWidth() / 2f;
+            y = launcher.getDragLayer().getHeight() / 2f;
         }
         RectF target = new RectF(x - halfSize, y - halfSize, x + halfSize, y + halfSize);
 
         ArrayList<OptionItem> options = new ArrayList<>();
         options.add(new OptionItem(R.string.wallpaper_button_text, R.drawable.ic_wallpaper,
-                ControlType.WALLPAPER_BUTTON, OptionsPopupView::startWallpaperPicker));
+                OptionsPopupView::startWallpaperPicker));
         options.add(new OptionItem(R.string.widget_button_text, R.drawable.ic_widget,
-                ControlType.WIDGETS_BUTTON, OptionsPopupView::onWidgetsClicked));
+                OptionsPopupView::onWidgetsClicked));
         options.add(new OptionItem(R.string.settings_button_text, R.drawable.ic_setting,
-                ControlType.SETTINGS_BUTTON, OptionsPopupView::startSettings));
+                OptionsPopupView::startSettings));
 
         show(launcher, target, options);
     }
@@ -164,14 +160,11 @@ public class OptionsPopupView extends ArrowPopup
 
         private final int mLabelRes;
         private final int mIconRes;
-        private final int mControlTypeForLog;
         private final OnLongClickListener mClickListener;
 
-        public OptionItem(int labelRes, int iconRes, int controlTypeForLog,
-                          OnLongClickListener clickListener) {
+        public OptionItem(int labelRes, int iconRes, OnLongClickListener clickListener) {
             mLabelRes = labelRes;
             mIconRes = iconRes;
-            mControlTypeForLog = controlTypeForLog;
             mClickListener = clickListener;
         }
     }

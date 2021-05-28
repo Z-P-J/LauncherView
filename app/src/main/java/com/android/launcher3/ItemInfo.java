@@ -16,9 +16,6 @@
 
 package com.android.launcher3;
 
-import android.content.ComponentName;
-import android.content.Intent;
-
 /**
  * Represents an item in the launcher.
  */
@@ -119,14 +116,6 @@ public class ItemInfo {
         itemType = info.itemType;
         container = info.container;
         contentDescription = info.contentDescription;
-    }
-
-    public Intent getIntent() {
-        return null;
-    }
-
-    public ComponentName getTargetComponent() {
-        return null;
     }
 
     @Override

@@ -46,5 +46,7 @@ dependencies {
     implementation "com.github.Raizlabs.DBFlow:dbflow:4.2.4"
 
     implementation 'com.github.Z-P-J:ZUtils:1.0.0'
+    implementation 'com.github.Z-P-J:Fragmentation-Dialog:1.2.3'
+    implementation 'com.github.Z-P-J:Fragmentation:1.1.4'
 
 }

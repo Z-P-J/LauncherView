@@ -17,7 +17,6 @@
 package com.android.launcher3;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.UserHandle;
@@ -259,7 +258,6 @@ public class LauncherLoader {
         sortWorkspaceItemsSpatially(otherWorkspaceItems);
 
         // Tell the workspace that we're about to start binding items
-        callbacks.clearPendingBinds();
         callbacks.startBinding();
 
         // Bind workspace screens
@@ -423,8 +421,6 @@ public class LauncherLoader {
         void rebindModel();
 
         int getCurrentWorkspaceScreen();
-
-        void clearPendingBinds();
 
         void startBinding();
 

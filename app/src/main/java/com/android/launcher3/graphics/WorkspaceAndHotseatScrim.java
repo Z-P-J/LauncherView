@@ -150,6 +150,7 @@ public class WorkspaceAndHotseatScrim implements
         if (mHasSysUiScrim) {
             mTopScrim = Themes.getAttrDrawable(view.getContext(), R.attr.workspaceStatusBarScrim);
             mBottomMask = createDitheredAlphaMask();
+//            mBottomMask = null;
         } else {
             mTopScrim = null;
             mBottomMask = null;

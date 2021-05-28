@@ -15,7 +15,6 @@
  */
 package com.android.launcher3.uioverrides;
 
-import com.android.launcher3.ContainerType;
 import com.android.launcher3.LauncherState;
 
 import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
@@ -26,6 +25,6 @@ import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
 public class OverviewState extends LauncherState {
 
     public OverviewState(int id) {
-        super(id, ContainerType.WORKSPACE, OVERVIEW_TRANSITION_MS, FLAG_DISABLE_RESTORE);
+        super(id, OVERVIEW_TRANSITION_MS, FLAG_DISABLE_RESTORE);
     }
 }
