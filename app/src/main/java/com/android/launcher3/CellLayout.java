@@ -72,7 +72,7 @@ public class CellLayout extends ViewGroup {
     private static final String TAG = "CellLayout";
     private static final boolean LOGD = false;
 
-    private final Launcher mLauncher;
+    private final LauncherActivity mLauncher;
     @ViewDebug.ExportedProperty(category = "launcher")
     @Thunk
     int mCellWidth;
@@ -201,7 +201,7 @@ public class CellLayout extends ViewGroup {
         // the user where a dragged item will land when dropped.
         setWillNotDraw(false);
         setClipToPadding(false);
-        mLauncher = Launcher.getLauncher(context);
+        mLauncher = LauncherActivity.fromContext(context);
 
         DeviceProfile grid = mLauncher.getDeviceProfile();
 
@@ -332,7 +332,7 @@ public class CellLayout extends ViewGroup {
         // the home screen mode, however, once in overview mode stylus button press should be
         // enabled to allow rearranging the different home screens. So check what mode
         // the workspace is in, and only perform stylus button presses while in overview mode.
-        if (mLauncher.isInState(LauncherState.OVERVIEW)
+        if (mLauncher.getLauncherLayout().isInState(LauncherState.OVERVIEW)
                 && mStylusEventHelper.onMotionEvent(ev)) {
             return true;
         }
@@ -2024,7 +2024,7 @@ public class CellLayout extends ViewGroup {
     private void commitTempPlacement() {
         mTmpOccupied.copyTo(mOccupied);
 
-        long screenId = mLauncher.getWorkspace().getIdForScreen(this);
+        long screenId = mLauncher.getLauncherLayout().getWorkspace().getIdForScreen(this);
         int container = ItemInfo.CONTAINER_DESKTOP;
 
         if (mContainerType == HOTSEAT) {

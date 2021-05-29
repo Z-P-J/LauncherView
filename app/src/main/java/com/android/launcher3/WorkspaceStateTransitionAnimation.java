@@ -35,19 +35,18 @@ import static com.android.launcher3.anim.Interpolators.LINEAR;
 import static com.android.launcher3.anim.Interpolators.ZOOM_OUT;
 import static com.android.launcher3.anim.PropertySetter.NO_ANIM_PROPERTY_SETTER;
 import static com.android.launcher3.graphics.WorkspaceAndHotseatScrim.SCRIM_PROGRESS;
-import static com.android.launcher3.graphics.WorkspaceAndHotseatScrim.SYSUI_PROGRESS;
 
 /**
  * Manages the animations between each of the workspace states.
  */
 public class WorkspaceStateTransitionAnimation {
 
-    private final Launcher mLauncher;
+    private final LauncherLayout mLauncher;
     private final Workspace mWorkspace;
 
     private float mNewScale;
 
-    public WorkspaceStateTransitionAnimation(Launcher launcher, Workspace workspace) {
+    public WorkspaceStateTransitionAnimation(LauncherLayout launcher, Workspace workspace) {
         mLauncher = launcher;
         mWorkspace = workspace;
     }
@@ -112,7 +111,7 @@ public class WorkspaceStateTransitionAnimation {
         WorkspaceAndHotseatScrim scrim = mLauncher.getDragLayer().getScrim();
         propertySetter.setFloat(scrim, SCRIM_PROGRESS, state.getWorkspaceScrimAlpha(mLauncher),
                 LINEAR);
-        propertySetter.setFloat(scrim, SYSUI_PROGRESS, state.hasSysUiScrim ? 1 : 0, LINEAR);
+//        propertySetter.setFloat(scrim, SYSUI_PROGRESS, state.hasSysUiScrim ? 1 : 0, LINEAR);
     }
 
     public void applyChildState(LauncherState state, CellLayout cl, int childIndex) {

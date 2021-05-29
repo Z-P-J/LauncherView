@@ -18,7 +18,7 @@ package com.android.launcher3.dragndrop;
 
 import com.android.launcher3.Alarm;
 import com.android.launcher3.CellLayout;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.OnAlarmListener;
 import com.android.launcher3.Workspace;
 
@@ -31,9 +31,9 @@ public class SpringLoadedDragController implements OnAlarmListener {
 
     // the screen the user is currently hovering over, if any
     private CellLayout mScreen;
-    private final Launcher mLauncher;
+    private final LauncherLayout mLauncher;
 
-    public SpringLoadedDragController(Launcher launcher) {
+    public SpringLoadedDragController(LauncherLayout launcher) {
         mLauncher = launcher;
         mAlarm = new Alarm();
         mAlarm.setOnAlarmListener(this);

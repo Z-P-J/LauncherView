@@ -36,7 +36,7 @@ import android.widget.TextView;
 
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.CellLayout;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.R;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.Workspace;
@@ -51,7 +51,7 @@ import com.android.launcher3.views.BaseDragLayer;
 /**
  * A ViewGroup that coordinates dragging across its descendants
  */
-public class DragLayer extends BaseDragLayer<Launcher> {
+public class DragLayer extends BaseDragLayer<LauncherActivity> {
 
     public static final int ALPHA_INDEX_OVERLAY = 0;
     public static final int ALPHA_INDEX_LAUNCHER_LOAD = 1;
@@ -104,11 +104,12 @@ public class DragLayer extends BaseDragLayer<Launcher> {
     public void setup(DragController dragController, Workspace workspace) {
         mDragController = dragController;
         mScrim.setWorkspace(workspace);
-        recreateControllers();
+//        recreateControllers();
+        mController = mDragController;
     }
 
     public void recreateControllers() {
-        mController = mActivity.getDragController();
+        mController = mActivity.getLauncherLayout().getDragController();
     }
 
     public ViewGroupFocusHelper getFocusIndicatorHelper() {
@@ -127,7 +128,7 @@ public class DragLayer extends BaseDragLayer<Launcher> {
 
     @Override
     protected boolean findActiveController(MotionEvent ev) {
-        if (mActivity.getStateManager().getState().disableInteraction) {
+        if (mActivity.getLauncherLayout().getStateManager().getState().disableInteraction) {
             // You Shall Not Pass!!!
             mActiveController = null;
             return true;
@@ -137,10 +138,10 @@ public class DragLayer extends BaseDragLayer<Launcher> {
 
     @Override
     public boolean onInterceptHoverEvent(MotionEvent ev) {
-        if (mActivity == null || mActivity.getWorkspace() == null) {
+        if (mActivity == null || mActivity.getLauncherLayout().getWorkspace() == null) {
             return false;
         }
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(mActivity);
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(mActivity.getLauncherLayout());
         if (!(topView instanceof Folder)) {
             return false;
         } else {
@@ -503,13 +504,11 @@ public class DragLayer extends BaseDragLayer<Launcher> {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mScrim.setSize(w, h);
     }
 
     @Override
     public void setInsets(Rect insets) {
         super.setInsets(insets);
-        mScrim.onInsetsChanged(insets);
     }
 
     public WorkspaceAndHotseatScrim getScrim() {

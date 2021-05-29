@@ -21,13 +21,14 @@ import android.graphics.RectF;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Toast;
 
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
 import com.android.launcher3.popup.ArrowPopup;
@@ -98,8 +99,8 @@ public class OptionsPopupView extends ArrowPopup
         mTargetRect.roundOut(outPos);
     }
 
-    public static void show(Launcher launcher, RectF targetRect, List<OptionItem> items) {
-        OptionsPopupView popup = (OptionsPopupView) launcher.getLayoutInflater()
+    public static void show(LauncherLayout launcher, RectF targetRect, List<OptionItem> items) {
+        OptionsPopupView popup = (OptionsPopupView) LayoutInflater.from(launcher.getContext())
                 .inflate(R.layout.longpress_options_menu, launcher.getDragLayer(), false);
         popup.mTargetRect = targetRect;
 
@@ -116,7 +117,7 @@ public class OptionsPopupView extends ArrowPopup
         popup.reorderAndShow(popup.getChildCount());
     }
 
-    public static void showDefaultOptions(Launcher launcher, float x, float y) {
+    public static void showDefaultOptions(LauncherLayout launcher, float x, float y) {
         float halfSize = launcher.getResources().getDimension(R.dimen.options_menu_thumb_size) / 2;
         if (x < 0 || y < 0) {
             x = launcher.getDragLayer().getWidth() / 2f;
@@ -126,33 +127,31 @@ public class OptionsPopupView extends ArrowPopup
 
         ArrayList<OptionItem> options = new ArrayList<>();
         options.add(new OptionItem(R.string.wallpaper_button_text, R.drawable.ic_wallpaper,
-                OptionsPopupView::startWallpaperPicker));
+                new OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
+                        launcher.getStateManager().goToState(LauncherState.SPRING_LOADED);
+                        return true;
+                    }
+                }));
         options.add(new OptionItem(R.string.widget_button_text, R.drawable.ic_widget,
-                OptionsPopupView::onWidgetsClicked));
+                new OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Toast.makeText(v.getContext(), "微件", Toast.LENGTH_SHORT).show();
+                        WidgetsFullSheet.show(launcher, true);
+                        return true;
+                    }
+                }));
         options.add(new OptionItem(R.string.settings_button_text, R.drawable.ic_setting,
                 OptionsPopupView::startSettings));
 
         show(launcher, target, options);
     }
 
-    public static boolean onWidgetsClicked(View view) {
-        Toast.makeText(view.getContext(), "微件", Toast.LENGTH_SHORT).show();
-        WidgetsFullSheet.show(Launcher.getLauncher(view.getContext()), true);
-        return true;
-    }
-
     public static boolean startSettings(View view) {
         Toast.makeText(view.getContext(), "设置", Toast.LENGTH_SHORT).show();
-        return true;
-    }
-
-    /**
-     * Event handler for the wallpaper picker button that appears after a long press
-     * on the home screen.
-     */
-    public static boolean startWallpaperPicker(View v) {
-        Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
-        Launcher.fromContext(v.getContext()).getStateManager().goToState(LauncherState.SPRING_LOADED);
         return true;
     }
 

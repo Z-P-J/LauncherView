@@ -60,7 +60,7 @@ public abstract class ButtonDropTarget extends TextView
     public static final int TOOLTIP_LEFT = 1;
     public static final int TOOLTIP_RIGHT = 2;
 
-    protected final Launcher mLauncher;
+    protected final LauncherActivity mLauncher;
 
     private final int mBottomDragPadding;
     protected DropTargetBar mDropTargetBar;
@@ -101,7 +101,7 @@ public abstract class ButtonDropTarget extends TextView
 
     public ButtonDropTarget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mLauncher = Launcher.getLauncher(context);
+        mLauncher = LauncherActivity.fromContext(context);
 
         Resources resources = getResources();
         mBottomDragPadding = resources.getDimensionPixelSize(R.dimen.drop_target_drag_padding);
@@ -252,7 +252,7 @@ public abstract class ButtonDropTarget extends TextView
     @Override
     public boolean isDropEnabled() {
         return mActive && (mAccessibleDrag ||
-                mLauncher.getDragController().getDistanceDragged() >= mDragDistanceThreshold);
+                mLauncher.getLauncherLayout().getDragController().getDistanceDragged() >= mDragDistanceThreshold);
     }
 
     @Override
@@ -277,7 +277,7 @@ public abstract class ButtonDropTarget extends TextView
         Runnable onAnimationEndRunnable = () -> {
             completeDrop(d);
             mDropTargetBar.onDragEnd();
-            mLauncher.getStateManager().goToState(NORMAL);
+            mLauncher.getLauncherLayout().getStateManager().goToState(NORMAL);
         };
 
         dragLayer.animateView(d.dragView, from, to, scale, 1f, 1f, 0.1f, 0.1f,

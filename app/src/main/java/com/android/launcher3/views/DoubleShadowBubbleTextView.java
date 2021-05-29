@@ -61,7 +61,6 @@ public class DoubleShadowBubbleTextView extends BubbleTextView {
         getPaint().setShadowLayer(mShadowInfo.ambientShadowBlur, 0, 0,
                 ColorUtils.setAlphaComponent(mShadowInfo.ambientShadowColor, alpha));
 
-        drawWithoutBadge(canvas);
         canvas.save();
         canvas.clipRect(getScrollX(), getScrollY() + getExtendedPaddingTop(),
                 getScrollX() + getWidth(),
@@ -69,7 +68,6 @@ public class DoubleShadowBubbleTextView extends BubbleTextView {
 
         getPaint().setShadowLayer(mShadowInfo.keyShadowBlur, 0.0f, mShadowInfo.keyShadowOffset,
                 ColorUtils.setAlphaComponent(mShadowInfo.keyShadowColor, alpha));
-        drawWithoutBadge(canvas);
         canvas.restore();
     }
 

@@ -25,7 +25,6 @@ import java.util.Arrays;
 
 import static android.view.View.IMPORTANT_FOR_ACCESSIBILITY_AUTO;
 import static android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS;
-import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
 import static com.android.launcher3.anim.Interpolators.ACCEL_2;
 import static com.android.launcher3.states.RotationHelper.REQUEST_NONE;
 
@@ -166,7 +165,7 @@ public class LauncherState {
         return Arrays.copyOf(sAllStates, sAllStates.length);
     }
 
-    public float[] getWorkspaceScaleAndTranslation(Launcher launcher) {
+    public float[] getWorkspaceScaleAndTranslation(LauncherLayout launcher) {
         return new float[]{1, 0, 0};
     }
 
@@ -175,19 +174,19 @@ public class LauncherState {
      * scale for the current and adjacent pages
      * translationY factor where 0 is top aligned and 0.5 is centered vertically
      */
-    public float[] getOverviewScaleAndTranslationYFactor(Launcher launcher) {
+    public float[] getOverviewScaleAndTranslationYFactor(LauncherLayout launcher) {
         return new float[]{1.1f, 0f};
     }
 
-    public void onStateEnabled(Launcher launcher) {
+    public void onStateEnabled(LauncherLayout launcher) {
         dispatchWindowStateChanged(launcher);
     }
 
-    public void onStateDisabled(Launcher launcher) {
+    public void onStateDisabled(LauncherLayout launcher) {
     }
 
-    public int getVisibleElements(Launcher launcher) {
-        if (launcher.getDeviceProfile().isVerticalBarLayout()) {
+    public int getVisibleElements(LauncherLayout launcher) {
+        if (LauncherActivity.fromContext(launcher).getDeviceProfile().isVerticalBarLayout()) {
             return HOTSEAT_ICONS | VERTICAL_SWIPE_INDICATOR;
         }
         return HOTSEAT_ICONS | HOTSEAT_SEARCH_BOX | VERTICAL_SWIPE_INDICATOR;
@@ -197,20 +196,20 @@ public class LauncherState {
      * Fraction shift in the vertical translation UI and related properties
      *
      */
-    public float getVerticalProgress(Launcher launcher) {
+    public float getVerticalProgress(LauncherLayout launcher) {
         return 1f;
     }
 
-    public float getWorkspaceScrimAlpha(Launcher launcher) {
+    public float getWorkspaceScrimAlpha(LauncherLayout launcher) {
         return 0;
     }
 
-    public String getDescription(Launcher launcher) {
+    public String getDescription(LauncherLayout launcher) {
         return launcher.getWorkspace().getCurrentPageDescription();
     }
 
-    public PageAlphaProvider getWorkspacePageAlphaProvider(Launcher launcher) {
-        if (this != NORMAL || !launcher.getDeviceProfile().shouldFadeAdjacentWorkspaceScreens()) {
+    public PageAlphaProvider getWorkspacePageAlphaProvider(LauncherLayout launcher) {
+        if (this != NORMAL || !LauncherActivity.fromContext(launcher).getDeviceProfile().shouldFadeAdjacentWorkspaceScreens()) {
             return DEFAULT_ALPHA_PROVIDER;
         }
         final int centerPage = launcher.getWorkspace().getNextPage();
@@ -230,15 +229,16 @@ public class LauncherState {
     /**
      * Called when the start transition ends and the user settles on this particular state.
      */
-    public void onStateTransitionEnd(Launcher launcher) {
+    public void onStateTransitionEnd(LauncherLayout launcher) {
         if (this == NORMAL) {
             // Clear any rotation locks when going to normal state
-            launcher.getRotationHelper().setCurrentStateRequest(REQUEST_NONE);
+            LauncherActivity.fromContext(launcher).getRotationHelper()
+                    .setCurrentStateRequest(REQUEST_NONE);
         }
     }
 
-    protected static void dispatchWindowStateChanged(Launcher launcher) {
-        launcher.getWindow().getDecorView().sendAccessibilityEvent(TYPE_WINDOW_STATE_CHANGED);
+    protected static void dispatchWindowStateChanged(LauncherLayout launcher) {
+
     }
 
     public static abstract class PageAlphaProvider {

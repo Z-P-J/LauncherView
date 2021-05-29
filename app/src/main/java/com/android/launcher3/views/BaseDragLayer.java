@@ -28,6 +28,7 @@ import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.BaseActivity;
 import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.InsettableFrameLayout;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.MultiValueAlpha.AlphaProperty;
@@ -81,7 +82,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
     protected boolean findActiveController(MotionEvent ev) {
         mActiveController = null;
 
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(mActivity);
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout());
         if (topView != null && topView.onControllerInterceptTouchEvent(ev)) {
             mActiveController = topView;
             return true;
@@ -198,12 +199,12 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
     @Override
     public boolean dispatchUnhandledMove(View focused, int direction) {
         // Consume the unhandled move if a container is open, to avoid switching pages underneath.
-        return AbstractFloatingView.getTopOpenView(mActivity) != null;
+        return AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout()) != null;
     }
 
     @Override
     protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
-        View topView = AbstractFloatingView.getTopOpenView(mActivity);
+        View topView = AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout());
         if (topView != null) {
             return topView.requestFocus(direction, previouslyFocusedRect);
         } else {
@@ -213,7 +214,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
 
     @Override
     public void addFocusables(ArrayList<View> views, int direction, int focusableMode) {
-        View topView = AbstractFloatingView.getTopOpenView(mActivity);
+        View topView = AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout());
         if (topView != null) {
             topView.addFocusables(views, direction);
         } else {

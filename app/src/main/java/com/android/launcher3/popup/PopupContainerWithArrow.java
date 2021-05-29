@@ -37,7 +37,7 @@ import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget;
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.R;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
@@ -122,7 +122,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
      * @return the container if shown or null.
      */
     public static PopupContainerWithArrow showForIcon(BubbleTextView icon) {
-        Launcher launcher = Launcher.getLauncher(icon.getContext());
+        LauncherActivity launcher = LauncherActivity.fromContext(icon.getContext());
         if (getOpen(launcher) != null) {
             // There is already an items container open, so don't open this one.
             icon.clearFocus();
@@ -188,8 +188,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
         reorderAndShow(viewsToFlip);
 
-        mLauncher.getDragController().addDragListener(this);
-        mOriginalIcon.forceHideBadge(true);
+        mLauncher.getLauncherLayout().getDragController().addDragListener(this);
 
         // All views are added. Animate layout from now on.
         setLayoutTransition(new LayoutTransition());
@@ -223,7 +222,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                info.getOnClickListener(mLauncher,
+                info.getOnClickListener(LauncherActivity.fromContext(v),
                         (ItemInfo) mOriginalIcon.getTag()).onClick(v);
                 close(true);
             }
@@ -304,14 +303,12 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
     protected void onCreateCloseAnimation(AnimatorSet anim) {
         // Animate original icon's text back in.
         anim.play(mOriginalIcon.createTextAlphaAnimator(true /* fadeIn */));
-        mOriginalIcon.forceHideBadge(false);
     }
 
     @Override
     protected void closeComplete() {
         super.closeComplete();
         mOriginalIcon.setTextVisibility(mOriginalIcon.shouldTextBeVisible());
-        mOriginalIcon.forceHideBadge(false);
     }
 
     @Override
@@ -328,7 +325,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
     @Override
     public boolean onLongClick(View v) {
-        if (!ItemLongClickListener.canStartDrag(mLauncher)) return false;
+        if (!ItemLongClickListener.canStartDrag(mLauncher.getLauncherLayout())) return false;
         // Return early if not the correct view
         if (!(v.getParent() instanceof DeepShortcutView)) return false;
 
@@ -339,7 +336,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         // Move the icon to align with the center-top of the touch point
         Point iconShift = new Point();
         iconShift.x = mIconLastTouchPos.x - sv.getIconCenter().x;
-        iconShift.y = mIconLastTouchPos.y - mLauncher.getDeviceProfile().iconSizePx;
+        iconShift.y = mIconLastTouchPos.y - LauncherActivity.fromContext(v).getDeviceProfile().iconSizePx;
 
 //        DragView dv = mLauncher.getWorkspace().beginDragShared(sv.getIconView(),
 //                this, sv.getFinalInfo(),
@@ -347,14 +344,14 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 //        dv.animateShift(-iconShift.x, -iconShift.y);
 
         // TODO: support dragging from within folder without having to close it
-        AbstractFloatingView.closeOpenContainer(mLauncher, AbstractFloatingView.TYPE_FOLDER);
+        AbstractFloatingView.closeOpenContainer(LauncherActivity.fromContext(v), AbstractFloatingView.TYPE_FOLDER);
         return false;
     }
 
     /**
      * Returns a PopupContainerWithArrow which is already open or null
      */
-    public static PopupContainerWithArrow getOpen(Launcher launcher) {
+    public static PopupContainerWithArrow getOpen(LauncherActivity launcher) {
         return getOpenView(launcher, TYPE_ACTION_POPUP);
     }
 }

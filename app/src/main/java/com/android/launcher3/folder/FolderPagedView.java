@@ -33,7 +33,7 @@ import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.PagedView;
 import com.android.launcher3.R;
@@ -233,8 +233,9 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
 
     @SuppressLint("InflateParams")
     public View createNewView(ShortcutInfo item) {
+        // R.id.folder_application
         final BubbleTextView textView = (BubbleTextView) mInflater.inflate(
-                R.layout.folder_application, null, false);
+                R.layout.app_icon, null, false);
         textView.applyFromShortcutInfo(item);
         textView.setHapticFeedbackEnabled(false);
         textView.setOnClickListener(ItemClickHandler.INSTANCE);
@@ -256,7 +257,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
     }
 
     private CellLayout createAndAddNewPage() {
-        DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
+        DeviceProfile grid = LauncherActivity.fromContext(getContext()).getDeviceProfile();
         CellLayout page = (CellLayout) mInflater.inflate(R.layout.folder_page, this, false);
         page.setCellDimensions(grid.folderCellWidthPx, grid.folderCellHeightPx);
         page.getShortcutsAndWidgets().setMotionEventSplittingEnabled(false);
@@ -322,7 +323,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
         int newX, newY, rank;
 
         FolderIconPreviewVerifier verifier = new FolderIconPreviewVerifier(
-                Launcher.getLauncher(getContext()).getDeviceProfile().inv);
+                LauncherActivity.fromContext(getContext()).getDeviceProfile().inv);
         rank = 0;
         for (int i = 0; i < itemCount; i++) {
             View v = list.size() > i ? list.get(i) : null;

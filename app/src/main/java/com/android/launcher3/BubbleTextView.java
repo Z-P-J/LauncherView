@@ -23,7 +23,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -40,38 +39,21 @@ import android.view.ViewConfiguration;
 import android.view.ViewDebug;
 import android.widget.TextView;
 
-import com.android.launcher3.Launcher.OnResumeCallback;
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.graphics.DrawableFactory;
-import com.android.launcher3.graphics.IconPalette;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan
  * because we want to make the bubble taller than the text and TextView's clip is
  * too aggressive.
  */
-public class BubbleTextView extends TextView implements OnResumeCallback {
+public class BubbleTextView extends TextView {
 
     private static final int DISPLAY_WORKSPACE = 0;
     private static final int DISPLAY_ALL_APPS = 1;
     private static final int DISPLAY_FOLDER = 2;
 
     private static final int[] STATE_PRESSED = new int[]{android.R.attr.state_pressed};
-
-
-    private static final Property<BubbleTextView, Float> BADGE_SCALE_PROPERTY
-            = new Property<BubbleTextView, Float>(Float.TYPE, "badgeScale") {
-        @Override
-        public Float get(BubbleTextView bubbleTextView) {
-            return bubbleTextView.mBadgeScale;
-        }
-
-        @Override
-        public void set(BubbleTextView bubbleTextView, Float value) {
-            bubbleTextView.mBadgeScale = value;
-            bubbleTextView.invalidate();
-        }
-    };
 
     public static final Property<BubbleTextView, Float> TEXT_ALPHA_PROPERTY
             = new Property<BubbleTextView, Float>(Float.class, "textAlpha") {
@@ -103,12 +85,6 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
     private int mTextColor;
     @ViewDebug.ExportedProperty(category = "launcher")
     private float mTextAlpha = 1;
-
-    private int mBadgeColor;
-    private float mBadgeScale;
-    private boolean mForceHideBadge;
-    private final Point mTempSpaceForBadgeOffset = new Point();
-    private final Rect mTempIconBounds = new Rect();
 
     @ViewDebug.ExportedProperty(category = "launcher")
     private boolean mStayPressed;
@@ -173,9 +149,6 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
      * Resets the view so it can be recycled.
      */
     public void reset() {
-        mBadgeColor = Color.TRANSPARENT;
-        mBadgeScale = 0f;
-        mForceHideBadge = false;
     }
 
     public void applyFromShortcutInfo(ShortcutInfo info) {
@@ -193,7 +166,6 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
 //        }
         Log.d("BubbleTextView", "icon=" + info.iconBitmap);
         FastBitmapDrawable iconDrawable = DrawableFactory.get(getContext()).newIcon(info);
-        mBadgeColor = IconPalette.getMutedColor(info.iconColor, 0.54f);
 
         setIcon(iconDrawable);
         setText(info.title);
@@ -272,12 +244,12 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
         refreshDrawableState();
     }
 
-    @Override
-    public void onLauncherResume() {
-        // Reset the pressed state of icon that was locked in the press state while activity
-        // was launching
-        setStayPressed(false);
-    }
+//    @Override
+//    public void onLauncherResume() {
+//        // Reset the pressed state of icon that was locked in the press state while activity
+//        // was launching
+//        setStayPressed(false);
+//    }
 
     void clearPressedBackground() {
         setPressed(false);
@@ -296,25 +268,9 @@ public class BubbleTextView extends TextView implements OnResumeCallback {
         return result;
     }
 
-    @SuppressWarnings("wrongcall")
-    protected void drawWithoutBadge(Canvas canvas) {
-        super.onDraw(canvas);
-    }
-
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-    }
-
-    public void forceHideBadge(boolean forceHideBadge) {
-        if (mForceHideBadge == forceHideBadge) {
-            return;
-        }
-        mForceHideBadge = forceHideBadge;
-
-        if (forceHideBadge) {
-            invalidate();
-        }
     }
 
     public void getIconBounds(Rect outBounds) {

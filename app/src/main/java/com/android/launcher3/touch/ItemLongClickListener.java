@@ -21,7 +21,8 @@ import android.view.View.OnLongClickListener;
 
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.folder.Folder;
 
@@ -40,7 +41,7 @@ public class ItemLongClickListener {
 //            ItemLongClickListener::onAllAppsItemLongClick;
 
     private static boolean onWorkspaceItemLongClick(View v) {
-        Launcher launcher = Launcher.getLauncher(v.getContext());
+        LauncherLayout launcher = LauncherActivity.fromContext(v).getLauncherLayout();
         Log.d("ItemLongClickListener", "onWorkspaceItemLongClick isWorkspaceLocked=" + launcher.isWorkspaceLocked());
         if (!canStartDrag(launcher)) return false;
         if (!launcher.isInState(NORMAL) && !launcher.isInState(OVERVIEW)) return false;
@@ -50,7 +51,7 @@ public class ItemLongClickListener {
         return true;
     }
 
-    public static void beginDrag(View v, Launcher launcher, ItemInfo info,
+    public static void beginDrag(View v, LauncherLayout launcher, ItemInfo info,
                                  DragOptions dragOptions) {
         if (info.container >= 0) {
             Folder folder = Folder.getOpen(launcher);
@@ -97,7 +98,7 @@ public class ItemLongClickListener {
 //        return false;
 //    }
 
-    public static boolean canStartDrag(Launcher launcher) {
+    public static boolean canStartDrag(LauncherLayout launcher) {
         if (launcher == null) {
             return false;
         }

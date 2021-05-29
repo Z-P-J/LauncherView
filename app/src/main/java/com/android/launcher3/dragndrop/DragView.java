@@ -24,25 +24,16 @@ import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.animation.FloatPropertyCompat;
-import android.support.animation.SpringAnimation;
-import android.support.animation.SpringForce;
 import android.view.View;
 
-import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAnimUtils;
 import com.android.launcher3.R;
-import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
@@ -50,8 +41,6 @@ import com.android.launcher3.util.Thunk;
 import java.util.Arrays;
 
 public class DragView extends View {
-    private static final ColorMatrix sTempMatrix1 = new ColorMatrix();
-    private static final ColorMatrix sTempMatrix2 = new ColorMatrix();
 
     public static final int COLOR_CHANGE_DURATION = 120;
     public static final int VIEW_ZOOM_DURATION = 150;
@@ -73,7 +62,6 @@ public class DragView extends View {
 
     private Point mDragVisualizeOffset = null;
     private Rect mDragRegion = null;
-    private final Launcher mLauncher;
     private final DragLayer mDragLayer;
     @Thunk
     final DragController mDragController;
@@ -93,14 +81,6 @@ public class DragView extends View {
 
     private int mLastTouchX;
     private int mLastTouchY;
-    private int mAnimatedShiftX;
-    private int mAnimatedShiftY;
-
-    // Below variable only needed IF FeatureFlags.LAUNCHER3_SPRING_ICONS is {@code true}
-    private Drawable mBgSpringDrawable, mFgSpringDrawable;
-    private SpringFloatValue mTranslateX, mTranslateY;
-    private Path mScaledMaskPath;
-    private ColorMatrixColorFilter mBaseFilter;
 
     /**
      * Construct the drag view.
@@ -108,17 +88,15 @@ public class DragView extends View {
      * The registration point is the point inside our view that the touch events should
      * be centered upon.
      *
-     * @param launcher      The Launcher instance
      * @param bitmap        The view that we're dragging around.  We scale it up when we draw it.
      * @param registrationX The x coordinate of the registration point.
      * @param registrationY The y coordinate of the registration point.
      */
-    public DragView(Launcher launcher, Bitmap bitmap, int registrationX, int registrationY,
+    public DragView(DragLayer dragLayer, DragController dragController, Bitmap bitmap, int registrationX, int registrationY,
                     final float initialScale, final float scaleOnDrop, final float finalScaleDps) {
-        super(launcher);
-        mLauncher = launcher;
-        mDragLayer = launcher.getDragLayer();
-        mDragController = launcher.getDragController();
+        super(dragLayer.getContext());
+        mDragLayer = dragLayer;
+        mDragController = dragController;
 
         final float scale = (bitmap.getWidth() + finalScaleDps) / bitmap.getWidth();
 
@@ -178,29 +156,10 @@ public class DragView extends View {
     private void updateColorFilter() {
         if (mCurrentFilter == null) {
             mPaint.setColorFilter(null);
-
-            if (mScaledMaskPath != null) {
-                mBgSpringDrawable.setColorFilter(mBaseFilter);
-                mFgSpringDrawable.setColorFilter(mBaseFilter);
-            }
         } else {
             ColorMatrixColorFilter currentFilter = new ColorMatrixColorFilter(mCurrentFilter);
             mPaint.setColorFilter(currentFilter);
-
-            if (mScaledMaskPath != null) {
-                if (mBaseFilter != null) {
-                    mBaseFilter.getColorMatrix(sTempMatrix1);
-                    sTempMatrix2.set(mCurrentFilter);
-                    sTempMatrix1.postConcat(sTempMatrix2);
-
-                    currentFilter = new ColorMatrixColorFilter(sTempMatrix1);
-                }
-
-                mBgSpringDrawable.setColorFilter(currentFilter);
-                mFgSpringDrawable.setColorFilter(currentFilter);
-            }
         }
-
         invalidate();
     }
 
@@ -306,15 +265,6 @@ public class DragView extends View {
                 canvas.drawBitmap(mCrossFadeBitmap, 0.0f, 0.0f, mPaint);
                 canvas.restoreToCount(saveCount);
             }
-        }
-
-        if (mScaledMaskPath != null) {
-            int cnt = canvas.save();
-            canvas.clipPath(mScaledMaskPath);
-            mBgSpringDrawable.draw(canvas);
-            canvas.translate(mTranslateX.mValue, mTranslateY.mValue);
-            mFgSpringDrawable.draw(canvas);
-            canvas.restoreToCount(cnt);
         }
     }
 
@@ -427,11 +377,6 @@ public class DragView extends View {
      * @param touchY the y coordinate the user touched in DragLayer coordinates
      */
     public void move(int touchX, int touchY) {
-        if (touchX > 0 && touchY > 0 && mLastTouchX > 0 && mLastTouchY > 0
-                && mScaledMaskPath != null) {
-            mTranslateX.animateToPos(mLastTouchX - touchX);
-            mTranslateY.animateToPos(mLastTouchY - touchY);
-        }
         mLastTouchX = touchX;
         mLastTouchY = touchY;
         applyTranslation();
@@ -444,27 +389,9 @@ public class DragView extends View {
                 DragLayer.ANIMATION_END_DISAPPEAR, onCompleteRunnable, duration);
     }
 
-    public void animateShift(final int shiftX, final int shiftY) {
-        if (mAnim.isStarted()) {
-            return;
-        }
-        mAnimatedShiftX = shiftX;
-        mAnimatedShiftY = shiftY;
-        applyTranslation();
-        mAnim.addUpdateListener(new AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float fraction = 1 - animation.getAnimatedFraction();
-                mAnimatedShiftX = (int) (fraction * shiftX);
-                mAnimatedShiftY = (int) (fraction * shiftY);
-                applyTranslation();
-            }
-        });
-    }
-
     private void applyTranslation() {
-        setTranslationX(mLastTouchX - mRegistrationX + mAnimatedShiftX);
-        setTranslationY(mLastTouchY - mRegistrationY + mAnimatedShiftY);
+        setTranslationX(mLastTouchX - mRegistrationX);
+        setTranslationY(mLastTouchY - mRegistrationY);
     }
 
     public void remove() {
@@ -481,65 +408,4 @@ public class DragView extends View {
         return mInitialScale;
     }
 
-    private static class SpringFloatValue {
-
-        private static final FloatPropertyCompat<SpringFloatValue> VALUE =
-                new FloatPropertyCompat<SpringFloatValue>("value") {
-                    @Override
-                    public float getValue(SpringFloatValue object) {
-                        return object.mValue;
-                    }
-
-                    @Override
-                    public void setValue(SpringFloatValue object, float value) {
-                        object.mValue = value;
-                        object.mView.invalidate();
-                    }
-                };
-
-        // Following three values are fine tuned with motion ux designer
-        private final static int STIFFNESS = 4000;
-        private final static float DAMPENING_RATIO = 1f;
-        private final static int PARALLAX_MAX_IN_DP = 8;
-
-        private final View mView;
-        private final SpringAnimation mSpring;
-        private final float mDelta;
-
-        private float mValue;
-
-        public SpringFloatValue(View view, float range) {
-            mView = view;
-            mSpring = new SpringAnimation(this, VALUE, 0)
-                    .setMinValue(-range).setMaxValue(range)
-                    .setSpring(new SpringForce(0)
-                            .setDampingRatio(DAMPENING_RATIO)
-                            .setStiffness(STIFFNESS));
-            mDelta = view.getResources().getDisplayMetrics().density * PARALLAX_MAX_IN_DP;
-        }
-
-        public void animateToPos(float value) {
-            mSpring.animateToFinalPosition(Utilities.boundToRange(value, -mDelta, mDelta));
-        }
-    }
-
-    private static class FixedSizeEmptyDrawable extends ColorDrawable {
-
-        private final int mSize;
-
-        public FixedSizeEmptyDrawable(int size) {
-            super(Color.TRANSPARENT);
-            mSize = size;
-        }
-
-        @Override
-        public int getIntrinsicHeight() {
-            return mSize;
-        }
-
-        @Override
-        public int getIntrinsicWidth() {
-            return mSize;
-        }
-    }
 }

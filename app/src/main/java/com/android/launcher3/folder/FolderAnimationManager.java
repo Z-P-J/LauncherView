@@ -32,8 +32,8 @@ import android.view.animation.AnimationUtils;
 
 import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.CellLayout;
-import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.R;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.Utilities;
@@ -65,7 +65,7 @@ public class FolderAnimationManager {
     private final PreviewBackground mPreviewBackground;
 
     private final Context mContext;
-    private final Launcher mLauncher;
+    private final LauncherLayout mLauncher;
 
     private final boolean mIsOpening;
 

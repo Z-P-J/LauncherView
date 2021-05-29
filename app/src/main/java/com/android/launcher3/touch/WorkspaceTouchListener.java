@@ -25,7 +25,8 @@ import android.view.View.OnTouchListener;
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.views.OptionsPopupView;
@@ -54,13 +55,13 @@ public class WorkspaceTouchListener implements OnTouchListener, Runnable {
     private static final int STATE_COMPLETED = 3;
 
     private final Rect mTempRect = new Rect();
-    private final Launcher mLauncher;
+    private final LauncherLayout mLauncher;
     private final Workspace mWorkspace;
     private final PointF mTouchDownPoint = new PointF();
 
     private int mLongPressState = STATE_CANCELLED;
 
-    public WorkspaceTouchListener(Launcher launcher, Workspace workspace) {
+    public WorkspaceTouchListener(LauncherLayout launcher, Workspace workspace) {
         mLauncher = launcher;
         mWorkspace = workspace;
     }
@@ -74,7 +75,7 @@ public class WorkspaceTouchListener implements OnTouchListener, Runnable {
 
             if (handleLongPress) {
                 // Check if the event is not near the edges
-                DeviceProfile dp = mLauncher.getDeviceProfile();
+                DeviceProfile dp = LauncherActivity.fromContext(view).getDeviceProfile();
                 DragLayer dl = mLauncher.getDragLayer();
                 Rect insets = dp.getInsets();
 

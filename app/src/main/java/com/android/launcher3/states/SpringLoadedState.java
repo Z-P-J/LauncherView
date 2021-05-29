@@ -18,7 +18,8 @@ package com.android.launcher3.states;
 import android.graphics.Rect;
 
 import com.android.launcher3.DeviceProfile;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.Workspace;
 
@@ -39,8 +40,8 @@ public class SpringLoadedState extends LauncherState {
     }
 
     @Override
-    public float[] getWorkspaceScaleAndTranslation(Launcher launcher) {
-        DeviceProfile grid = launcher.getDeviceProfile();
+    public float[] getWorkspaceScaleAndTranslation(LauncherLayout launcher) {
+        DeviceProfile grid = LauncherActivity.fromContext(launcher).getDeviceProfile();
         Workspace ws = launcher.getWorkspace();
         if (ws.getChildCount() == 0) {
             return super.getWorkspaceScaleAndTranslation(launcher);
@@ -63,7 +64,7 @@ public class SpringLoadedState extends LauncherState {
 
         float desiredCellTop = shrunkTop + (totalShrunkSpace - scaledHeight) / 2;
 
-        float halfHeight = ws.getHeight() / 2;
+        float halfHeight = ws.getHeight() / 2f;
         float myCenter = ws.getTop() + halfHeight;
         float cellTopFromCenter = halfHeight - ws.getChildAt(0).getTop();
         float actualCellTop = myCenter - cellTopFromCenter * scale;
@@ -71,21 +72,21 @@ public class SpringLoadedState extends LauncherState {
     }
 
     @Override
-    public void onStateEnabled(Launcher launcher) {
+    public void onStateEnabled(LauncherLayout launcher) {
         Workspace ws = launcher.getWorkspace();
         ws.showPageIndicatorAtCurrentScroll();
         ws.getPageIndicator().setShouldAutoHide(false);
 
-        launcher.getRotationHelper().setCurrentStateRequest(REQUEST_LOCK);
+        LauncherActivity.fromContext(launcher).getRotationHelper().setCurrentStateRequest(REQUEST_LOCK);
     }
 
     @Override
-    public float getWorkspaceScrimAlpha(Launcher launcher) {
+    public float getWorkspaceScrimAlpha(LauncherLayout launcher) {
         return 0.3f;
     }
 
     @Override
-    public void onStateDisabled(final Launcher launcher) {
+    public void onStateDisabled(final LauncherLayout launcher) {
         launcher.getWorkspace().getPageIndicator().setShouldAutoHide(true);
     }
 }

@@ -10,7 +10,7 @@ import android.view.animation.DecelerateInterpolator;
 
 import com.android.launcher3.ButtonDropTarget;
 import com.android.launcher3.DropTarget.DragObject;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragView;
 
@@ -25,7 +25,7 @@ public class FlingAnimation implements AnimatorUpdateListener, Runnable {
     private static final int DRAG_END_DELAY = 300;
 
     private final ButtonDropTarget mDropTarget;
-    private final Launcher mLauncher;
+    private final LauncherLayout mLauncher;
 
     protected final DragObject mDragObject;
     protected final DragLayer mDragLayer;
@@ -39,7 +39,7 @@ public class FlingAnimation implements AnimatorUpdateListener, Runnable {
 
     protected float mAX, mAY;
 
-    public FlingAnimation(DragObject d, PointF vel, ButtonDropTarget dropTarget, Launcher launcher) {
+    public FlingAnimation(DragObject d, PointF vel, ButtonDropTarget dropTarget, LauncherLayout launcher) {
         mDropTarget = dropTarget;
         mLauncher = launcher;
         mDragObject = d;

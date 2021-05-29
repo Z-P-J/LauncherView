@@ -23,7 +23,6 @@ import android.view.animation.Interpolator;
 import com.android.launcher3.LauncherAnimUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Utility class for building animator set
@@ -39,7 +38,6 @@ public class AnimatorSetBuilder {
     protected final ArrayList<Animator> mAnims = new ArrayList<>();
 
     private final SparseArray<Interpolator> mInterpolators = new SparseArray<>();
-    private final List<Runnable> mOnFinishRunnables = new ArrayList<>();
 
     /**
      * Associates a tag with all the animations added after this call.
@@ -51,24 +49,9 @@ public class AnimatorSetBuilder {
         mAnims.add(anim);
     }
 
-    public void addOnFinishRunnable(Runnable onFinishRunnable) {
-        mOnFinishRunnables.add(onFinishRunnable);
-    }
-
     public AnimatorSet build() {
         AnimatorSet anim = LauncherAnimUtils.createAnimatorSet();
         anim.playTogether(mAnims);
-        if (!mOnFinishRunnables.isEmpty()) {
-            anim.addListener(new AnimationSuccessListener() {
-                @Override
-                public void onAnimationSuccess(Animator animation) {
-                    for (Runnable onFinishRunnable : mOnFinishRunnables) {
-                        onFinishRunnable.run();
-                    }
-                    mOnFinishRunnables.clear();
-                }
-            });
-        }
         return anim;
     }
 

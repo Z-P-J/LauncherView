@@ -5,7 +5,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.R;
 
 /**
@@ -25,14 +25,14 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
 
     public abstract View.OnClickListener getOnClickListener(T activity, ItemInfo itemInfo);
 
-    public static class Widgets extends SystemShortcut<Launcher> {
+    public static class Widgets extends SystemShortcut<LauncherActivity> {
 
         public Widgets() {
             super(R.drawable.ic_widget, R.string.widget_button_text);
         }
 
         @Override
-        public View.OnClickListener getOnClickListener(final Launcher launcher,
+        public View.OnClickListener getOnClickListener(final LauncherActivity launcher,
                                                        final ItemInfo itemInfo) {
             return v -> Toast.makeText(launcher, "微件", Toast.LENGTH_SHORT).show();
         }

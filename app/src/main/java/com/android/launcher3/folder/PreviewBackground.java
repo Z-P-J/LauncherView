@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -36,7 +37,7 @@ import android.view.View;
 
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAnimUtils;
 import com.android.launcher3.util.Themes;
 
@@ -128,19 +129,19 @@ public class PreviewBackground {
                 }
             };
 
-    public void setup(Launcher launcher, View invalidateDelegate,
+    public void setup(Context context, View invalidateDelegate,
                       int availableSpaceX, int topPadding) {
         mInvalidateDelegate = invalidateDelegate;
-        mBgColor = Themes.getAttrColor(launcher, android.R.attr.colorPrimary);
+        mBgColor = Themes.getAttrColor(context, android.R.attr.colorPrimary);
 
-        DeviceProfile grid = launcher.getDeviceProfile();
+        DeviceProfile grid = LauncherActivity.fromContext(context).getDeviceProfile();
         previewSize = grid.folderIconSizePx;
 
         basePreviewOffsetX = (availableSpaceX - previewSize) / 2;
         basePreviewOffsetY = topPadding + grid.folderIconOffsetYPx;
 
         // Stroke width is 1dp
-        mStrokeWidth = launcher.getResources().getDisplayMetrics().density;
+        mStrokeWidth = context.getResources().getDisplayMetrics().density;
 
         float radius = getScaledRadius();
         float shadowRadius = radius + mStrokeWidth;

@@ -27,8 +27,8 @@ import android.view.View;
 import android.view.animation.Interpolator;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.touch.SwipeDetector;
@@ -57,7 +57,7 @@ public abstract class AbstractSlideInView extends AbstractFloatingView
     protected static final float TRANSLATION_SHIFT_CLOSED = 1f;
     protected static final float TRANSLATION_SHIFT_OPENED = 0f;
 
-    protected final Launcher mLauncher;
+    protected LauncherLayout mLauncher;
     protected final SwipeDetector mSwipeDetector;
     protected final ObjectAnimator mOpenCloseAnimator;
 
@@ -71,7 +71,6 @@ public abstract class AbstractSlideInView extends AbstractFloatingView
 
     public AbstractSlideInView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mLauncher = Launcher.getLauncher(context);
 
         mScrollInterpolator = Interpolators.SCROLL_CUBIC;
         mSwipeDetector = new SwipeDetector(context, this, SwipeDetector.VERTICAL);

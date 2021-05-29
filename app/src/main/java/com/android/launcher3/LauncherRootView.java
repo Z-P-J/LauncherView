@@ -16,7 +16,7 @@ import static com.android.launcher3.util.SystemUiController.UI_STATE_ROOT_VIEW;
 
 public class LauncherRootView extends InsettableFrameLayout {
 
-    private final Launcher mLauncher;
+    private final LauncherActivity mLauncher;
 
     private final Paint mOpaquePaint;
 
@@ -33,7 +33,7 @@ public class LauncherRootView extends InsettableFrameLayout {
         mOpaquePaint.setColor(Color.BLACK);
         mOpaquePaint.setStyle(Paint.Style.FILL);
 
-        mLauncher = Launcher.getLauncher(context);
+        mLauncher = LauncherActivity.fromContext(context);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class LauncherRootView extends InsettableFrameLayout {
     protected boolean fitSystemWindows(Rect insets) {
         mConsumedInsets.setEmpty();
         boolean drawInsetBar = false;
-        if (mLauncher.isInMultiWindowModeCompat()
+        if (LauncherActivity.fromContext(getContext()).isInMultiWindowModeCompat()
                 && (insets.left > 0 || insets.right > 0 || insets.bottom > 0)) {
             mConsumedInsets.left = insets.left;
             mConsumedInsets.right = insets.right;
@@ -113,7 +113,7 @@ public class LauncherRootView extends InsettableFrameLayout {
             }
         }
         if (resetState) {
-            mLauncher.getStateManager().reapplyState(true /* cancelCurrentAnimation */);
+            mLauncher.getLauncherLayout().getStateManager().reapplyState(true /* cancelCurrentAnimation */);
         }
 
         return true; // I'll take it from here

@@ -16,7 +16,8 @@
 package com.android.launcher3.uioverrides;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
 
@@ -44,34 +45,34 @@ public class AllAppsState extends LauncherState {
     }
 
     @Override
-    public void onStateEnabled(Launcher launcher) {
+    public void onStateEnabled(LauncherLayout launcher) {
         AbstractFloatingView.closeAllOpenViews(launcher);
         dispatchWindowStateChanged(launcher);
     }
 
     @Override
-    public String getDescription(Launcher launcher) {
-        return launcher.getString(R.string.all_apps_button_label);
+    public String getDescription(LauncherLayout launcher) {
+        return launcher.getContext().getString(R.string.all_apps_button_label);
     }
 
     @Override
-    public int getVisibleElements(Launcher launcher) {
+    public int getVisibleElements(LauncherLayout launcher) {
         return ALL_APPS_HEADER | ALL_APPS_CONTENT;
     }
 
     @Override
-    public float[] getWorkspaceScaleAndTranslation(Launcher launcher) {
+    public float[] getWorkspaceScaleAndTranslation(LauncherLayout launcher) {
         return new float[]{1f, 0,
-                -launcher.getDeviceProfile().heightPx * PARALLAX_COEFFICIENT};
+                -LauncherActivity.fromContext(launcher).getDeviceProfile().heightPx * PARALLAX_COEFFICIENT};
     }
 
     @Override
-    public PageAlphaProvider getWorkspacePageAlphaProvider(Launcher launcher) {
+    public PageAlphaProvider getWorkspacePageAlphaProvider(LauncherLayout launcher) {
         return PAGE_ALPHA_PROVIDER;
     }
 
     @Override
-    public float getVerticalProgress(Launcher launcher) {
+    public float getVerticalProgress(LauncherLayout launcher) {
         return 0f;
     }
 }

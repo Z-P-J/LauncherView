@@ -43,7 +43,8 @@ import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.FolderInfo.FolderListener;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.OnAlarmListener;
 import com.android.launcher3.R;
 import com.android.launcher3.ShortcutInfo;
@@ -68,7 +69,7 @@ import static com.android.launcher3.folder.PreviewItemManager.INITIAL_ITEM_ANIMA
  */
 public class FolderIcon extends FrameLayout implements FolderListener {
     @Thunk
-    Launcher mLauncher;
+    LauncherLayout mLauncher;
     @Thunk
     Folder mFolder;
     private FolderInfo mInfo;
@@ -140,8 +141,9 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mPreviewItemManager = new PreviewItemManager(this);
     }
 
-    public static FolderIcon fromXml(int resId, Launcher launcher, ViewGroup group,
+    public static FolderIcon fromXml(int resId, LauncherLayout launcher, ViewGroup group,
                                      FolderInfo folderInfo) {
+        Context context = group.getContext();
         @SuppressWarnings("all") // suppress dead code warning
         final boolean error = INITIAL_ITEM_ANIMATION_DURATION >= DROP_IN_ANIMATION_DURATION;
         if (error) {
@@ -150,8 +152,8 @@ public class FolderIcon extends FrameLayout implements FolderListener {
                     "is dependent on this");
         }
 
-        DeviceProfile grid = launcher.getDeviceProfile();
-        FolderIcon icon = (FolderIcon) LayoutInflater.from(group.getContext())
+        DeviceProfile grid = LauncherActivity.fromContext(context).getDeviceProfile();
+        FolderIcon icon = (FolderIcon) LayoutInflater.from(context)
                 .inflate(resId, group, false);
 
         icon.setClipToPadding(false);
@@ -165,9 +167,9 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         icon.setOnClickListener(ItemClickHandler.INSTANCE);
         icon.mInfo = folderInfo;
         icon.mLauncher = launcher;
-        icon.setContentDescription(launcher.getString(R.string.folder_name_format, folderInfo.title));
-        Folder folder = Folder.fromXml(launcher);
-        folder.setDragController(launcher.getDragController());
+        icon.setContentDescription(context.getString(R.string.folder_name_format, folderInfo.title));
+        Folder folder = Folder.fromXml(context);
+        folder.setLauncher(launcher);
         folder.setFolderIcon(icon);
         folder.bind(folderInfo);
         icon.setFolder(folder);
@@ -190,7 +192,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     private void setFolder(Folder folder) {
         mFolder = folder;
-        mPreviewVerifier = new FolderIconPreviewVerifier(mLauncher.getDeviceProfile().inv);
+        mPreviewVerifier = new FolderIconPreviewVerifier(LauncherActivity.fromContext(mLauncher).getDeviceProfile().inv);
         updatePreviewItems(false);
     }
 

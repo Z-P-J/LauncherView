@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.ActionMode;
 import android.view.FocusFinder;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -51,7 +52,8 @@ import com.android.launcher3.ExtendedEditText;
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.FolderInfo.FolderListener;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.OnAlarmListener;
 import com.android.launcher3.PagedView;
 import com.android.launcher3.R;
@@ -128,7 +130,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
 
     private AnimatorSet mCurrentAnimator;
 
-    protected final Launcher mLauncher;
+    protected LauncherLayout mLauncher;
     protected DragController mDragController;
     public FolderInfo mInfo;
 
@@ -199,7 +201,6 @@ public class Folder extends AbstractFloatingView implements DragSource,
         if (sHintText == null) {
             sHintText = res.getString(R.string.folder_hint_text);
         }
-        mLauncher = Launcher.getLauncher(context);
         // We need this view to be focusable in touch mode so that when text editing of the folder
         // name is complete, we have something to focus on, thus hiding the cursor and giving
         // reliable behavior when clicking the text field (since it will always gain focus on click).
@@ -350,8 +351,9 @@ public class Folder extends AbstractFloatingView implements DragSource,
         return mFolderIcon;
     }
 
-    public void setDragController(DragController dragController) {
-        mDragController = dragController;
+    public void setLauncher(LauncherLayout launcher) {
+        this.mLauncher = launcher;
+        mDragController = launcher.getDragController();
     }
 
     public void setFolderIcon(FolderIcon icon) {
@@ -425,12 +427,11 @@ public class Folder extends AbstractFloatingView implements DragSource,
     /**
      * Creates a new UserFolder, inflated from R.layout.user_folder.
      *
-     * @param launcher The main activity.
      * @return A new UserFolder.
      */
     @SuppressLint("InflateParams")
-    static Folder fromXml(Launcher launcher) {
-        return (Folder) launcher.getLayoutInflater()
+    static Folder fromXml(Context context) {
+        return (Folder) LayoutInflater.from(context)
                 .inflate(R.layout.user_folder_icon_normalized, null);
     }
 
@@ -527,7 +528,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
                     mFolderName.animate().setDuration(FOLDER_NAME_ANIMATION_DURATION)
                             .translationX(0)
                             .setInterpolator(AnimationUtils.loadInterpolator(
-                                    mLauncher, android.R.interpolator.fast_out_slow_in));
+                                    mLauncher.getContext(), android.R.interpolator.fast_out_slow_in));
                     mPageIndicator.playEntryAnimation();
 
                     if (updateAnimationFlag) {
@@ -852,7 +853,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
     }
 
     private void centerAboutIcon() {
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherActivity.fromContext(mLauncher).getDeviceProfile();
 
         DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
         DragLayer parent = (DragLayer) mLauncher.findViewById(R.id.drag_layer);
@@ -924,7 +925,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
     }
 
     private int getContentAreaHeight() {
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherActivity.fromContext(this).getDeviceProfile();
         int maxContentAreaHeight = grid.availableHeightPx
                 - grid.getTotalWorkspacePadding().y - mFooterHeight;
         int height = Math.min(maxContentAreaHeight,
@@ -960,7 +961,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
 
         if (mContent.getChildCount() > 0) {
             int cellIconGap = (mContent.getPageAt(0).getCellWidth()
-                    - mLauncher.getDeviceProfile().iconSizePx) / 2;
+                    - LauncherActivity.fromContext(mLauncher).getDeviceProfile().iconSizePx) / 2;
             mFooter.setPadding(mContent.getPaddingLeft() + cellIconGap,
                     mFooter.getPaddingTop(),
                     mContent.getPaddingRight() + cellIconGap,
@@ -1363,7 +1364,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
     /**
      * Returns a folder which is already open or null
      */
-    public static Folder getOpen(Launcher launcher) {
+    public static Folder getOpen(LauncherLayout launcher) {
         return getOpenView(launcher, TYPE_FOLDER);
     }
 

@@ -141,6 +141,23 @@ public abstract class AbstractFloatingView extends LinearLayout implements Touch
         return null;
     }
 
+    protected static <T extends AbstractFloatingView> T getOpenView(
+            LauncherLayout launcherLayout, @FloatingViewType int type) {
+        BaseDragLayer dragLayer = launcherLayout.getDragLayer();
+        // Iterate in reverse order. AbstractFloatingView is added later to the dragLayer,
+        // and will be one of the last views.
+        for (int i = dragLayer.getChildCount() - 1; i >= 0; i--) {
+            View child = dragLayer.getChildAt(i);
+            if (child instanceof AbstractFloatingView) {
+                AbstractFloatingView view = (AbstractFloatingView) child;
+                if (view.isOfType(type) && view.isOpen()) {
+                    return (T) view;
+                }
+            }
+        }
+        return null;
+    }
+
     public static void closeOpenContainer(BaseDraggingActivity activity,
                                           @FloatingViewType int type) {
         AbstractFloatingView view = getOpenView(activity, type);
@@ -170,15 +187,23 @@ public abstract class AbstractFloatingView extends LinearLayout implements Touch
         activity.finishAutoCancelActionMode();
     }
 
+    public static void closeAllOpenViews(View view) {
+        closeAllOpenViews(LauncherActivity.fromContext(view), true);
+    }
+
+    public static void closeAllOpenViews(Context context) {
+        closeAllOpenViews(LauncherActivity.fromContext(context), true);
+    }
+
     public static void closeAllOpenViews(BaseDraggingActivity activity) {
         closeAllOpenViews(activity, true);
     }
 
-    public static AbstractFloatingView getTopOpenView(BaseDraggingActivity activity) {
+    public static AbstractFloatingView getTopOpenView(LauncherLayout activity) {
         return getTopOpenViewWithType(activity, TYPE_ALL);
     }
 
-    public static AbstractFloatingView getTopOpenViewWithType(BaseDraggingActivity activity,
+    public static AbstractFloatingView getTopOpenViewWithType(LauncherLayout activity,
                                                               @FloatingViewType int type) {
         return getOpenView(activity, type);
     }

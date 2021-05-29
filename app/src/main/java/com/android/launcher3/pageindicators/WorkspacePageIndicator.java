@@ -21,7 +21,7 @@ import android.widget.FrameLayout;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Insettable;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 
@@ -45,7 +45,7 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
     private final ValueAnimator[] mAnimators = new ValueAnimator[ANIMATOR_COUNT];
 
     private final Handler mDelayedLineFadeHandler = new Handler(Looper.getMainLooper());
-    private final Launcher mLauncher;
+    private final LauncherActivity mLauncher;
 
     private boolean mShouldAutoHide = true;
 
@@ -119,7 +119,7 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
         mLinePaint = new Paint();
         mLinePaint.setAlpha(0);
 
-        mLauncher = Launcher.getLauncher(context);
+        mLauncher = LauncherActivity.fromContext(context);
         mLineHeight = res.getDimensionPixelSize(R.dimen.dynamic_grid_page_indicator_line_height);
 
         boolean darkText = false;

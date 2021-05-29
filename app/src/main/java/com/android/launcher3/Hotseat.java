@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 public class HotSeat extends FrameLayout implements Insettable {
 
-    private final Launcher mLauncher;
+    private final LauncherActivity mLauncher;
     private CellLayout mContent;
 
     @ViewDebug.ExportedProperty(category = "launcher")
@@ -47,7 +47,7 @@ public class HotSeat extends FrameLayout implements Insettable {
 
     public HotSeat(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mLauncher = Launcher.getLauncher(context);
+        mLauncher = LauncherActivity.fromContext(getContext());
     }
 
     public CellLayout getLayout() {
@@ -108,7 +108,7 @@ public class HotSeat extends FrameLayout implements Insettable {
 //                }
             Toast.makeText(context, "All", Toast.LENGTH_SHORT).show();
         });
-        allAppsButton.setOnFocusChangeListener(mLauncher.mFocusHandler);
+        allAppsButton.setOnFocusChangeListener(mLauncher.getLauncherLayout().mFocusHandler);
 
         // Note: We do this to ensure that the hotseat is always laid out in the orientation of
         // the hotseat in order regardless of which orientation they were added
@@ -123,7 +123,7 @@ public class HotSeat extends FrameLayout implements Insettable {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         // We don't want any clicks to go through to the hotseat unless the workspace is in
         // the normal state or an accessible drag is in progress.
-        return !mLauncher.getWorkspace().workspaceIconsCanBeDragged();
+        return !mLauncher.getLauncherLayout().getWorkspace().workspaceIconsCanBeDragged();
     }
 
 //    @Override

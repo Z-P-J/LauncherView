@@ -43,7 +43,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
-import com.android.launcher3.Launcher.LauncherOverlay;
+import com.android.launcher3.LauncherActivity.LauncherOverlay;
 import com.android.launcher3.LauncherStateManager.AnimationConfig;
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.Interpolators;
@@ -157,7 +157,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     private CellLayout mDropToLayout = null;
 
     @Thunk
-    final Launcher mLauncher;
+    LauncherLayout mLauncher;
     @Thunk
     DragController mDragController;
 
@@ -233,7 +233,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     private float mOverlayTranslation;
 
     // Handles workspace state transitions
-    private final WorkspaceStateTransitionAnimation mStateTransitionAnimation;
+    private WorkspaceStateTransitionAnimation mStateTransitionAnimation;
 
     /**
      * Used to inflate the Workspace from XML.
@@ -255,7 +255,11 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     public Workspace(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        mLauncher = Launcher.getLauncher(context);
+
+    }
+
+    public void init(LauncherLayout launcherLayout) {
+        mLauncher = launcherLayout;
         mStateTransitionAnimation = new WorkspaceStateTransitionAnimation(mLauncher, this);
 
         setHapticFeedbackEnabled(false);
@@ -270,7 +274,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     public void setInsets(Rect insets) {
         mInsets.set(insets);
 
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherActivity.fromContext(this).getDeviceProfile();
         mMaxDistanceForFolderCreation = (0.55f * grid.iconSizePx);
         mWorkspaceFadeInAdjacentScreens = grid.shouldFadeAdjacentWorkspaceScreens();
 
@@ -496,8 +500,8 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         // created CellLayout.
         CellLayout newScreen = (CellLayout) LayoutInflater.from(getContext()).inflate(
                 R.layout.workspace_screen, this, false /* attachToRoot */);
-        int paddingLeftRight = mLauncher.getDeviceProfile().cellLayoutPaddingLeftRightPx;
-        int paddingBottom = mLauncher.getDeviceProfile().cellLayoutBottomPaddingPx;
+        int paddingLeftRight = LauncherActivity.fromContext(getContext()).getDeviceProfile().cellLayoutPaddingLeftRightPx;
+        int paddingBottom = LauncherActivity.fromContext(getContext()).getDeviceProfile().cellLayoutBottomPaddingPx;
         newScreen.setPadding(paddingLeftRight, 0, paddingLeftRight, paddingBottom);
 
         mWorkspaceScreens.put(screenId, newScreen);
@@ -1431,7 +1435,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         int dragLayerX = mTempXY[0];
         int dragLayerY = mTempXY[1];
 
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherActivity.fromContext(getContext()).getDeviceProfile();
         Point dragVisualizeOffset = null;
         Rect dragRect = null;
         if (child instanceof BubbleTextView) {
@@ -1711,7 +1715,6 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         } else {
             final View cell = mDragInfo.cell;
             boolean droppedOnOriginalCellDuringTransition = false;
-            Runnable onCompleteRunnable = null;
 
             if (dropTargetLayout != null && !d.cancelled) {
                 // Move internally
@@ -1830,7 +1833,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
                     // Animate the item to its original position, while simultaneously exiting
                     // spring-loaded mode so the page meets the icon where it was picked up.
                     mLauncher.getDragController().animateDragViewToOriginalPosition(
-                            onCompleteRunnable, cell, SPRING_LOADED_TRANSITION_MS);
+                            cell, SPRING_LOADED_TRANSITION_MS);
                     mLauncher.getStateManager().goToState(NORMAL);
                     mLauncher.getDropTargetBar().onDragEnd();
                     parent.onDropChild(cell);
@@ -1847,14 +1850,14 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
             parent.onDropChild(cell);
 
             mLauncher.getStateManager().goToState(
-                    NORMAL, SPRING_LOADED_EXIT_DELAY, onCompleteRunnable);
+                    NORMAL, SPRING_LOADED_EXIT_DELAY);
         }
     }
 
     public void onNoCellFound(View dropTargetLayout) {
         if (mLauncher.isHotseatLayout(dropTargetLayout)) {
             HotSeat hotseat = mLauncher.getHotseat();
-            boolean droppedOnAllAppsIcon = mTargetCell != null && !mLauncher.getDeviceProfile().inv.isAllAppsButtonRank(
+            boolean droppedOnAllAppsIcon = mTargetCell != null && !LauncherActivity.fromContext(getContext()).getDeviceProfile().inv.isAllAppsButtonRank(
                     hotseat.getOrderInHotseat(mTargetCell[0], mTargetCell[1]));
             if (!droppedOnAllAppsIcon) {
                 // Only show message when hotseat is full and drop target was not AllApps button
@@ -1867,7 +1870,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
 
     private void showOutOfSpaceMessage(boolean isHotseatLayout) {
         int strId = (isHotseatLayout ? R.string.hotseat_out_of_space : R.string.out_of_space);
-        Toast.makeText(mLauncher, mLauncher.getString(strId), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getContext().getString(strId), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -2267,7 +2270,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
             this.cellY = cellY;
 
             BubbleTextView cell = (BubbleTextView) layout.getChildAt(cellX, cellY);
-            bg.setup(mLauncher, null, cell.getMeasuredWidth(), cell.getPaddingTop());
+            bg.setup(getContext(), null, cell.getMeasuredWidth(), cell.getPaddingTop());
 
             // The full preview background should appear behind the icon
             bg.isClipping = false;
@@ -2902,13 +2905,13 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     @Override
     public int getExpectedHeight() {
         return getMeasuredHeight() <= 0 || !mIsLayoutValid
-                ? mLauncher.getDeviceProfile().heightPx : getMeasuredHeight();
+                ? LauncherActivity.fromContext(getContext()).getDeviceProfile().heightPx : getMeasuredHeight();
     }
 
     @Override
     public int getExpectedWidth() {
         return getMeasuredWidth() <= 0 || !mIsLayoutValid
-                ? mLauncher.getDeviceProfile().widthPx : getMeasuredWidth();
+                ? LauncherActivity.fromContext(getContext()).getDeviceProfile().widthPx : getMeasuredWidth();
     }
 
     @Override

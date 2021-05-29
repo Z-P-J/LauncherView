@@ -21,12 +21,14 @@ import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.animation.AnimationUtils;
 
 import com.android.launcher3.Insettable;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.R;
 import com.android.launcher3.views.TopRoundedCornerView;
 
@@ -107,12 +109,12 @@ public class WidgetsFullSheet extends BaseWidgetSheet
         if (mInsets.bottom > 0) {
             widthUsed = 0;
         } else {
-            Rect padding = mLauncher.getDeviceProfile().workspacePadding;
+            Rect padding = LauncherActivity.fromContext(this).getDeviceProfile().workspacePadding;
             widthUsed = Math.max(padding.left + padding.right,
                     2 * (mInsets.left + mInsets.right));
         }
 
-        int heightUsed = mInsets.top + mLauncher.getDeviceProfile().edgeMarginPx;
+        int heightUsed = mInsets.top + LauncherActivity.fromContext(this).getDeviceProfile().edgeMarginPx;
         measureChildWithMargins(mContent, widthMeasureSpec,
                 widthUsed, heightMeasureSpec, heightUsed);
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
@@ -190,9 +192,10 @@ public class WidgetsFullSheet extends BaseWidgetSheet
         return super.onControllerInterceptTouchEvent(ev);
     }
 
-    public static WidgetsFullSheet show(Launcher launcher, boolean animate) {
-        WidgetsFullSheet sheet = (WidgetsFullSheet) launcher.getLayoutInflater()
+    public static WidgetsFullSheet show(LauncherLayout launcher, boolean animate) {
+        WidgetsFullSheet sheet = (WidgetsFullSheet) LayoutInflater.from(launcher.getContext())
                 .inflate(R.layout.widgets_full_sheet, launcher.getDragLayer(), false);
+        sheet.mLauncher = launcher;
         sheet.mIsOpen = true;
         launcher.getDragLayer().addView(sheet);
         sheet.open(animate);

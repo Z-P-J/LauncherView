@@ -41,12 +41,10 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     private int mCountX;
 
-    private final Launcher mLauncher;
     private boolean mInvertIfRtl = false;
 
     public ShortcutAndWidgetContainer(Context context, @ContainerType int containerType) {
         super(context);
-        mLauncher = Launcher.getLauncher(context);
         mContainerType = containerType;
     }
 
@@ -98,12 +96,12 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     public int getCellContentHeight() {
         return Math.min(getMeasuredHeight(),
-                mLauncher.getDeviceProfile().getCellHeight(mContainerType));
+                LauncherActivity.fromContext(getContext()).getDeviceProfile().getCellHeight(mContainerType));
     }
 
     public void measureChild(View child) {
         CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
-        final DeviceProfile profile = mLauncher.getDeviceProfile();
+        final DeviceProfile profile = LauncherActivity.fromContext(getContext()).getDeviceProfile();
 
         lp.setup(mCellWidth, mCellHeight, invertLayoutHorizontally(), mCountX);
         // Center the icon/folder

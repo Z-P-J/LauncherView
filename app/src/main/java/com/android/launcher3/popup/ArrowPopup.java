@@ -38,7 +38,7 @@ import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.Launcher;
+import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAnimUtils;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
@@ -60,7 +60,7 @@ public abstract class ArrowPopup extends AbstractFloatingView {
 
     protected final LayoutInflater mInflater;
     private final float mOutlineRadius;
-    protected final Launcher mLauncher;
+    protected final LauncherActivity mLauncher;
     protected final boolean mIsRtl;
 
     private final int mArrayOffset;
@@ -77,9 +77,9 @@ public abstract class ArrowPopup extends AbstractFloatingView {
 
     public ArrowPopup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mLauncher = LauncherActivity.fromContext(context);
         mInflater = LayoutInflater.from(context);
         mOutlineRadius = getResources().getDimension(R.dimen.bg_round_rect_radius);
-        mLauncher = Launcher.getLauncher(context);
         mIsRtl = Utilities.isRtl(getResources());
 
         setClipToOutline(true);
@@ -181,7 +181,7 @@ public abstract class ArrowPopup extends AbstractFloatingView {
             ShapeDrawable arrowDrawable = new ShapeDrawable(TriangleShape.create(
                     arrowLp.width, arrowLp.height, !mIsAboveIcon));
             Paint arrowPaint = arrowDrawable.getPaint();
-            arrowPaint.setColor(Themes.getAttrColor(mLauncher, R.attr.popupColorPrimary));
+            arrowPaint.setColor(Themes.getAttrColor(getContext(), R.attr.popupColorPrimary));
             // The corner path effect won't be reflected in the shadow, but shouldn't be noticeable.
             int radius = getResources().getDimensionPixelSize(R.dimen.popup_arrow_corner_radius);
             arrowPaint.setPathEffect(new CornerPathEffect(radius));
