@@ -17,14 +17,13 @@ package com.android.launcher3;
 
 import android.view.animation.Interpolator;
 
+import com.android.launcher3.states.EditModeState;
 import com.android.launcher3.states.SpringLoadedState;
 import com.android.launcher3.uioverrides.AllAppsState;
 import com.android.launcher3.uioverrides.OverviewState;
 
 import java.util.Arrays;
 
-import static android.view.View.IMPORTANT_FOR_ACCESSIBILITY_AUTO;
-import static android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS;
 import static com.android.launcher3.anim.Interpolators.ACCEL_2;
 import static com.android.launcher3.states.RotationHelper.REQUEST_NONE;
 
@@ -80,7 +79,7 @@ public class LauncherState {
      */
     public static final LauncherState SPRING_LOADED = new SpringLoadedState(1);
     public static final LauncherState OVERVIEW = new OverviewState(2);
-//    public static final LauncherState FAST_OVERVIEW = new FastOverviewState(3);
+    public static final LauncherState EDIT_MODE = new EditModeState(3);
     public static final LauncherState ALL_APPS = new AllAppsState(4);
 //    public static final LauncherState OPTIONS = new OptionsState(5);
 
@@ -95,13 +94,6 @@ public class LauncherState {
      * True if workspace has multiple pages visible.
      */
     public final boolean hasMultipleVisiblePages;
-
-    /**
-     * Accessibility flag for workspace and its pages.
-     *
-     * @see android.view.View#setImportantForAccessibility(int)
-     */
-    public final int workspaceAccessibilityFlag;
 
     /**
      * Properties related to state transition animation
@@ -146,9 +138,6 @@ public class LauncherState {
 
         this.hasWorkspacePageBackground = (flags & FLAG_PAGE_BACKGROUNDS) != 0;
         this.hasMultipleVisiblePages = (flags & FLAG_MULTI_PAGE) != 0;
-        this.workspaceAccessibilityFlag = (flags & FLAG_DISABLE_ACCESSIBILITY) != 0
-                ? IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-                : IMPORTANT_FOR_ACCESSIBILITY_AUTO;
         this.disableRestore = (flags & FLAG_DISABLE_RESTORE) != 0;
         this.workspaceIconsCanBeDragged = (flags & FLAG_WORKSPACE_ICONS_CAN_BE_DRAGGED) != 0;
         this.disablePageClipping = (flags & FLAG_DISABLE_PAGE_CLIPPING) != 0;

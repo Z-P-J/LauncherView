@@ -14,7 +14,7 @@
 
 <!-- AllApps & Launcher transitions -->
     <!-- Out of 100, the percent to shrink the workspace during spring loaded mode. -->
-    <integer name="config_workspaceSpringLoadShrinkPercentage">90</integer>
+    <integer name="config_workspaceSpringLoadShrinkPercentage">76</integer>
 
     <!-- View tag key used to store SpringAnimation data. -->
 
@@ -64,7 +64,6 @@
 
     <!-- QSB IDs. DO not change -->
     <item type="id" name="search_container_workspace" />
-    <item type="id" name="search_container_hotseat" />
 
     <!-- Recents -->
     <item type="id" name="overview_panel"/>

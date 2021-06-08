@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
 
 /**
@@ -93,8 +94,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     @Thunk
     HotSeat mHotSeat;
-    @Nullable
-    private View mHotseatSearchBox;
 
     private DropTargetBar mDropTargetBar;
 
@@ -138,7 +137,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         mWorkspace.initParentViews(mDragLayer);
         mOverviewPanel = findViewById(R.id.overview_panel);
         mHotSeat = findViewById(R.id.hotseat);
-        mHotseatSearchBox = findViewById(R.id.search_container_hotseat);
 
         mLauncherView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -167,6 +165,8 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     }
 
+
+    private LauncherLoader loader;
     public void init(Bundle savedInstanceState) {
         restoreState(savedInstanceState);
 
@@ -180,7 +180,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         mWorkspace.setCurrentPage(currentScreen);
         setWorkspaceLoading(true);
 
-        LauncherLoader loader = new LauncherLoader(getContext(), LauncherAppState.getInstance(getContext()));
+        loader = new LauncherLoader(getContext(), LauncherAppState.getInstance(getContext()));
         loader.initialize(this);
         loader.startLoader(currentScreen);
     }
@@ -188,8 +188,8 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
 
 
-    protected void reapplyUi() {
-
+    public void rebindWorkspace(InvariantDeviceProfile idp) {
+        loader.startLoader(mWorkspace.getCurrentPage());
     }
 
     @Override
@@ -326,10 +326,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         return mHotSeat;
     }
 
-    public View getHotSeatSearchBox() {
-        return mHotseatSearchBox;
-    }
-
     public <T extends View> T getOverviewPanel() {
         return (T) mOverviewPanel;
     }
@@ -355,6 +351,28 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
     }
 
 
+    public boolean onBackPressed() {
+        if (mDragController.isDragging()) {
+            mDragController.cancelDrag();
+            return true;
+        }
+
+        // Note: There should be at most one log per method call. This is enforced implicitly
+        // by using if-else statements.
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(this);
+        Log.d(TAG, "topView=" + topView + " isInState(ALL_APPS)=" + isInState(ALL_APPS));
+        if (topView != null && topView.onBackPressed()) {
+            // Handled by the floating view.
+            return true;
+        } else if (!isInState(NORMAL)) {
+            mStateManager.goToState(NORMAL);
+            return true;
+        } else {
+            // Back button is a no-op here, but give at least some feedback for the button press
+            mWorkspace.showOutlinesTemporarily();
+        }
+        return false;
+    }
 
 
 

@@ -16,6 +16,7 @@
 
 package com.android.launcher3;
 
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Interpolator;
 
@@ -27,8 +28,8 @@ import com.android.launcher3.graphics.WorkspaceAndHotseatScrim;
 
 import static com.android.launcher3.LauncherAnimUtils.DRAWABLE_ALPHA;
 import static com.android.launcher3.LauncherAnimUtils.SCALE_PROPERTY;
+import static com.android.launcher3.LauncherState.EDIT_MODE;
 import static com.android.launcher3.LauncherState.HOTSEAT_ICONS;
-import static com.android.launcher3.LauncherState.HOTSEAT_SEARCH_BOX;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_FADE;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_SCALE;
 import static com.android.launcher3.anim.Interpolators.LINEAR;
@@ -83,10 +84,16 @@ public class WorkspaceStateTransitionAnimation {
         Interpolator fadeInterpolator = builder.getInterpolator(ANIM_WORKSPACE_FADE,
                 pageAlphaProvider.interpolator);
         boolean playAtomicComponent = config.playAtomicComponent();
+        Log.d("setWorkspaceProperty", "playAtomicComponent=" + playAtomicComponent + " elements & HOTSEAT_ICONS=" + (elements & HOTSEAT_ICONS));
         if (playAtomicComponent) {
             Interpolator scaleInterpolator = builder.getInterpolator(ANIM_WORKSPACE_SCALE, ZOOM_OUT);
             propertySetter.setFloat(mWorkspace, SCALE_PROPERTY, mNewScale, scaleInterpolator);
-            float hotseatIconsAlpha = (elements & HOTSEAT_ICONS) != 0 ? 1 : 0;
+            float hotseatIconsAlpha;
+            if (state == EDIT_MODE) {
+                hotseatIconsAlpha = 0;
+            } else {
+                hotseatIconsAlpha = (elements & HOTSEAT_ICONS) != 0 ? 1 : 0;
+            }
             propertySetter.setViewAlpha(mLauncher.getHotseat().getLayout(), hotseatIconsAlpha,
                     fadeInterpolator);
             propertySetter.setViewAlpha(mLauncher.getWorkspace().getPageIndicator(),
@@ -104,14 +111,10 @@ public class WorkspaceStateTransitionAnimation {
         propertySetter.setFloat(mWorkspace, View.TRANSLATION_Y,
                 scaleAndTranslation[2], translationInterpolator);
 
-        propertySetter.setViewAlpha(mLauncher.getHotSeatSearchBox(),
-                (elements & HOTSEAT_SEARCH_BOX) != 0 ? 1 : 0, fadeInterpolator);
-
         // Set scrim
         WorkspaceAndHotseatScrim scrim = mLauncher.getDragLayer().getScrim();
         propertySetter.setFloat(scrim, SCRIM_PROGRESS, state.getWorkspaceScrimAlpha(mLauncher),
                 LINEAR);
-//        propertySetter.setFloat(scrim, SYSUI_PROGRESS, state.hasSysUiScrim ? 1 : 0, LINEAR);
     }
 
     public void applyChildState(LauncherState state, CellLayout cl, int childIndex) {

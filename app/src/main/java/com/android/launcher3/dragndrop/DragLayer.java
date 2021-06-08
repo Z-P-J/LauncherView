@@ -175,10 +175,6 @@ public class DragLayer extends BaseDragLayer<LauncherActivity> {
         return false;
     }
 
-    private void sendTapOutsideFolderAccessibilityEvent(boolean isEditingName) {
-        int stringId = isEditingName ? R.string.folder_tap_to_rename : R.string.folder_tap_to_close;
-    }
-
     @Override
     public boolean onHoverEvent(MotionEvent ev) {
         // If we've received this, we've already done the necessary handling

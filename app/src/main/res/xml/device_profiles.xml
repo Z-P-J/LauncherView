@@ -28,7 +28,6 @@
         launcher:iconSize="48"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="3"
-        launcher:defaultLayoutId="@xml/default_workspace_3x3"
         />
 
     <profile
@@ -42,7 +41,6 @@
         launcher:iconSize="48"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="3"
-        launcher:defaultLayoutId="@xml/default_workspace_3x3"
         />
 
     <profile
@@ -56,7 +54,6 @@
         launcher:iconSize="48"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="5"
-        launcher:defaultLayoutId="@xml/default_workspace_4x4"
         />
 
     <profile
@@ -70,7 +67,6 @@
         launcher:iconSize="48"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="5"
-        launcher:defaultLayoutId="@xml/default_workspace_4x4"
         />
 
     <profile
@@ -84,7 +80,6 @@
         launcher:iconSize="48"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="5"
-        launcher:defaultLayoutId="@xml/default_workspace_4x4"
         />
 
     <profile
@@ -98,7 +93,6 @@
         launcher:iconSize="54"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="5"
-        launcher:defaultLayoutId="@xml/default_workspace_4x4"
         />
 
     <profile
@@ -112,7 +106,6 @@
         launcher:iconSize="48"
         launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="5"
-        launcher:defaultLayoutId="@xml/default_workspace_5x6"
         />
 
 <!--    <profile-->
@@ -126,7 +119,6 @@
 <!--        launcher:iconSize="54"-->
 <!--        launcher:iconTextSize="13.0"-->
 <!--        launcher:numHotseatIcons="5"-->
-<!--        launcher:defaultLayoutId="@xml/default_workspace_4x4"-->
 <!--        />-->
 
     <profile
@@ -140,7 +132,6 @@
         launcher:iconSize="56"
         launcher:iconTextSize="14.4"
         launcher:numHotseatIcons="5"
-        launcher:defaultLayoutId="@xml/default_workspace_5x5"
         />
 
     <profile
@@ -154,7 +145,6 @@
         launcher:iconSize="64"
         launcher:iconTextSize="14.4"
         launcher:numHotseatIcons="7"
-        launcher:defaultLayoutId="@xml/default_workspace_5x6"
         />
 
     <profile
@@ -168,7 +158,6 @@
         launcher:iconSize="76"
         launcher:iconTextSize="14.4"
         launcher:numHotseatIcons="7"
-        launcher:defaultLayoutId="@xml/default_workspace_5x6"
         />
 
     <profile
@@ -182,7 +171,6 @@
         launcher:iconSize="100"
         launcher:iconTextSize="20.0"
         launcher:numHotseatIcons="7"
-        launcher:defaultLayoutId="@xml/default_workspace_5x6"
         />
 
 </profiles>

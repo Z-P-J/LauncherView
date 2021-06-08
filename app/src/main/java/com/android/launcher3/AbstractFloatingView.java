@@ -182,13 +182,32 @@ public abstract class AbstractFloatingView extends LinearLayout implements Touch
         }
     }
 
+    public static void closeOpenViews(BaseDragLayer dragLayer, boolean animate,
+                                      @FloatingViewType int type) {
+        // Iterate in reverse order. AbstractFloatingView is added later to the dragLayer,
+        // and will be one of the last views.
+        for (int i = dragLayer.getChildCount() - 1; i >= 0; i--) {
+            View child = dragLayer.getChildAt(i);
+            if (child instanceof AbstractFloatingView) {
+                AbstractFloatingView abs = (AbstractFloatingView) child;
+                if (abs.isOfType(type)) {
+                    abs.close(animate);
+                }
+            }
+        }
+    }
+
     public static void closeAllOpenViews(BaseDraggingActivity activity, boolean animate) {
         closeOpenViews(activity, animate, TYPE_ALL);
         activity.finishAutoCancelActionMode();
     }
 
-    public static void closeAllOpenViews(View view) {
-        closeAllOpenViews(LauncherActivity.fromContext(view), true);
+    public static void closeAllOpenViews(LauncherLayout launcherLayout, boolean animate) {
+        closeOpenViews(launcherLayout.getDragLayer(), animate, TYPE_ALL);
+    }
+
+    public static void closeAllOpenViews(LauncherLayout launcherLayout) {
+        closeAllOpenViews(launcherLayout, true);
     }
 
     public static void closeAllOpenViews(Context context) {

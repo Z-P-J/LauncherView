@@ -32,7 +32,6 @@
     <attr name="workspaceAmbientShadowColor" format="color"/>
     <attr name="workspaceKeyShadowColor" format="color" />
     <attr name="workspaceStatusBarScrim" format="reference" />
-    <attr name="widgetsTheme" format="reference" />
 
     <!-- BubbleTextView specific attributes. -->
     <declare-styleable name="BubbleTextView">
@@ -109,8 +108,6 @@
         <attr name="landscapeIconSize" format="float" />
         <attr name="iconTextSize" format="float" />
 
-        <attr name="defaultLayoutId" format="reference" />
-        <attr name="demoModeLayoutId" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="CellLayout">

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
+
+        <Button
+            android:id="@+id/btn_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4x5"
+            />
+
+        <Button
+            android:id="@+id/btn_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4x6"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
+
+        <Button
+            android:id="@+id/btn_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5x5"
+            />
+
+        <Button
+            android:id="@+id/btn_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5x6"
+            />
+
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:min="20"
+        android:max="100"
+        />
+
+
+</LinearLayout>

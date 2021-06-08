@@ -18,7 +18,8 @@ package com.android.launcher3.graphics;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.Region;
 import android.support.v4.graphics.ColorUtils;
 import android.util.Property;
@@ -46,9 +47,10 @@ public class WorkspaceAndHotseatScrim {
                 }
             };
 
-    private final Rect mHighlightRect = new Rect();
+    private final RectF mHighlightRect = new RectF();
     private final LauncherActivity mLauncher;
     private final View mRoot;
+    private final float mRadius;
 
     private Workspace mWorkspace;
 
@@ -57,6 +59,7 @@ public class WorkspaceAndHotseatScrim {
 
     public WorkspaceAndHotseatScrim(View view) {
         mRoot = view;
+        mRadius = (view.getResources().getDisplayMetrics().density * 14);
         mLauncher = LauncherActivity.fromContext(view);
     }
 
@@ -74,8 +77,12 @@ public class WorkspaceAndHotseatScrim {
             if (currCellLayout != null && currCellLayout != mLauncher.getLauncherLayout().getHotseat().getLayout()) {
                 // Cut a hole in the darkening scrim on the page that should be highlighted, if any.
                 mLauncher.getDragLayer()
-                        .getDescendantRectRelativeToSelf(currCellLayout, mHighlightRect);
-                canvas.clipRect(mHighlightRect, Region.Op.DIFFERENCE);
+                        .getDescendantRectFRelativeToSelf(currCellLayout, mHighlightRect);
+//                canvas.clipRect(mHighlightRect, Region.Op.DIFFERENCE);
+
+                Path path = new Path();
+                path.addRoundRect(mHighlightRect.left, mHighlightRect.top, mHighlightRect.right, mHighlightRect.bottom, mRadius, mRadius, Path.Direction.CW);
+                canvas.clipPath(path, Region.Op.DIFFERENCE);
             }
 
             canvas.drawColor(ColorUtils.setAlphaComponent(Color.TRANSPARENT, mScrimAlpha));

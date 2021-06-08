@@ -34,6 +34,7 @@ import com.android.launcher3.R;
 import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.widget.WidgetsFullSheet;
+import com.qianxun.browser.ui.fragment.SettingsBottomDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +132,10 @@ public class OptionsPopupView extends ArrowPopup
                     @Override
                     public boolean onLongClick(View v) {
                         Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
-                        launcher.getStateManager().goToState(LauncherState.SPRING_LOADED);
+                        launcher.getStateManager().goToState(LauncherState.EDIT_MODE);
+
+                        new SettingsBottomDialog().show(v.getContext());
+
                         return true;
                     }
                 }));

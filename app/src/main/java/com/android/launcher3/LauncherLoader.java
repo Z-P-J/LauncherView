@@ -218,7 +218,6 @@ public class LauncherLoader {
     }
 
     public void bindWorkspace(int mPageToBindFirst) {
-        Runnable r;
 
         Callbacks callbacks = mCallbacks.get();
         // Don't use these two variables in any of the callback runnables.

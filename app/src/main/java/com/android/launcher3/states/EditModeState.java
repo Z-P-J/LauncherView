@@ -29,13 +29,13 @@ import static com.android.launcher3.states.RotationHelper.REQUEST_LOCK;
 /**
  * Definition for spring loaded state used during drag and drop.
  */
-public class SpringLoadedState extends LauncherState {
+public class EditModeState extends LauncherState {
 
     private static final int STATE_FLAGS = FLAG_MULTI_PAGE |
             FLAG_DISABLE_ACCESSIBILITY | FLAG_DISABLE_RESTORE | FLAG_WORKSPACE_ICONS_CAN_BE_DRAGGED |
             FLAG_DISABLE_PAGE_CLIPPING | FLAG_PAGE_BACKGROUNDS | FLAG_HIDE_BACK_BUTTON;
 
-    public SpringLoadedState(int id) {
+    public EditModeState(int id) {
         super(id, SPRING_LOADED_TRANSITION_MS, STATE_FLAGS);
     }
 
@@ -48,13 +48,13 @@ public class SpringLoadedState extends LauncherState {
         }
 
         if (grid.isVerticalBarLayout()) {
-            float scale = 0.82f;
 //            float scale = grid.workspaceSpringLoadShrinkFactor;
+            float scale = 0.76f;
             return new float[]{scale, 0, 0};
         }
 
-        float scale = 0.82f;
 //        float scale = grid.workspaceSpringLoadShrinkFactor;
+        float scale = 0.76f;
         Rect insets = launcher.getDragLayer().getInsets();
 
         float scaledHeight = scale * ws.getNormalChildHeight();

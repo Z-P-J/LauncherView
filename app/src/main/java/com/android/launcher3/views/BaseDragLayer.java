@@ -18,6 +18,7 @@ package com.android.launcher3.views;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -143,6 +144,17 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
         r.set(mTmpXY[0], mTmpXY[1],
                 (int) (mTmpXY[0] + scale * descendant.getMeasuredWidth()),
                 (int) (mTmpXY[1] + scale * descendant.getMeasuredHeight()));
+        return scale;
+    }
+
+    public float getDescendantRectFRelativeToSelf(View descendant, RectF r) {
+        mTmpXY[0] = 0;
+        mTmpXY[1] = 0;
+        float scale = getDescendantCoordRelativeToSelf(descendant, mTmpXY);
+
+        r.set(mTmpXY[0], mTmpXY[1],
+                mTmpXY[0] + scale * descendant.getMeasuredWidth(),
+                mTmpXY[1] + scale * descendant.getMeasuredHeight());
         return scale;
     }
 

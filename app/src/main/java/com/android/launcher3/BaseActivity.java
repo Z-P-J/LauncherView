@@ -16,13 +16,13 @@
 
 package com.android.launcher3;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.annotation.IntDef;
 
 import com.android.launcher3.DeviceProfile.OnDeviceProfileChangeListener;
 import com.android.launcher3.util.SystemUiController;
+import com.zpj.fragmentation.SupportActivity;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import static com.android.launcher3.util.SystemUiController.UI_STATE_OVERVIEW;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends SupportActivity {
 
     public static final int INVISIBLE_BY_STATE_HANDLER = 1 << 0;
     public static final int INVISIBLE_BY_APP_TRANSITIONS = 1 << 1;
@@ -139,7 +139,7 @@ public abstract class BaseActivity extends Activity {
         mDPChangeListeners.add(listener);
     }
 
-    protected void dispatchDeviceProfileChanged() {
+    public void dispatchDeviceProfileChanged() {
         for (int i = mDPChangeListeners.size() - 1; i >= 0; i--) {
             mDPChangeListeners.get(i).onDeviceProfileChanged(mDeviceProfile);
         }

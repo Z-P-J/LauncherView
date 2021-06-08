@@ -16,8 +16,6 @@
 
 package com.android.launcher3;
 
-import android.appwidget.AppWidgetHostView;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -62,10 +60,9 @@ public class DeviceProfile {
     public final int cellLayoutPaddingLeftRightPx;
     public final int cellLayoutBottomPaddingPx;
     public final int edgeMarginPx;
-    public final Rect defaultWidgetPadding;
+//    public final Rect defaultWidgetPadding;
     public final int defaultPageSpacingPx;
     private final int topWorkspacePadding;
-    public float workspaceSpringLoadShrinkFactor;
     public final int workspaceSpringLoadedBottomSpace;
 
     // Drag handle
@@ -146,9 +143,10 @@ public class DeviceProfile {
         res = context.getResources();
 
 
-        ComponentName cn = new ComponentName(context.getPackageName(),
-                this.getClass().getName());
-        defaultWidgetPadding = AppWidgetHostView.getDefaultPaddingForWidget(context, cn, null);
+//        ComponentName cn = new ComponentName(context.getPackageName(),
+//                this.getClass().getName());
+//        defaultWidgetPadding = AppWidgetHostView.getDefaultPaddingForWidget(context, cn, null);
+
         edgeMarginPx = res.getDimensionPixelSize(R.dimen.dynamic_grid_edge_margin);
         desiredWorkspaceLeftRightMarginPx = isVerticalBarLayout() ? 0 : edgeMarginPx;
         cellLayoutPaddingLeftRightPx =
@@ -322,18 +320,6 @@ public class DeviceProfile {
             hotseatBarSizePx = iconSizePx;
         }
         hotseatCellHeightPx = iconSizePx;
-
-        if (!isVerticalLayout) {
-            int expectedWorkspaceHeight = availableHeightPx - hotseatBarSizePx
-                    - verticalDragHandleSizePx - topWorkspacePadding;
-            float minRequiredHeight = dropTargetBarSizePx + workspaceSpringLoadedBottomSpace;
-            workspaceSpringLoadShrinkFactor = Math.min(
-                    res.getInteger(R.integer.config_workspaceSpringLoadShrinkPercentage) / 100.0f,
-                    1 - (minRequiredHeight / expectedWorkspaceHeight));
-        } else {
-            workspaceSpringLoadShrinkFactor =
-                    res.getInteger(R.integer.config_workspaceSpringLoadShrinkPercentage) / 100.0f;
-        }
 
         // Folder icon
         folderIconSizePx = getNormalizedCircleSize(iconSizePx);
