@@ -20,7 +20,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.zpj.utils.PrefsHelper;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED;

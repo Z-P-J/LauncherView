@@ -10,7 +10,7 @@ import android.widget.SeekBar;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.zpj.fragmentation.dialog.base.BottomDragDialogFragment;
 
 public class SettingsBottomDialog extends BottomDragDialogFragment<SettingsBottomDialog> {

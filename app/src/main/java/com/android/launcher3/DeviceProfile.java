@@ -27,6 +27,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.android.launcher3.CellLayout.ContainerType;
+import com.qianxun.browser.launcher.R;
 
 public class DeviceProfile {
 

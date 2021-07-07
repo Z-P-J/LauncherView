@@ -19,7 +19,7 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.launcher3">
+    package="com.qianxun.browser.launcher">
 
     <application
         android:name="com.qianxun.browser.utils.App"

@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.graphics.DrawableFactory;
+import com.qianxun.browser.launcher.R;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan

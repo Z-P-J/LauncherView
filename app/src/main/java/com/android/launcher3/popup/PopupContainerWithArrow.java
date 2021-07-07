@@ -38,7 +38,7 @@ import com.android.launcher3.DropTarget;
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherActivity;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;

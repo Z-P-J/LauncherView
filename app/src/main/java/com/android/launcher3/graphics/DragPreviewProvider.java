@@ -33,7 +33,7 @@ import android.view.View;
 
 import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.LauncherActivity;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.folder.FolderIcon;
 
 import java.nio.ByteBuffer;

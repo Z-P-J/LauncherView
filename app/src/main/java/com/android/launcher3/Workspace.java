@@ -63,6 +63,7 @@ import com.android.launcher3.touch.WorkspaceTouchListener;
 import com.android.launcher3.util.LongArrayMap;
 import com.android.launcher3.util.Thunk;
 import com.qianxun.browser.database.HomepageManager;
+import com.qianxun.browser.launcher.R;
 
 import java.util.ArrayList;
 import java.util.HashSet;

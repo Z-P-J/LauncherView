@@ -19,7 +19,7 @@ import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherState;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 
 import static com.android.launcher3.LauncherAnimUtils.ALL_APPS_TRANSITION_MS;
 import static com.android.launcher3.anim.Interpolators.DEACCEL_2;

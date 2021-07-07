@@ -22,7 +22,7 @@ import android.graphics.Color;
 import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.util.Themes;
 
 /**

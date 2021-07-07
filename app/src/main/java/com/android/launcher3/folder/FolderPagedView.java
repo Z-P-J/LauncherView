@@ -36,7 +36,7 @@ import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.PagedView;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;

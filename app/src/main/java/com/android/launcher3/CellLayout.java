@@ -56,6 +56,7 @@ import com.android.launcher3.util.ParcelableSparseArray;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 import com.qianxun.browser.database.HomepageManager;
+import com.qianxun.browser.launcher.R;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

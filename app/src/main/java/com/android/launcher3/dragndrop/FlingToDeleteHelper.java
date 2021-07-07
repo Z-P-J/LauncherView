@@ -28,7 +28,7 @@ import com.android.launcher3.ButtonDropTarget;
 import com.android.launcher3.DropTarget;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.util.FlingAnimation;
 
 /**

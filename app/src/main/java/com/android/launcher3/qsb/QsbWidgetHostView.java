@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 
 /**
  * Appwidget host view with QSB specific logic.

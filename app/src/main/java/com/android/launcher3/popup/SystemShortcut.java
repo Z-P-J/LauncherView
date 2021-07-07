@@ -6,7 +6,7 @@ import android.widget.Toast;
 import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherActivity;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 
 /**
  * Represents a system shortcut for a given app. The shortcut should have a static label and

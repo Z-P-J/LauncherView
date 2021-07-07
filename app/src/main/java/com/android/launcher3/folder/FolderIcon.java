@@ -46,7 +46,7 @@ import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.OnAlarmListener;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.SimpleOnStylusPressListener;
 import com.android.launcher3.StylusEventHelper;

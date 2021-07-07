@@ -22,7 +22,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 
 public class QsbContainerView extends FrameLayout {
 

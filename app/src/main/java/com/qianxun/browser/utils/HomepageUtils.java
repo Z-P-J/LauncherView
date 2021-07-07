@@ -4,7 +4,7 @@ import android.graphics.BitmapFactory;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.ShortcutInfo;
 import com.zpj.utils.FileUtils;
 

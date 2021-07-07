@@ -30,7 +30,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherState;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.widget.WidgetsFullSheet;

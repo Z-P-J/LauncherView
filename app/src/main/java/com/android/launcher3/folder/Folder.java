@@ -56,7 +56,7 @@ import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.OnAlarmListener;
 import com.android.launcher3.PagedView;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.Workspace.ItemOperator;

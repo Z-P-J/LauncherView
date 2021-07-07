@@ -25,7 +25,7 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.android.launcher3.BubbleTextView;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.Utilities;
 
 /**

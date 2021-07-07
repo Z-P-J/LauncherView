@@ -43,6 +43,7 @@ import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.dragndrop.DragView;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
+import com.qianxun.browser.launcher.R;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.android.launcher3.LauncherState.NORMAL;

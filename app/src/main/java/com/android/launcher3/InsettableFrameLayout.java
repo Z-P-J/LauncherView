@@ -9,6 +9,8 @@ import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.qianxun.browser.launcher.R;
+
 public class InsettableFrameLayout extends FrameLayout implements Insettable {
 
     @ViewDebug.ExportedProperty(category = "launcher")

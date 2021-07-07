@@ -40,7 +40,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAnimUtils;
-import com.android.launcher3.R;
+import com.qianxun.browser.launcher.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.RevealOutlineAnimation;
 import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;

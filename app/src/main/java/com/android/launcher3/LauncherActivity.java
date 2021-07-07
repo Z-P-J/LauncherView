@@ -15,6 +15,7 @@ import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
+import com.qianxun.browser.launcher.R;
 
 import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
 import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;

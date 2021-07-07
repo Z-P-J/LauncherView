@@ -25,6 +25,7 @@ import android.util.Log;
 
 import com.android.launcher3.util.Thunk;
 import com.qianxun.browser.database.HomepageManager;
+import com.qianxun.browser.launcher.R;
 import com.qianxun.browser.model.FavoriteItem;
 import com.qianxun.browser.model.ScreenItem;
 import com.qianxun.browser.utils.HomepageUtils;

@@ -29,6 +29,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qianxun.browser.launcher.R;
+
 public class HotSeat extends FrameLayout implements Insettable {
 
     private final LauncherActivity mLauncher;

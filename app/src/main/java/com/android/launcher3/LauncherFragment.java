@@ -8,6 +8,7 @@ import android.util.SparseArray;
 import android.view.View;
 
 import com.android.launcher3.dragndrop.DragLayer;
+import com.qianxun.browser.launcher.R;
 import com.zpj.fragmentation.BaseFragment;
 
 public class LauncherFragment extends BaseFragment {

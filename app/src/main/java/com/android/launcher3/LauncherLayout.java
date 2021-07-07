@@ -42,6 +42,7 @@ import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
 import com.qianxun.browser.database.HomepageManager;
+import com.qianxun.browser.launcher.R;
 
 import java.util.ArrayList;
 import java.util.Collection;
