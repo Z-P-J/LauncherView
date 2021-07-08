@@ -3,19 +3,20 @@ package com.android.launcher3.util;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.view.View;
 
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherAppState;
 
 public class WidgetUtil {
 
-//    public static void updateWidgetSizeRanges(AppWidgetHostView widgetView, Launcher launcher,
-//                                       int spanX, int spanY) {
-//        Rect sTmpRect = new Rect();
-//        getWidgetSizeRanges(launcher, spanX, spanY, sTmpRect);
+    public static void updateWidgetSizeRanges(View widgetView, Context launcher,
+                                              int spanX, int spanY) {
+        Rect sTmpRect = new Rect();
+        getWidgetSizeRanges(launcher, spanX, spanY, sTmpRect);
 //        widgetView.updateAppWidgetSize(null, sTmpRect.left, sTmpRect.top,
 //                sTmpRect.right, sTmpRect.bottom);
-//    }
+    }
 
     public static Rect getWidgetSizeRanges(Context context, int spanX, int spanY, Rect rect) {
         InvariantDeviceProfile inv = LauncherAppState.getIDP(context);

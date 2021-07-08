@@ -28,6 +28,8 @@ public class ItemInfo {
      */
     public long id = NO_ID;
 
+    public long tabId = NO_ID;
+
     /**
      * One of {@link ItemInfo#ITEM_TYPE_APPLICATION},
      * {@link ItemInfo#ITEM_TYPE_FOLDER},
@@ -151,12 +153,15 @@ public class ItemInfo {
 
     public static final int ITEM_TYPE_APPLICATION = 0;
     public static final int ITEM_TYPE_FOLDER = 2;
+    public static final int ITEM_TYPE_WIDGET = 4;
     static String itemTypeToString(int type) {
         switch (type) {
             case ITEM_TYPE_APPLICATION:
                 return "APP";
             case ITEM_TYPE_FOLDER:
                 return "FOLDER";
+            case ITEM_TYPE_WIDGET:
+                return "WIDGET";
             default:
                 return String.valueOf(type);
         }

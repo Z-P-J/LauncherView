@@ -293,6 +293,15 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         return favorite;
     }
 
+    public View createWidget(ViewGroup parent, ShortcutInfo info) {
+        BubbleTextView favorite = (BubbleTextView) LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.app_icon, parent, false);
+        favorite.applyFromShortcutInfo(info);
+        favorite.setOnClickListener(ItemClickHandler.INSTANCE);
+        favorite.setOnFocusChangeListener(mFocusHandler);
+        return favorite;
+    }
+
 //    public FolderIcon findFolderIcon(final long folderIconId) {
 //        return (FolderIcon) mWorkspace.getFirstMatch(new ItemOperator() {
 //            @Override
@@ -408,6 +417,76 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         CellLayout parent = mWorkspace.getParentCellLayoutForView(newFolder);
         parent.getShortcutsAndWidgets().measureChild(newFolder);
         return newFolder;
+    }
+
+    public void addPendingItem(TabItemInfo info, long container, long screenId,
+                               int[] cell, int spanX, int spanY) {
+        info.container = container;
+        info.screenId = screenId;
+        if (cell != null) {
+            info.cellX = cell[0];
+            info.cellY = cell[1];
+        }
+        info.spanX = spanX;
+        info.spanY = spanY;
+
+        addAppWidgetFromDrop(info);
+    }
+
+    /**
+     * Process a widget drop.
+     */
+    private void addAppWidgetFromDrop(TabItemInfo info) {
+        View hostView = null;
+        final long appWidgetId = System.currentTimeMillis();
+        if (hostView != null) {
+            // In the case where we've prebound the widget, we remove it from the DragLayer
+            if (LOGD) {
+                Log.d(TAG, "Removing widget view from drag layer and setting boundWidget to null");
+            }
+            getDragLayer().removeView(hostView);
+
+            addAppWidgetImpl(appWidgetId, info, hostView);
+        } else {
+            addAppWidgetImpl(appWidgetId, info, null);
+        }
+    }
+
+    void addAppWidgetImpl(long appWidgetId, TabItemInfo info,
+                          View boundWidget) {
+        Runnable onComplete = new Runnable() {
+            @Override
+            public void run() {
+                // Exit spring loaded mode if necessary after adding the widget
+                mStateManager.goToState(NORMAL);
+            }
+        };
+        completeAddAppWidget(appWidgetId, info, boundWidget);
+        mWorkspace.removeExtraEmptyScreenDelayed(true, onComplete, 0, false);
+    }
+
+    void completeAddAppWidget(long appWidgetId, TabItemInfo itemInfo, View hostView) {
+
+//        if (appWidgetInfo == null) {
+//            appWidgetInfo = mAppWidgetManager.getLauncherAppWidgetInfo(appWidgetId);
+//        }
+
+//        getModelWriter().addItemToDatabase(launcherInfo,
+//                itemInfo.container, itemInfo.screenId, itemInfo.cellX, itemInfo.cellY);
+
+        HomepageManager.getInstance().addItemToDatabase(itemInfo,
+                itemInfo.container, itemInfo.screenId, itemInfo.cellX, itemInfo.cellY);
+
+        if (hostView == null) {
+            // Perform actual inflation because we're live
+            View card = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
+            hostView = card;
+        }
+        hostView.setVisibility(View.VISIBLE);
+        hostView.setTag(itemInfo);
+        itemInfo.tabId = appWidgetId;
+//        prepareAppWidget(hostView, launcherInfo);
+        mWorkspace.addInScreen(hostView, itemInfo);
     }
 
     /**
@@ -587,6 +666,11 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
                     view = FolderIcon.fromXml(R.layout.folder_icon, this,
                             (ViewGroup) workspace.getChildAt(workspace.getCurrentPage()),
                             (FolderInfo) item);
+                    break;
+                }
+                case ItemInfo.ITEM_TYPE_WIDGET: {
+                    view = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
+                    view.setTag(item);
                     break;
                 }
                 default:

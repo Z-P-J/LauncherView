@@ -206,6 +206,14 @@ public class LauncherLoader {
                     manager.checkAndAddItem(mApp.getInvariantDeviceProfile(), folderInfo);
                     Log.d(TAG, "loadWorkspace 7");
                     break;
+                case ItemInfo.ITEM_TYPE_WIDGET:
+                    Log.d(TAG, "loadWorkspace 8");
+                    TabItemInfo itemInfo = new TabItemInfo();
+                    item.applyCommonProperties(itemInfo);
+                    Log.d(TAG, "loadWorkspace 9");
+                    manager.checkAndAddItem(mApp.getInvariantDeviceProfile(), itemInfo);
+                    Log.d(TAG, "loadWorkspace 10");
+                    break;
                 default:
                     break;
             }

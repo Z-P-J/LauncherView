@@ -135,17 +135,24 @@ public class LauncherStateManager {
     }
 
     /**
+     * Changes the Launcher state to the provided state after the given delay.
+     */
+    public void goToState(LauncherState state, long delay, Runnable onCompleteRunnable) {
+        goToState(state, true, delay, onCompleteRunnable);
+    }
+
+    /**
      * @see #goToState(LauncherState, boolean)
      */
     public void goToState(LauncherState state, boolean animated) {
-        goToState(state, animated, 0);
+        goToState(state, animated, 0, null);
     }
 
     /**
      * Changes the Launcher state to the provided state after the given delay.
      */
     public void goToState(LauncherState state, long delay) {
-        goToState(state, true, delay);
+        goToState(state, true, delay, null);
     }
 
     public void reapplyState() {
@@ -161,11 +168,25 @@ public class LauncherStateManager {
         }
     }
 
-    private void goToState(LauncherState state, boolean animated, long delay) {
+    private void goToState(LauncherState state, boolean animated, long delay,
+                           final Runnable onCompleteRunnable) {
         if (mLauncher.isInState(state)) {
             if (mConfig.mCurrentAnimation == null) {
+                // Run any queued runnable
+                if (onCompleteRunnable != null) {
+                    onCompleteRunnable.run();
+                }
                 return;
             } else if (!mConfig.userControlled && animated && mConfig.mTargetState == state) {
+                // We are running the same animation as requested
+                if (onCompleteRunnable != null) {
+                    mConfig.mCurrentAnimation.addListener(new AnimationSuccessListener() {
+                        @Override
+                        public void onAnimationSuccess(Animator animator) {
+                            onCompleteRunnable.run();
+                        }
+                    });
+                }
                 return;
             }
         }
@@ -180,6 +201,11 @@ public class LauncherStateManager {
 
             onStateTransitionEnd(state);
 
+            // Run any queued runnable
+            if (onCompleteRunnable != null) {
+                onCompleteRunnable.run();
+            }
+
             return;
         }
 
@@ -190,7 +216,7 @@ public class LauncherStateManager {
         AnimatorSetBuilder builder = new AnimatorSetBuilder();
         prepareForAtomicAnimation(fromState, state, builder);
         AnimatorSet animation = createAnimationToNewWorkspaceInternal(
-                state, builder);
+                state, builder, onCompleteRunnable);
         Runnable runnable = new StartAnimRunnable(animation);
         if (delay > 0) {
             mUiHandler.postDelayed(runnable, delay);
@@ -234,7 +260,8 @@ public class LauncherStateManager {
     }
 
     protected AnimatorSet createAnimationToNewWorkspaceInternal(final LauncherState state,
-                                                                AnimatorSetBuilder builder) {
+                                                                AnimatorSetBuilder builder,
+                                                                final Runnable onCompleteRunnable) {
         Workspace workspace = mLauncher.getWorkspace();
         builder.startTag(workspace);
         workspace.setStateWithAnimation(state, builder, mConfig);
@@ -257,6 +284,9 @@ public class LauncherStateManager {
             @Override
             public void onAnimationSuccess(Animator animator) {
                 // Run any queued runnables
+                if (onCompleteRunnable != null) {
+                    onCompleteRunnable.run();
+                }
                 onStateTransitionEnd(state);
             }
         });

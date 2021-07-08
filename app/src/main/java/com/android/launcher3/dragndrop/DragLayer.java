@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -52,6 +53,8 @@ import com.android.launcher3.views.BaseDragLayer;
  * A ViewGroup that coordinates dragging across its descendants
  */
 public class DragLayer extends BaseDragLayer<LauncherActivity> {
+
+    private static final String TAG = "DragLayer";
 
     public static final int ALPHA_INDEX_OVERLAY = 0;
     public static final int ALPHA_INDEX_LAUNCHER_LOAD = 1;
@@ -216,6 +219,7 @@ public class DragLayer extends BaseDragLayer<LauncherActivity> {
 
     public void animateViewIntoPosition(DragView dragView, final View child, int duration,
                                         View anchorView) {
+        Log.d(TAG, "animateViewIntoPosition");
         ShortcutAndWidgetContainer parentChildren = (ShortcutAndWidgetContainer) child.getParent();
         CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
         parentChildren.measureChild(child);

@@ -14,6 +14,8 @@ public class FavoriteItem extends BaseModel {
     @PrimaryKey(autoincrement = true)
     @Column(name = "_id")
     private long id;
+    @Column(name = "tabId")
+    private long tabId;
     @Column
     private String title;
     @Column
@@ -47,6 +49,14 @@ public class FavoriteItem extends BaseModel {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getTabId() {
+        return tabId;
+    }
+
+    public void setTabId(long tabId) {
+        this.tabId = tabId;
     }
 
     public String getTitle() {
@@ -134,6 +144,7 @@ public class FavoriteItem extends BaseModel {
         if (info.id != ItemInfo.NO_ID) {
             favoriteItem.id = info.id;
         }
+        favoriteItem.tabId = info.tabId;
         favoriteItem.cellX = info.cellX;
         favoriteItem.cellY = info.cellY;
         favoriteItem.title = info.title.toString();
@@ -148,6 +159,7 @@ public class FavoriteItem extends BaseModel {
 
     public void applyCommonProperties(ItemInfo info) {
         info.id = id;
+        info.tabId = tabId;
         info.cellX = cellX;
         info.cellY = cellY;
         info.title = title;

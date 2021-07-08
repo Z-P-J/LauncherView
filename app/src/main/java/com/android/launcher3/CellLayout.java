@@ -2023,6 +2023,7 @@ public class CellLayout extends ViewGroup {
     }
 
     private void commitTempPlacement() {
+        Log.d(TAG, "commitTempPlacement");
         mTmpOccupied.copyTo(mOccupied);
 
         long screenId = mLauncher.getLauncherLayout().getWorkspace().getIdForScreen(this);

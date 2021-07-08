@@ -288,11 +288,14 @@ public class DragController implements DragDriver.EventListener, TouchController
     }
 
     private void endDrag() {
+        Log.d(TAG, "endDrag isDragging=" + isDragging());
         if (isDragging()) {
             mDragDriver = null;
             boolean isDeferred = false;
+            Log.d(TAG, "endDrag dragView=" + mDragObject.dragView);
             if (mDragObject.dragView != null) {
                 isDeferred = mDragObject.deferDragViewCleanupPostAnimation;
+                Log.d(TAG, "endDrag isDeferred=" + isDeferred + " mIsInPreDrag=" + mIsInPreDrag);
                 if (!isDeferred) {
                     mDragObject.dragView.remove();
                 } else if (mIsInPreDrag) {

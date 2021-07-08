@@ -32,10 +32,25 @@ import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_I
 @Database(name = HomepageManager.NAME, version = HomepageManager.VERSION)
 public class HomepageManager {
 
+//    @Migration(version = 29, database = HomepageManager.class)
+//    public static class HomeMigration extends AlterTableMigration<FavoriteItem> {
+//
+//        public HomeMigration(Class<FavoriteItem> table) {
+//            super(table);
+//        }
+//
+//        @Override
+//        public void onPreMigrate() {
+//            Log.d(TAG, "HomeMigration onPreMigrate");
+//            addColumn(SQLiteType.INTEGER, "tabId");
+//        }
+//    }
+
+
     private static final String TAG = "HomepageManager";
 
     static final String NAME = "launcher";
-    public static final int VERSION = 27;
+    public static final int VERSION = 1;
 
     private final ArrayList<ItemInfo> itemsToRemove = new ArrayList<>();
     private final ArrayList<Long> restoredRows = new ArrayList<>();
@@ -106,6 +121,14 @@ public class HomepageManager {
                     } else {
                         findOrMakeFolder(item.container).add((ShortcutInfo) item, false);
                     }
+
+                }
+                break;
+            case ItemInfo.ITEM_TYPE_WIDGET:
+                if (item.container == ItemInfo.CONTAINER_DESKTOP) {
+                    mWorkspaceItems.add(item);
+                } else {
+                    markDeleted(item, "Item invalid!");
 
                 }
                 break;

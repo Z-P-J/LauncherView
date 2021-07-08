@@ -19,18 +19,21 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.PropertyValuesHolder;
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 
 import com.android.launcher3.Insettable;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherLayout;
-import com.qianxun.browser.launcher.R;
+import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.views.TopRoundedCornerView;
+import com.qianxun.browser.launcher.R;
 
 /**
  * Popup for showing the full list of available widgets
@@ -47,6 +50,8 @@ public class WidgetsFullSheet extends BaseWidgetSheet
 //    private final WidgetsListAdapter mAdapter;
 //
 //    private WidgetsRecyclerView mRecyclerView;
+
+    private View ivTest;
 
     public WidgetsFullSheet(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -65,6 +70,13 @@ public class WidgetsFullSheet extends BaseWidgetSheet
     protected void onFinishInflate() {
         super.onFinishInflate();
         mContent = findViewById(R.id.container);
+        ivTest = findViewById(R.id.iv_test);
+        ivTest.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return beginDraggingWidget(ivTest);
+            }
+        });
 
 //        mRecyclerView = findViewById(R.id.widgets_list_view);
 //        mRecyclerView.setAdapter(mAdapter);
@@ -74,6 +86,17 @@ public class WidgetsFullSheet extends BaseWidgetSheet
 //        springLayout.addSpringView(R.id.widgets_list_view);
 //        mRecyclerView.setEdgeEffectFactory(springLayout.createEdgeEffectFactory());
 //        onWidgetsBound();
+    }
+
+    private boolean beginDraggingWidget(View v) {
+
+        int[] loc = new int[2];
+        mLauncher.getDragLayer().getLocationInDragLayer(v, loc);
+        new PendingItemDragHelper(v).startDrag(
+                new Rect(0, 0, v.getWidth(), v.getHeight()), v.getWidth(), v.getWidth(),
+                new Point(loc[0], loc[1]), this, new DragOptions());
+        close(true);
+        return true;
     }
 
     @Override
