@@ -18,7 +18,7 @@
  -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" msgid="649227358658669779">"Launcher3"</string>
+    <string name="app_name" msgid="649227358658669779">"LauncherView"</string>
     <string name="folder_name" msgid="7371454440695724752">文件夹</string>
     <string name="long_press_widget_to_add" msgid="7699152356777458215">"触摸并按住微件即可选择。"</string>
     <string name="long_accessible_way_to_add" msgid="4289502106628154155">"点按两次并按住微件即可选择微件，您也可以使用自定义操作。"</string>

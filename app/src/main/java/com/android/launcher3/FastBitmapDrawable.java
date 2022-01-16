@@ -95,7 +95,7 @@ public class FastBitmapDrawable extends Drawable {
         this(info.iconBitmap, info.iconColor);
     }
 
-    protected FastBitmapDrawable(Bitmap b, int iconColor) {
+    public FastBitmapDrawable(Bitmap b, int iconColor) {
         mBitmap = b;
         mIconColor = iconColor;
         setFilterBitmap(true);

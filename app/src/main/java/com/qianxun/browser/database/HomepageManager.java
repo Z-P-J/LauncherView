@@ -53,7 +53,6 @@ public class HomepageManager {
     public static final int VERSION = 1;
 
     private final ArrayList<ItemInfo> itemsToRemove = new ArrayList<>();
-    private final ArrayList<Long> restoredRows = new ArrayList<>();
     private final LongArrayMap<GridOccupancy> occupied = new LongArrayMap<>();
 
     public final LongArrayMap<ItemInfo> itemsIdMap = new LongArrayMap<>();

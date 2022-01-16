@@ -37,10 +37,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewDebug;
-import android.widget.TextView;
 
 import com.android.launcher3.folder.FolderIcon;
-import com.android.launcher3.graphics.DrawableFactory;
+import com.android.launcher3.util.IconLoader;
 import com.qianxun.browser.launcher.R;
 
 /**
@@ -48,7 +47,7 @@ import com.qianxun.browser.launcher.R;
  * because we want to make the bubble taller than the text and TextView's clip is
  * too aggressive.
  */
-public class BubbleTextView extends TextView {
+public class BubbleTextView extends android.support.v7.widget.AppCompatTextView {
 
     private static final int DISPLAY_WORKSPACE = 0;
     private static final int DISPLAY_ALL_APPS = 1;
@@ -166,9 +165,10 @@ public class BubbleTextView extends TextView {
 //            info.iconBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_home);
 //        }
         Log.d("BubbleTextView", "icon=" + info.iconBitmap);
-        FastBitmapDrawable iconDrawable = DrawableFactory.get(getContext()).newIcon(info);
+//        FastBitmapDrawable iconDrawable = DrawableFactory.get(getContext()).newIcon(info);
 
-        setIcon(iconDrawable);
+        IconLoader.load(this, info);
+//        setIcon(iconDrawable);
         setText(info.title);
         if (info.contentDescription != null) {
             setContentDescription(info.isDisabled()
@@ -359,7 +359,7 @@ public class BubbleTextView extends TextView {
     /**
      * Sets the icon for this view based on the layout direction.
      */
-    private void setIcon(Drawable icon) {
+    public void setIcon(Drawable icon) {
         if (mIsIconVisible) {
             applyCompoundDrawables(icon);
         }
