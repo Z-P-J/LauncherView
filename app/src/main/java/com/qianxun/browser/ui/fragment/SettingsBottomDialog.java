@@ -1,19 +1,20 @@
 package com.qianxun.browser.ui.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 
+import androidx.annotation.Nullable;
+
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
 import com.qianxun.browser.launcher.R;
-import com.zpj.fragmentation.dialog.base.BottomDragDialogFragment;
+import com.zpj.fragmentation.dialog.impl.BottomActionDialogFragment;
 
-public class SettingsBottomDialog extends BottomDragDialogFragment<SettingsBottomDialog> {
+public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBottomDialog> {
 
     @Override
     protected int getContentLayoutId() {

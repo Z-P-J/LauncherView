@@ -18,7 +18,7 @@ package com.android.launcher3;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.android.launcher3.DeviceProfile.OnDeviceProfileChangeListener;
 import com.android.launcher3.util.SystemUiController;

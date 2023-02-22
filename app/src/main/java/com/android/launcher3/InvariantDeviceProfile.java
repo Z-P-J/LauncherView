@@ -19,7 +19,7 @@ package com.android.launcher3;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;

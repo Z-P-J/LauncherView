@@ -3,15 +3,15 @@ package com.android.launcher3;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.android.launcher3.dragndrop.DragLayer;
 import com.qianxun.browser.launcher.R;
-import com.zpj.fragmentation.BaseFragment;
+import com.zpj.fragmentation.SimpleFragment;
 
-public class LauncherFragment extends BaseFragment {
+public class LauncherFragment extends SimpleFragment {
 
     // Type: int
     private static final String RUNTIME_STATE_CURRENT_SCREEN = "launcher.current_screen";
