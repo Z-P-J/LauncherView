@@ -19,10 +19,10 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.qianxun.browser.launcher">
+    package="com.ark.browser.launcher.demo">
 
     <application
-        android:name="com.qianxun.browser.utils.App"
+        android:name="com.ark.browser.launcher.demo.App"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher_home"
         android:label="@string/derived_app_name"
