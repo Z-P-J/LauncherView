@@ -37,8 +37,7 @@ import android.widget.TextView;
 
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.CellLayout;
-import com.android.launcher3.LauncherActivity;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.anim.Interpolators;
@@ -48,11 +47,12 @@ import com.android.launcher3.graphics.WorkspaceAndHotseatScrim;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.views.BaseDragLayer;
+import com.ark.browser.launcher.R;
 
 /**
  * A ViewGroup that coordinates dragging across its descendants
  */
-public class DragLayer extends BaseDragLayer<LauncherActivity> {
+public class DragLayer extends BaseDragLayer {
 
     private static final String TAG = "DragLayer";
 
@@ -112,7 +112,7 @@ public class DragLayer extends BaseDragLayer<LauncherActivity> {
     }
 
     public void recreateControllers() {
-        mController = mActivity.getLauncherLayout().getDragController();
+        mController = LauncherManager.getDragController();
     }
 
     public ViewGroupFocusHelper getFocusIndicatorHelper() {
@@ -131,7 +131,7 @@ public class DragLayer extends BaseDragLayer<LauncherActivity> {
 
     @Override
     protected boolean findActiveController(MotionEvent ev) {
-        if (mActivity.getLauncherLayout().getStateManager().getState().disableInteraction) {
+        if (LauncherManager.getStateManager().getState().disableInteraction) {
             // You Shall Not Pass!!!
             mActiveController = null;
             return true;
@@ -141,10 +141,10 @@ public class DragLayer extends BaseDragLayer<LauncherActivity> {
 
     @Override
     public boolean onInterceptHoverEvent(MotionEvent ev) {
-        if (mActivity == null || mActivity.getLauncherLayout().getWorkspace() == null) {
+        if (LauncherManager.getWorkspace() == null) {
             return false;
         }
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(mActivity.getLauncherLayout());
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
         if (!(topView instanceof Folder)) {
             return false;
         } else {

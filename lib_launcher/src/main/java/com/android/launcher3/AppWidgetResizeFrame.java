@@ -115,8 +115,8 @@ public class AppWidgetResizeFrame extends AbstractFloatingView implements View.O
 
     public static void showForWidget(View widget, CellLayout cellLayout) {
         Context context = cellLayout.getContext();
-        LauncherLayout launcher = LauncherActivity.fromContext(context).getLauncherLayout();
-        AbstractFloatingView.closeAllOpenViews(launcher);
+        LauncherLayout launcher = LauncherManager.getLauncherLayout();
+        AbstractFloatingView.closeAllOpenViews();
 
         DragLayer dl = launcher.getDragLayer();
         AppWidgetResizeFrame frame = (AppWidgetResizeFrame) LayoutInflater.from(context)

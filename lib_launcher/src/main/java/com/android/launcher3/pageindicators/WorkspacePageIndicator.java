@@ -21,9 +21,9 @@ import android.widget.FrameLayout;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Insettable;
-import com.android.launcher3.LauncherActivity;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.Utilities;
+import com.ark.browser.launcher.R;
 
 /**
  * A PageIndicator that briefly shows a fraction of a line when moving between pages
@@ -45,7 +45,6 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
     private final ValueAnimator[] mAnimators = new ValueAnimator[ANIMATOR_COUNT];
 
     private final Handler mDelayedLineFadeHandler = new Handler(Looper.getMainLooper());
-    private final LauncherActivity mLauncher;
 
     private boolean mShouldAutoHide = true;
 
@@ -119,7 +118,6 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
         mLinePaint = new Paint();
         mLinePaint.setAlpha(0);
 
-        mLauncher = LauncherActivity.fromContext(context);
         mLineHeight = res.getDimensionPixelSize(R.dimen.dynamic_grid_page_indicator_line_height);
 
         boolean darkText = false;
@@ -257,7 +255,7 @@ public class WorkspacePageIndicator extends View implements Insettable, PageIndi
 
     @Override
     public void setInsets(Rect insets) {
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) getLayoutParams();
 
         if (grid.isVerticalBarLayout()) {

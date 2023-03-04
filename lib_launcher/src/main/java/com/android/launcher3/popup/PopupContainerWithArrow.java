@@ -25,6 +25,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -37,13 +38,13 @@ import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget;
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.LauncherActivity;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.touch.ItemLongClickListener;
+import com.ark.browser.launcher.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,7 +105,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
     @Override
     public boolean onControllerInterceptTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            DragLayer dl = mLauncher.getDragLayer();
+            DragLayer dl = LauncherManager.getDragLayer();
             if (!dl.isEventOverView(this, ev)) {
                 close(true);
 
@@ -122,8 +123,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
      * @return the container if shown or null.
      */
     public static PopupContainerWithArrow showForIcon(BubbleTextView icon) {
-        LauncherActivity launcher = LauncherActivity.fromContext(icon.getContext());
-        if (getOpen(launcher) != null) {
+        if (getOpen() != null) {
             // There is already an items container open, so don't open this one.
             icon.clearFocus();
             return null;
@@ -131,10 +131,12 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
         List<SystemShortcut> systemShortcuts = Arrays.asList(SYSTEM_SHORTCUTS);
 
+
         final PopupContainerWithArrow container =
-                (PopupContainerWithArrow) launcher.getLayoutInflater().inflate(
-                        R.layout.popup_container, launcher.getDragLayer(), false);
+                (PopupContainerWithArrow) LayoutInflater.from(LauncherManager.getLauncherLayout().getContext()).inflate(
+                        R.layout.popup_container, LauncherManager.getDragLayer(), false);
         container.populateAndShow(icon, new ArrayList<>(), systemShortcuts);
+
         return container;
     }
 
@@ -188,7 +190,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
         reorderAndShow(viewsToFlip);
 
-        mLauncher.getLauncherLayout().getDragController().addDragListener(this);
+        LauncherManager.getDragController().addDragListener(this);
 
         // All views are added. Animate layout from now on.
         setLayoutTransition(new LayoutTransition());
@@ -196,7 +198,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
     @Override
     protected void getTargetObjectLocation(Rect outPos) {
-        mLauncher.getDragLayer().getDescendantRectRelativeToSelf(mOriginalIcon, outPos);
+        LauncherManager.getDragLayer().getDescendantRectRelativeToSelf(mOriginalIcon, outPos);
         outPos.top += mOriginalIcon.getPaddingTop();
         outPos.left += mOriginalIcon.getPaddingLeft();
         outPos.right -= mOriginalIcon.getPaddingRight();
@@ -222,7 +224,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                info.getOnClickListener(LauncherActivity.fromContext(v),
+                info.getOnClickListener(v.getContext(),
                         (ItemInfo) mOriginalIcon.getTag()).onClick(v);
                 close(true);
             }
@@ -325,7 +327,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
     @Override
     public boolean onLongClick(View v) {
-        if (!ItemLongClickListener.canStartDrag(mLauncher.getLauncherLayout())) return false;
+        if (!ItemLongClickListener.canStartDrag(LauncherManager.getLauncherLayout())) return false;
         // Return early if not the correct view
         if (!(v.getParent() instanceof DeepShortcutView)) return false;
 
@@ -336,7 +338,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         // Move the icon to align with the center-top of the touch point
         Point iconShift = new Point();
         iconShift.x = mIconLastTouchPos.x - sv.getIconCenter().x;
-        iconShift.y = mIconLastTouchPos.y - LauncherActivity.fromContext(v).getDeviceProfile().iconSizePx;
+        iconShift.y = mIconLastTouchPos.y - LauncherManager.getDeviceProfile().iconSizePx;
 
 //        DragView dv = mLauncher.getWorkspace().beginDragShared(sv.getIconView(),
 //                this, sv.getFinalInfo(),
@@ -344,14 +346,14 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 //        dv.animateShift(-iconShift.x, -iconShift.y);
 
         // TODO: support dragging from within folder without having to close it
-        AbstractFloatingView.closeOpenContainer(LauncherActivity.fromContext(v), AbstractFloatingView.TYPE_FOLDER);
+        AbstractFloatingView.closeOpenContainer(AbstractFloatingView.TYPE_FOLDER);
         return false;
     }
 
     /**
      * Returns a PopupContainerWithArrow which is already open or null
      */
-    public static PopupContainerWithArrow getOpen(LauncherActivity launcher) {
-        return getOpenView(launcher, TYPE_ACTION_POPUP);
+    public static PopupContainerWithArrow getOpen() {
+        return getOpenView(LauncherManager.getLauncherLayout(), TYPE_ACTION_POPUP);
     }
 }

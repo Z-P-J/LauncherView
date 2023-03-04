@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.ark.browser.launcher.demo;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 public abstract class BaseActivity extends SupportActivity {
 
-    public static final int INVISIBLE_BY_STATE_HANDLER = 1 << 0;
+    public static final int INVISIBLE_BY_STATE_HANDLER = 1;
     public static final int INVISIBLE_BY_APP_TRANSITIONS = 1 << 1;
     public static final int INVISIBLE_ALL =
             INVISIBLE_BY_STATE_HANDLER | INVISIBLE_BY_APP_TRANSITIONS;
@@ -44,12 +44,7 @@ public abstract class BaseActivity extends SupportActivity {
     public @interface InvisibilityFlags {
     }
 
-    private final ArrayList<OnDeviceProfileChangeListener> mDPChangeListeners = new ArrayList<>();
-
-    protected DeviceProfile mDeviceProfile;
-    protected SystemUiController mSystemUiController;
-
-    private static final int ACTIVITY_STATE_STARTED = 1 << 0;
+    private static final int ACTIVITY_STATE_STARTED = 1;
     private static final int ACTIVITY_STATE_RESUMED = 1 << 1;
     /**
      * State flag indicating if the user is active or the actitvity when to background as a result
@@ -71,28 +66,6 @@ public abstract class BaseActivity extends SupportActivity {
     // animation
     @InvisibilityFlags
     private int mForceInvisible;
-
-    public DeviceProfile getDeviceProfile() {
-        return mDeviceProfile;
-    }
-
-    public boolean isInMultiWindowModeCompat() {
-        return Utilities.ATLEAST_NOUGAT && isInMultiWindowMode();
-    }
-
-    public static BaseActivity fromContext(Context context) {
-        if (context instanceof BaseActivity) {
-            return (BaseActivity) context;
-        }
-        return ((BaseActivity) ((ContextWrapper) context).getBaseContext());
-    }
-
-    public SystemUiController getSystemUiController() {
-        if (mSystemUiController == null) {
-            mSystemUiController = new SystemUiController(getWindow());
-        }
-        return mSystemUiController;
-    }
 
     @Override
     protected void onStart() {
@@ -123,26 +96,10 @@ public abstract class BaseActivity extends SupportActivity {
     protected void onPause() {
         mActivityFlags &= ~ACTIVITY_STATE_RESUMED;
         super.onPause();
-
-        // Reset the overridden sysui flags used for the task-swipe launch animation, we do this
-        // here instead of at the end of the animation because the start of the new activity does
-        // not happen immediately, which would cause us to reset to launcher's sysui flags and then
-        // back to the new app (causing a flash)
-        getSystemUiController().updateUiState(UI_STATE_OVERVIEW, 0);
     }
 
     public boolean isStarted() {
         return (mActivityFlags & ACTIVITY_STATE_STARTED) != 0;
-    }
-
-    public void addOnDeviceProfileChangeListener(OnDeviceProfileChangeListener listener) {
-        mDPChangeListeners.add(listener);
-    }
-
-    public void dispatchDeviceProfileChanged() {
-        for (int i = mDPChangeListeners.size() - 1; i >= 0; i--) {
-            mDPChangeListeners.get(i).onDeviceProfileChanged(mDeviceProfile);
-        }
     }
 
 

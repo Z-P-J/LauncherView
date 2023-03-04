@@ -31,14 +31,15 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.Region;
 import android.graphics.Shader;
-import androidx.core.graphics.ColorUtils;
 import android.util.Property;
 import android.view.View;
 
+import androidx.core.graphics.ColorUtils;
+
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.util.Themes;
 
 /**
@@ -134,7 +135,7 @@ public class PreviewBackground {
         mInvalidateDelegate = invalidateDelegate;
         mBgColor = Themes.getAttrColor(context, android.R.attr.colorPrimary);
 
-        DeviceProfile grid = LauncherActivity.fromContext(context).getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         previewSize = grid.folderIconSizePx;
 
         basePreviewOffsetX = (availableSpaceX - previewSize) / 2;

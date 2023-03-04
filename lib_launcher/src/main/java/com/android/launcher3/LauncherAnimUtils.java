@@ -113,7 +113,6 @@ public class LauncherAnimUtils {
                                          float... values) {
         ObjectAnimator anim = ObjectAnimator.ofFloat(target, property, values);
         cancelOnDestroyActivity(anim);
-        new FirstFrameAnimatorHelper(anim, target);
         return anim;
     }
 
@@ -134,7 +133,6 @@ public class LauncherAnimUtils {
                                                         View view, PropertyValuesHolder... values) {
         ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(target, values);
         cancelOnDestroyActivity(anim);
-        new FirstFrameAnimatorHelper(anim, view);
         return anim;
     }
 

@@ -73,7 +73,6 @@ public class CellLayout extends ViewGroup {
     private static final String TAG = "CellLayout";
     private static final boolean LOGD = false;
 
-    private final LauncherActivity mLauncher;
     @ViewDebug.ExportedProperty(category = "launcher")
     @Thunk
     int mCellWidth;
@@ -202,9 +201,8 @@ public class CellLayout extends ViewGroup {
         // the user where a dragged item will land when dropped.
         setWillNotDraw(false);
         setClipToPadding(false);
-        mLauncher = LauncherActivity.fromContext(context);
 
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
 
         mCellWidth = mCellHeight = -1;
         mFixedCellWidth = mFixedCellHeight = -1;
@@ -333,7 +331,7 @@ public class CellLayout extends ViewGroup {
         // the home screen mode, however, once in overview mode stylus button press should be
         // enabled to allow rearranging the different home screens. So check what mode
         // the workspace is in, and only perform stylus button presses while in overview mode.
-        if (mLauncher.getLauncherLayout().isInState(LauncherState.OVERVIEW)
+        if (LauncherManager.getLauncherLayout().isInState(LauncherState.OVERVIEW)
                 && mStylusEventHelper.onMotionEvent(ev)) {
             return true;
         }
@@ -494,7 +492,7 @@ public class CellLayout extends ViewGroup {
 
     public void setFolderLeaveBehindCell(int x, int y) {
         View child = getChildAt(x, y);
-        mFolderLeaveBehind.setup(mLauncher, null,
+        mFolderLeaveBehind.setup(getContext(), null,
                 child.getMeasuredWidth(), child.getPaddingTop());
 
         mFolderLeaveBehind.delegateCellX = x;
@@ -2026,7 +2024,7 @@ public class CellLayout extends ViewGroup {
         Log.d(TAG, "commitTempPlacement");
         mTmpOccupied.copyTo(mOccupied);
 
-        long screenId = mLauncher.getLauncherLayout().getWorkspace().getIdForScreen(this);
+        long screenId = LauncherManager.getWorkspace().getIdForScreen(this);
         int container = ItemInfo.CONTAINER_DESKTOP;
 
         if (mContainerType == HOTSEAT) {

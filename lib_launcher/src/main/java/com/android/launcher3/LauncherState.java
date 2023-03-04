@@ -175,7 +175,7 @@ public class LauncherState {
     }
 
     public int getVisibleElements(LauncherLayout launcher) {
-        if (LauncherActivity.fromContext(launcher).getDeviceProfile().isVerticalBarLayout()) {
+        if (LauncherManager.getDeviceProfile().isVerticalBarLayout()) {
             return HOTSEAT_ICONS | VERTICAL_SWIPE_INDICATOR;
         }
         return HOTSEAT_ICONS | HOTSEAT_SEARCH_BOX | VERTICAL_SWIPE_INDICATOR;
@@ -198,7 +198,7 @@ public class LauncherState {
     }
 
     public PageAlphaProvider getWorkspacePageAlphaProvider(LauncherLayout launcher) {
-        if (this != NORMAL || !LauncherActivity.fromContext(launcher).getDeviceProfile().shouldFadeAdjacentWorkspaceScreens()) {
+        if (this != NORMAL || !LauncherManager.getDeviceProfile().shouldFadeAdjacentWorkspaceScreens()) {
             return DEFAULT_ALPHA_PROVIDER;
         }
         final int centerPage = launcher.getWorkspace().getNextPage();
@@ -221,8 +221,7 @@ public class LauncherState {
     public void onStateTransitionEnd(LauncherLayout launcher) {
         if (this == NORMAL) {
             // Clear any rotation locks when going to normal state
-            LauncherActivity.fromContext(launcher).getRotationHelper()
-                    .setCurrentStateRequest(REQUEST_NONE);
+            launcher.getRotationHelper().setCurrentStateRequest(REQUEST_NONE);
         }
     }
 

@@ -26,7 +26,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.core.graphics.ColorUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -37,6 +36,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewDebug;
+
+import androidx.core.graphics.ColorUtils;
 
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.util.IconLoader;
@@ -68,7 +69,6 @@ public class BubbleTextView extends androidx.appcompat.widget.AppCompatTextView 
         }
     };
 
-    private final BaseDraggingActivity mActivity;
     private Drawable mIcon;
     private final boolean mCenterVertically;
 
@@ -103,8 +103,7 @@ public class BubbleTextView extends androidx.appcompat.widget.AppCompatTextView 
 
     public BubbleTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mActivity = BaseDraggingActivity.fromContext(context);
-        DeviceProfile grid = mActivity.getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         mSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 
         TypedArray a = context.obtainStyledAttributes(attrs,

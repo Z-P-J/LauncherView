@@ -21,12 +21,13 @@ import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Region;
-import androidx.core.graphics.ColorUtils;
 import android.util.Property;
 import android.view.View;
 
+import androidx.core.graphics.ColorUtils;
+
 import com.android.launcher3.CellLayout;
-import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.Workspace;
 
 /**
@@ -48,7 +49,6 @@ public class WorkspaceAndHotseatScrim {
             };
 
     private final RectF mHighlightRect = new RectF();
-    private final LauncherActivity mLauncher;
     private final View mRoot;
     private final float mRadius;
 
@@ -60,7 +60,6 @@ public class WorkspaceAndHotseatScrim {
     public WorkspaceAndHotseatScrim(View view) {
         mRoot = view;
         mRadius = (view.getResources().getDisplayMetrics().density * 14);
-        mLauncher = LauncherActivity.fromContext(view);
     }
 
     public void setWorkspace(Workspace workspace) {
@@ -74,9 +73,9 @@ public class WorkspaceAndHotseatScrim {
             mWorkspace.computeScrollWithoutInvalidation();
             CellLayout currCellLayout = mWorkspace.getCurrentDragOverlappingLayout();
             canvas.save();
-            if (currCellLayout != null && currCellLayout != mLauncher.getLauncherLayout().getHotseat().getLayout()) {
+            if (currCellLayout != null && currCellLayout != LauncherManager.getHotseat().getLayout()) {
                 // Cut a hole in the darkening scrim on the page that should be highlighted, if any.
-                mLauncher.getDragLayer()
+                LauncherManager.getDragLayer()
                         .getDescendantRectFRelativeToSelf(currCellLayout, mHighlightRect);
 //                canvas.clipRect(mHighlightRect, Region.Op.DIFFERENCE);
 

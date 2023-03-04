@@ -15,6 +15,13 @@
  */
 package com.android.launcher3.touch;
 
+import static android.view.MotionEvent.ACTION_CANCEL;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_POINTER_UP;
+import static android.view.MotionEvent.ACTION_UP;
+import static android.view.ViewConfiguration.getLongPressTimeout;
+import static com.android.launcher3.LauncherState.NORMAL;
+
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.view.HapticFeedbackConstants;
@@ -25,18 +32,11 @@ import android.view.View.OnTouchListener;
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.views.OptionsPopupView;
-
-import static android.view.MotionEvent.ACTION_CANCEL;
-import static android.view.MotionEvent.ACTION_DOWN;
-import static android.view.MotionEvent.ACTION_POINTER_UP;
-import static android.view.MotionEvent.ACTION_UP;
-import static android.view.ViewConfiguration.getLongPressTimeout;
-import static com.android.launcher3.LauncherState.NORMAL;
 
 /**
  * Helper class to handle touch on empty space in workspace and show options popup on long press
@@ -75,7 +75,7 @@ public class WorkspaceTouchListener implements OnTouchListener, Runnable {
 
             if (handleLongPress) {
                 // Check if the event is not near the edges
-                DeviceProfile dp = LauncherActivity.fromContext(view).getDeviceProfile();
+                DeviceProfile dp = LauncherManager.getDeviceProfile();
                 DragLayer dl = mLauncher.getDragLayer();
                 Rect insets = dp.getInsets();
 
@@ -157,7 +157,7 @@ public class WorkspaceTouchListener implements OnTouchListener, Runnable {
 
                 mWorkspace.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
                         HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
-                OptionsPopupView.showDefaultOptions(mLauncher, mTouchDownPoint.x, mTouchDownPoint.y);
+                OptionsPopupView.showDefaultOptions(mTouchDownPoint.x, mTouchDownPoint.y);
             } else {
                 cancelLongPress();
             }

@@ -1,5 +1,8 @@
 package com.android.launcher3;
 
+import static com.android.launcher3.util.SystemUiController.FLAG_DARK_NAV;
+import static com.android.launcher3.util.SystemUiController.UI_STATE_ROOT_VIEW;
+
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -11,12 +14,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewDebug;
 
-import static com.android.launcher3.util.SystemUiController.FLAG_DARK_NAV;
-import static com.android.launcher3.util.SystemUiController.UI_STATE_ROOT_VIEW;
-
 public class LauncherRootView extends InsettableFrameLayout {
-
-    private final LauncherActivity mLauncher;
 
     private final Paint mOpaquePaint;
 
@@ -32,8 +30,6 @@ public class LauncherRootView extends InsettableFrameLayout {
         mOpaquePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mOpaquePaint.setColor(Color.BLACK);
         mOpaquePaint.setStyle(Paint.Style.FILL);
-
-        mLauncher = LauncherActivity.fromContext(context);
     }
 
     @Override
@@ -76,7 +72,7 @@ public class LauncherRootView extends InsettableFrameLayout {
     protected boolean fitSystemWindows(Rect insets) {
         mConsumedInsets.setEmpty();
         boolean drawInsetBar = false;
-        if (LauncherActivity.fromContext(getContext()).isInMultiWindowModeCompat()
+        if (LauncherManager.isInMultiWindowModeCompat()
                 && (insets.left > 0 || insets.right > 0 || insets.bottom > 0)) {
             mConsumedInsets.left = insets.left;
             mConsumedInsets.right = insets.right;
@@ -92,11 +88,11 @@ public class LauncherRootView extends InsettableFrameLayout {
             drawInsetBar = true;
         }
 
-        mLauncher.getSystemUiController().updateUiState(
+        LauncherManager.getSystemUiController().updateUiState(
                 UI_STATE_ROOT_VIEW, drawInsetBar ? FLAG_DARK_NAV : 0);
 
         // Update device profile before notifying th children.
-        mLauncher.getDeviceProfile().updateInsets(insets);
+        LauncherManager.getDeviceProfile().updateInsets(insets);
         boolean resetState = !insets.equals(mInsets);
         setInsets(insets);
 
@@ -113,7 +109,7 @@ public class LauncherRootView extends InsettableFrameLayout {
             }
         }
         if (resetState) {
-            mLauncher.getLauncherLayout().getStateManager().reapplyState(true /* cancelCurrentAnimation */);
+            LauncherManager.getStateManager().reapplyState(true /* cancelCurrentAnimation */);
         }
 
         return true; // I'll take it from here
@@ -129,7 +125,7 @@ public class LauncherRootView extends InsettableFrameLayout {
     }
 
     public void dispatchInsets() {
-        mLauncher.getDeviceProfile().updateInsets(mInsets);
+        LauncherManager.getDeviceProfile().updateInsets(mInsets);
         super.setInsets(mInsets);
     }
 

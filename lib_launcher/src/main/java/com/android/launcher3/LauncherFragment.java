@@ -1,13 +1,19 @@
 package com.android.launcher3;
 
+import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
+import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;
+
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.android.launcher3.dragndrop.DragLayer;
+import com.android.launcher3.states.RotationHelper;
 import com.ark.browser.launcher.R;
 import com.zpj.fragmentation.SimpleFragment;
 
@@ -22,10 +28,7 @@ public class LauncherFragment extends SimpleFragment {
     // Type: SparseArray<Parcelable>
     private static final String RUNTIME_STATE_WIDGET_PANEL = "launcher.widget_panel";
 
-
-
     private LauncherLayout mLauncherLayout;
-
 
     @Override
     protected int getLayoutId() {
@@ -58,7 +61,7 @@ public class LauncherFragment extends SimpleFragment {
 
         // We close any open folders and shortcut containers since they will not be re-opened,
         // and we need to make sure this state is reflected.
-        AbstractFloatingView.closeAllOpenViews(mLauncherLayout, false);
+        AbstractFloatingView.closeAllOpenViews(false);
 
         super.onSaveInstanceState(outState);
     }
@@ -66,25 +69,18 @@ public class LauncherFragment extends SimpleFragment {
     @Override
     public void onPause() {
         super.onPause();
-        mLauncherLayout.getDragController().cancelDrag();
-        mLauncherLayout.getDragController().resetLastGestureUpTime();
+        mLauncherLayout.onPause();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        //        mLauncherLayout.getStateManager().moveToRestState();
+    public void onDestroyView() {
+        super.onDestroyView();
+        mLauncherLayout.onDestroy();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-    }
-
-    public void onConfigurationChanged() {
-        mLauncherLayout.getDragLayer().recreateControllers();
-        // TODO: We can probably avoid rebind when only screen size changed.
-        mLauncherLayout.rebindModel();
     }
 
     @Override
@@ -93,29 +89,6 @@ public class LauncherFragment extends SimpleFragment {
             return true;
         }
         return super.onBackPressedSupport();
-    }
-
-
-
-
-
-
-
-
-    public DragLayer getDragLayer() {
-        return mLauncherLayout.getDragLayer();
-    }
-
-    public LauncherLayout getLauncherLayout() {
-        return mLauncherLayout;
-    }
-
-    public <T extends View> T getOverviewPanel() {
-        return mLauncherLayout.getOverviewPanel();
-    }
-
-    public View getRootView() {
-        return mLauncherLayout.getRootView();
     }
 
     protected void reapplyUi() {

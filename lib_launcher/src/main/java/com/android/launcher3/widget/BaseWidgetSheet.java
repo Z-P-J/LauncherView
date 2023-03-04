@@ -24,13 +24,13 @@ import android.widget.Toast;
 
 import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget.DragObject;
-import com.android.launcher3.LauncherActivity;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.AbstractSlideInView;
+import com.ark.browser.launcher.R;
 
 /**
  * Base class for various widgets popup
@@ -88,13 +88,13 @@ abstract class BaseWidgetSheet extends AbstractSlideInView
     }
 
     protected void clearNavBarColor() {
-        LauncherActivity.fromContext(this).getSystemUiController().updateUiState(
+        LauncherManager.getSystemUiController().updateUiState(
                 SystemUiController.UI_STATE_WIDGET_BOTTOM_SHEET, 0);
     }
 
     protected void setupNavBarColor() {
         boolean isSheetDark = Themes.getAttrBoolean(getContext(), R.attr.isMainColorDark);
-        LauncherActivity.fromContext(this).getSystemUiController().updateUiState(
+        LauncherManager.getSystemUiController().updateUiState(
                 SystemUiController.UI_STATE_WIDGET_BOTTOM_SHEET,
                 isSheetDark ? SystemUiController.FLAG_DARK_NAV : SystemUiController.FLAG_LIGHT_NAV);
     }

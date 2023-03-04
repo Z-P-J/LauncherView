@@ -1,11 +1,10 @@
 package com.android.launcher3.popup;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.LauncherActivity;
 import com.ark.browser.launcher.R;
 
 /**
@@ -14,7 +13,7 @@ import com.ark.browser.launcher.R;
  * <p>
  * Example system shortcuts, defined as inner classes, include Widgets and AppInfo.
  */
-public abstract class SystemShortcut<T extends BaseDraggingActivity> extends ItemInfo {
+public abstract class SystemShortcut<T extends Context> extends ItemInfo {
     public final int iconResId;
     public final int labelResId;
 
@@ -23,18 +22,18 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
         this.labelResId = labelResId;
     }
 
-    public abstract View.OnClickListener getOnClickListener(T activity, ItemInfo itemInfo);
+    public abstract View.OnClickListener getOnClickListener(T context, ItemInfo itemInfo);
 
-    public static class Widgets extends SystemShortcut<LauncherActivity> {
+    public static class Widgets extends SystemShortcut<Context> {
 
         public Widgets() {
             super(R.drawable.ic_widget, R.string.widget_button_text);
         }
 
         @Override
-        public View.OnClickListener getOnClickListener(final LauncherActivity launcher,
+        public View.OnClickListener getOnClickListener(final Context context,
                                                        final ItemInfo itemInfo) {
-            return v -> Toast.makeText(launcher, "微件", Toast.LENGTH_SHORT).show();
+            return v -> Toast.makeText(context, "微件", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -45,8 +44,8 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
 
         @Override
         public View.OnClickListener getOnClickListener(
-                BaseDraggingActivity activity, ItemInfo itemInfo) {
-            return v -> Toast.makeText(activity, "应用信息", Toast.LENGTH_SHORT).show();
+                Context context, ItemInfo itemInfo) {
+            return v -> Toast.makeText(context, "应用信息", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -57,8 +56,8 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
 
         @Override
         public View.OnClickListener getOnClickListener(
-                BaseDraggingActivity activity, ItemInfo itemInfo) {
-            return v -> Toast.makeText(activity, "安装", Toast.LENGTH_SHORT).show();
+                Context context, ItemInfo itemInfo) {
+            return v -> Toast.makeText(context, "安装", Toast.LENGTH_SHORT).show();
         }
     }
 

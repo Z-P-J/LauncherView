@@ -32,9 +32,9 @@ import android.os.Process;
 import android.view.View;
 
 import com.android.launcher3.BubbleTextView;
-import com.android.launcher3.LauncherActivity;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.folder.FolderIcon;
+import com.ark.browser.launcher.R;
 
 import java.nio.ByteBuffer;
 
@@ -163,8 +163,7 @@ public class DragPreviewProvider {
     }
 
     public float getScaleAndPosition(Bitmap preview, int[] outPos) {
-        float scale = LauncherActivity.fromContext(mView)
-                .getDragLayer().getLocationInDragLayer(mView, outPos);
+        float scale = LauncherManager.getDragLayer().getLocationInDragLayer(mView, outPos);
 
         outPos[0] = Math.round(outPos[0] -
                 (preview.getWidth() - scale * mView.getWidth() * mView.getScaleX()) / 2);

@@ -33,10 +33,9 @@ import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.PagedView;
-import com.ark.browser.launcher.R;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;
@@ -46,6 +45,7 @@ import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.pageindicators.PageIndicatorDots;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
+import com.ark.browser.launcher.R;
 import com.ark.browser.launcher.database.HomepageManager;
 
 import java.util.ArrayList;
@@ -257,7 +257,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
     }
 
     private CellLayout createAndAddNewPage() {
-        DeviceProfile grid = LauncherActivity.fromContext(getContext()).getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         CellLayout page = (CellLayout) mInflater.inflate(R.layout.folder_page, this, false);
         page.setCellDimensions(grid.folderCellWidthPx, grid.folderCellHeightPx);
         page.getShortcutsAndWidgets().setMotionEventSplittingEnabled(false);
@@ -323,7 +323,7 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
         int newX, newY, rank;
 
         FolderIconPreviewVerifier verifier = new FolderIconPreviewVerifier(
-                LauncherActivity.fromContext(getContext()).getDeviceProfile().inv);
+                LauncherManager.getDeviceProfile().inv);
         rank = 0;
         for (int i = 0; i < itemCount; i++) {
             View v = list.size() > i ? list.get(i) : null;

@@ -16,22 +16,32 @@
 
 package com.android.launcher3;
 
+import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
+import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;
+
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.UserHandle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import android.text.method.TextKeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
@@ -39,10 +49,15 @@ import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
+import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.touch.ItemClickHandler;
+import com.android.launcher3.uioverrides.DisplayRotationListener;
+import com.android.launcher3.util.SystemUiController;
+import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 import com.ark.browser.launcher.database.HomepageManager;
 import com.ark.browser.launcher.R;
+import com.zpj.utils.ContextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +65,7 @@ import java.util.List;
 
 import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.util.SystemUiController.UI_STATE_OVERVIEW;
 
 /**
  * Default launcher application.
@@ -71,6 +87,8 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
     private static final String RUNTIME_STATE_PENDING_ACTIVITY_RESULT = "launcher.activity_result";
     // Type: SparseArray<Parcelable>
     private static final String RUNTIME_STATE_WIDGET_PANEL = "launcher.widget_panel";
+
+    private final RotationHelper mRotationHelper;
 
     private LauncherStateManager mStateManager;
 
@@ -108,6 +126,12 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     public ViewGroupFocusHelper mFocusHandler;
 
+    private DisplayRotationListener mRotationListener;
+
+    protected SystemUiController mSystemUiController;
+
+    private LauncherLoader loader;
+
     public LauncherLayout(@NonNull Context context) {
         this(context, null);
     }
@@ -119,6 +143,14 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
     public LauncherLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        LauncherManager.init(this);
+
+        mRotationListener = new DisplayRotationListener(getContext(), this::onDeviceRotationChanged);
+
+        LauncherAppState app = LauncherAppState.getInstance(getContext());
+        initDeviceProfile(app.getInvariantDeviceProfile());
+
+        mRotationHelper = new RotationHelper((Activity) context);
 
         mStateManager = new LauncherStateManager(this);
 
@@ -166,9 +198,9 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     }
 
-
-    private LauncherLoader loader;
     public void init(Bundle savedInstanceState) {
+        mOldConfig = new Configuration(getResources().getConfiguration());
+
         restoreState(savedInstanceState);
 
         // We only load the page synchronously if the user rotates (or triggers a
@@ -181,15 +213,39 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         mWorkspace.setCurrentPage(currentScreen);
         setWorkspaceLoading(true);
 
-        loader = new LauncherLoader(getContext(), LauncherAppState.getInstance(getContext()));
+        LauncherAppState app = LauncherAppState.getInstance(getContext());
+        loader = new LauncherLoader(getContext(), app);
         loader.initialize(this);
         loader.startLoader(currentScreen);
+
+        mRotationHelper.initialize();
+
+        getSystemUiController().updateUiState(SystemUiController.UI_STATE_BASE_WINDOW,
+                Themes.getAttrBoolean(getContext(), R.attr.isWorkspaceDarkText));
+    }
+
+    public void onPause() {
+        mDragController.cancelDrag();
+        mDragController.resetLastGestureUpTime();
+        // Reset the overridden sysui flags used for the task-swipe launch animation, we do this
+        // here instead of at the end of the animation because the start of the new activity does
+        // not happen immediately, which would cause us to reset to launcher's sysui flags and then
+        // back to the new app (causing a flash)
+        getSystemUiController().updateUiState(UI_STATE_OVERVIEW, 0);
+    }
+
+    public void onDestroy() {
+        TextKeyListener.getInstance().release();
+        LauncherAnimUtils.onDestroyActivity();
+        mRotationListener.disable();
+        mRotationHelper.destroy();
+        LauncherManager.destroy();
     }
 
 
-
-
     public void rebindWorkspace(InvariantDeviceProfile idp) {
+        idp.update(getContext());
+        initDeviceProfile(idp);
         loader.startLoader(mWorkspace.getCurrentPage());
     }
 
@@ -573,7 +629,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         // Floating panels (except the full widget sheet) are associated with individual icons. If
         // we are starting a fresh bind, close all such panels as all the icons are about
         // to go away.
-        AbstractFloatingView.closeOpenViews(LauncherActivity.fromContext(getContext()), true,
+        AbstractFloatingView.closeOpenViews(true,
                 AbstractFloatingView.TYPE_ALL & ~AbstractFloatingView.TYPE_REBIND_SAFE);
 
         setWorkspaceLoading(true);
@@ -583,7 +639,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         mWorkspace.removeAllWorkspaceScreens();
 
         if (mHotSeat != null) {
-            mHotSeat.resetLayout(LauncherActivity.fromContext(getContext()).getDeviceProfile().isVerticalBarLayout());
+            mHotSeat.resetLayout(getDeviceProfile().isVerticalBarLayout());
         }
     }
 
@@ -720,7 +776,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
                     mWorkspace.postDelayed(new Runnable() {
                         public void run() {
                             if (mWorkspace != null) {
-                                AbstractFloatingView.closeAllOpenViews(LauncherActivity.fromContext(getContext()), false);
+                                AbstractFloatingView.closeAllOpenViews(false);
 
                                 mWorkspace.snapToPage(newScreenIndex);
                                 mWorkspace.postDelayed(startBounceAnimRunnable,
@@ -805,5 +861,103 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
 
 
+
+
+
+
+    public RotationHelper getRotationHelper() {
+        return mRotationHelper;
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        int diff = newConfig.diff(mOldConfig);
+        if ((diff & (CONFIG_ORIENTATION | CONFIG_SCREEN_SIZE)) != 0) {
+            initDeviceProfile(mDeviceProfile.inv);
+            dispatchDeviceProfileChanged();
+            reapplyUi();
+            onConfigurationChanged();
+        }
+
+        mOldConfig.setTo(newConfig);
+        super.onConfigurationChanged(newConfig);
+    }
+
+    public void onConfigurationChanged() {
+        getDragLayer().recreateControllers();
+        // TODO: We can probably avoid rebind when only screen size changed.
+        rebindModel();
+    }
+
+    protected void reapplyUi() {
+        getRootView().dispatchInsets();
+        getStateManager().reapplyState(true /* cancelCurrentAnimation */);
+    }
+
+
+
+    private final ArrayList<DeviceProfile.OnDeviceProfileChangeListener> mDPChangeListeners = new ArrayList<>();
+
+    protected DeviceProfile mDeviceProfile;
+
+    public DeviceProfile getDeviceProfile() {
+        return mDeviceProfile;
+    }
+
+    public void addOnDeviceProfileChangeListener(DeviceProfile.OnDeviceProfileChangeListener listener) {
+        mDPChangeListeners.add(listener);
+    }
+
+    public void dispatchDeviceProfileChanged() {
+        for (int i = mDPChangeListeners.size() - 1; i >= 0; i--) {
+            mDPChangeListeners.get(i).onDeviceProfileChanged(mDeviceProfile);
+        }
+    }
+
+    public Activity getActivity() {
+        return ContextUtils.getActivity(getContext());
+    }
+
+    public Window getWindow() {
+        return getActivity().getWindow();
+    }
+
+    public WindowManager getWindowManager() {
+        return getActivity().getWindowManager();
+    }
+
+    public SystemUiController getSystemUiController() {
+        if (mSystemUiController == null) {
+            mSystemUiController = new SystemUiController(getWindow());
+        }
+        return mSystemUiController;
+    }
+
+    private void initDeviceProfile(InvariantDeviceProfile idp) {
+        // Load configuration-specific DeviceProfile
+        mDeviceProfile = idp.getDeviceProfile(getContext());
+        if (LauncherManager.isInMultiWindowModeCompat()) {
+            Display display = getWindowManager().getDefaultDisplay();
+            Point mwSize = new Point();
+            display.getSize(mwSize);
+            mDeviceProfile = mDeviceProfile.getMultiWindowProfile(getContext(), mwSize);
+        }
+        onDeviceProfileInitiated();
+    }
+
+    protected void onDeviceProfileInitiated() {
+        if (mDeviceProfile.isVerticalBarLayout()) {
+            mRotationListener.enable();
+            mDeviceProfile.updateIsSeascape(getWindowManager());
+        } else {
+            mRotationListener.disable();
+        }
+    }
+
+    private void onDeviceRotationChanged() {
+        if (mDeviceProfile.updateIsSeascape(getWindowManager())) {
+            reapplyUi();
+        }
+    }
 
 }

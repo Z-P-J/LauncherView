@@ -22,7 +22,7 @@ import android.view.View;
 
 import com.android.launcher3.DragSource;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.TabItemInfo;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.graphics.DragPreviewProvider;
@@ -55,14 +55,13 @@ public class PendingItemDragHelper extends DragPreviewProvider {
 
     public void startDrag(Rect previewBounds, int previewBitmapWidth, int previewViewWidth,
                           Point screenPos, DragSource source, DragOptions options) {
-        final LauncherActivity launcher = LauncherActivity.fromContext(mView.getContext());
 //        LauncherAppState app = LauncherAppState.getInstance(mView.getContext());
 
         final float scale;
         final Point dragOffset;
         final Rect dragRegion;
 
-        mEstimatedCellSize = launcher.getLauncherLayout().getWorkspace().estimateItemSize(mAddInfo);
+        mEstimatedCellSize = LauncherManager.getWorkspace().estimateItemSize(mAddInfo);
 
 //        int maxWidth = Math.min((int) (previewBitmapWidth * MAX_WIDGET_SCALE), mEstimatedCellSize[0]);
 
@@ -86,7 +85,7 @@ public class PendingItemDragHelper extends DragPreviewProvider {
 
         // Since we are not going through the workspace for starting the drag, set drag related
         // information on the workspace before starting the drag.
-        launcher.getLauncherLayout().getWorkspace().prepareDragWithProvider(this);
+        LauncherManager.getWorkspace().prepareDragWithProvider(this);
 
         int dragLayerX = screenPos.x + previewBounds.left
                 + (int) ((scale * previewViewWidth - previewViewWidth) / 2);
@@ -94,7 +93,7 @@ public class PendingItemDragHelper extends DragPreviewProvider {
                 + (int) ((scale * previewViewWidth - previewViewWidth) / 2);
 
         // Start the drag
-        launcher.getLauncherLayout().getDragController().startDrag(createDragBitmap(), dragLayerX, dragLayerY, source, mAddInfo,
+        LauncherManager.getDragController().startDrag(createDragBitmap(), dragLayerX, dragLayerY, source, mAddInfo,
                 dragOffset, dragRegion, scale, scale, options);
     }
 

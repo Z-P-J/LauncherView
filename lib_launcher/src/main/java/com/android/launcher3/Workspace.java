@@ -16,6 +16,14 @@
 
 package com.android.launcher3;
 
+import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
+import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
+import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
+import static com.android.launcher3.LauncherState.ALL_APPS;
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.LauncherState.SPRING_LOADED;
+import static com.android.launcher3.dragndrop.DragLayer.ALPHA_INDEX_OVERLAY;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
@@ -44,7 +52,6 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.launcher3.LauncherActivity.LauncherOverlay;
 import com.android.launcher3.LauncherStateManager.AnimationConfig;
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.Interpolators;
@@ -64,19 +71,11 @@ import com.android.launcher3.touch.WorkspaceTouchListener;
 import com.android.launcher3.util.LongArrayMap;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.WidgetUtil;
-import com.ark.browser.launcher.database.HomepageManager;
 import com.ark.browser.launcher.R;
+import com.ark.browser.launcher.database.HomepageManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
-import static com.android.launcher3.LauncherState.ALL_APPS;
-import static com.android.launcher3.LauncherState.NORMAL;
-import static com.android.launcher3.LauncherState.SPRING_LOADED;
-import static com.android.launcher3.dragndrop.DragLayer.ALPHA_INDEX_OVERLAY;
 
 /**
  * The workspace is a wide area with a wallpaper and a finite number of pages.
@@ -277,7 +276,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     public void setInsets(Rect insets) {
         mInsets.set(insets);
 
-        DeviceProfile grid = LauncherActivity.fromContext(this).getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         mMaxDistanceForFolderCreation = (0.55f * grid.iconSizePx);
         mWorkspaceFadeInAdjacentScreens = grid.shouldFadeAdjacentWorkspaceScreens();
 
@@ -503,8 +502,8 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         // created CellLayout.
         CellLayout newScreen = (CellLayout) LayoutInflater.from(getContext()).inflate(
                 R.layout.workspace_screen, this, false /* attachToRoot */);
-        int paddingLeftRight = LauncherActivity.fromContext(getContext()).getDeviceProfile().cellLayoutPaddingLeftRightPx;
-        int paddingBottom = LauncherActivity.fromContext(getContext()).getDeviceProfile().cellLayoutBottomPaddingPx;
+        int paddingLeftRight = LauncherManager.getDeviceProfile().cellLayoutPaddingLeftRightPx;
+        int paddingBottom = LauncherManager.getDeviceProfile().cellLayoutBottomPaddingPx;
         newScreen.setPadding(paddingLeftRight, 0, paddingLeftRight, paddingBottom);
 
         mWorkspaceScreens.put(screenId, newScreen);
@@ -1438,7 +1437,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         int dragLayerX = mTempXY[0];
         int dragLayerY = mTempXY[1];
 
-        DeviceProfile grid = LauncherActivity.fromContext(getContext()).getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         Point dragVisualizeOffset = null;
         Rect dragRect = null;
         if (child instanceof BubbleTextView) {
@@ -1903,7 +1902,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     public void onNoCellFound(View dropTargetLayout) {
         if (mLauncher.isHotseatLayout(dropTargetLayout)) {
             HotSeat hotseat = mLauncher.getHotseat();
-            boolean droppedOnAllAppsIcon = mTargetCell != null && !LauncherActivity.fromContext(getContext()).getDeviceProfile().inv.isAllAppsButtonRank(
+            boolean droppedOnAllAppsIcon = mTargetCell != null && !LauncherManager.getDeviceProfile().inv.isAllAppsButtonRank(
                     hotseat.getOrderInHotseat(mTargetCell[0], mTargetCell[1]));
             if (!droppedOnAllAppsIcon) {
                 // Only show message when hotseat is full and drop target was not AllApps button
@@ -3019,13 +3018,13 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
     @Override
     public int getExpectedHeight() {
         return getMeasuredHeight() <= 0 || !mIsLayoutValid
-                ? LauncherActivity.fromContext(getContext()).getDeviceProfile().heightPx : getMeasuredHeight();
+                ? LauncherManager.getDeviceProfile().heightPx : getMeasuredHeight();
     }
 
     @Override
     public int getExpectedWidth() {
         return getMeasuredWidth() <= 0 || !mIsLayoutValid
-                ? LauncherActivity.fromContext(getContext()).getDeviceProfile().widthPx : getMeasuredWidth();
+                ? LauncherManager.getDeviceProfile().widthPx : getMeasuredWidth();
     }
 
     @Override
@@ -3088,4 +3087,25 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
             onEndStateTransition();
         }
     }
+
+    public interface LauncherOverlay {
+
+        /**
+         * Touch interaction leading to overscroll has begun
+         */
+        void onScrollInteractionBegin();
+
+        /**
+         * Touch interaction related to overscroll has ended
+         */
+        void onScrollInteractionEnd();
+
+        /**
+         * Scroll progress, between 0 and 100, when the user scrolls beyond the leftmost
+         * screen (or in the case of RTL, the rightmost screen).
+         */
+        void onScrollChange(float progress, boolean rtl);
+
+    }
+
 }

@@ -26,10 +26,10 @@ import android.view.ViewConfiguration;
 
 import com.android.launcher3.ButtonDropTarget;
 import com.android.launcher3.DropTarget;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.util.FlingAnimation;
+import com.ark.browser.launcher.R;
 
 /**
  * Utility class to manage fling to delete action during drag and drop.
@@ -121,7 +121,7 @@ public class FlingToDeleteHelper {
             // Do a quick dot product test to ensure that we are flinging upwards
             PointF upVec = new PointF(0f, -1f);
             theta = getAngleBetweenVectors(vel, upVec);
-        } else if (LauncherActivity.fromContext(mContext).getDeviceProfile().isVerticalBarLayout() &&
+        } else if (LauncherManager.getDeviceProfile().isVerticalBarLayout() &&
                 mVelocityTracker.getXVelocity() < mFlingToDeleteThresholdVelocity) {
             // Remove icon is on left side instead of top, so check if we are flinging to the left.
             PointF leftVec = new PointF(-1f, 0f);

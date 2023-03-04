@@ -16,6 +16,8 @@
 
 package com.android.launcher3.views;
 
+import static com.android.launcher3.Utilities.SINGLE_FRAME_MS;
+
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -26,10 +28,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.BaseActivity;
-import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.InsettableFrameLayout;
-import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.MultiValueAlpha.AlphaProperty;
@@ -37,17 +37,14 @@ import com.android.launcher3.util.TouchController;
 
 import java.util.ArrayList;
 
-import static com.android.launcher3.Utilities.SINGLE_FRAME_MS;
-
 /**
  * A viewgroup with utility methods for drag-n-drop and touch interception
  */
-public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends InsettableFrameLayout {
+public abstract class BaseDragLayer extends InsettableFrameLayout {
 
     protected final int[] mTmpXY = new int[2];
     protected final Rect mHitRect = new Rect();
 
-    protected final T mActivity;
     private final MultiValueAlpha mMultiValueAlpha;
 
     protected TouchController mController;
@@ -56,7 +53,6 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
 
     public BaseDragLayer(Context context, AttributeSet attrs, int alphaChannelCount) {
         super(context, attrs);
-        mActivity = (T) BaseActivity.fromContext(context);
         mMultiValueAlpha = new MultiValueAlpha(this, alphaChannelCount);
     }
 
@@ -75,7 +71,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
             }
             mTouchCompleteListener = null;
         } else if (action == MotionEvent.ACTION_DOWN) {
-            mActivity.finishAutoCancelActionMode();
+            LauncherManager.finishAutoCancelActionMode();
         }
         return findActiveController(ev);
     }
@@ -83,7 +79,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
     protected boolean findActiveController(MotionEvent ev) {
         mActiveController = null;
 
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout());
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
         if (topView != null && topView.onControllerInterceptTouchEvent(ev)) {
             mActiveController = topView;
             return true;
@@ -211,12 +207,12 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
     @Override
     public boolean dispatchUnhandledMove(View focused, int direction) {
         // Consume the unhandled move if a container is open, to avoid switching pages underneath.
-        return AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout()) != null;
+        return AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout()) != null;
     }
 
     @Override
     protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
-        View topView = AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout());
+        View topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
         if (topView != null) {
             return topView.requestFocus(direction, previouslyFocusedRect);
         } else {
@@ -226,7 +222,7 @@ public abstract class BaseDragLayer<T extends BaseDraggingActivity> extends Inse
 
     @Override
     public void addFocusables(ArrayList<View> views, int direction, int focusableMode) {
-        View topView = AbstractFloatingView.getTopOpenView(((LauncherActivity)mActivity).getLauncherLayout());
+        View topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
         if (topView != null) {
             topView.addFocusables(views, direction);
         } else {

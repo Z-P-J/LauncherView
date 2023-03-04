@@ -61,8 +61,6 @@ public abstract class ButtonDropTarget extends TextView
     public static final int TOOLTIP_LEFT = 1;
     public static final int TOOLTIP_RIGHT = 2;
 
-    protected final LauncherActivity mLauncher;
-
     private final int mBottomDragPadding;
     protected DropTargetBar mDropTargetBar;
 
@@ -102,7 +100,6 @@ public abstract class ButtonDropTarget extends TextView
 
     public ButtonDropTarget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mLauncher = LauncherActivity.fromContext(context);
 
         Resources resources = getResources();
         mBottomDragPadding = resources.getDimensionPixelSize(R.dimen.drop_target_drag_padding);
@@ -253,7 +250,7 @@ public abstract class ButtonDropTarget extends TextView
     @Override
     public boolean isDropEnabled() {
         return mActive && (mAccessibleDrag ||
-                mLauncher.getLauncherLayout().getDragController().getDistanceDragged() >= mDragDistanceThreshold);
+                LauncherManager.getDragController().getDistanceDragged() >= mDragDistanceThreshold);
     }
 
     @Override
@@ -267,7 +264,7 @@ public abstract class ButtonDropTarget extends TextView
      */
     @Override
     public void onDrop(final DragObject d, final DragOptions options) {
-        final DragLayer dragLayer = mLauncher.getDragLayer();
+        final DragLayer dragLayer = LauncherManager.getDragLayer();
         final Rect from = new Rect();
         dragLayer.getViewRectRelativeToSelf(d.dragView, from);
 
@@ -278,7 +275,7 @@ public abstract class ButtonDropTarget extends TextView
         Runnable onAnimationEndRunnable = () -> {
             completeDrop(d);
             mDropTargetBar.onDragEnd();
-            mLauncher.getLauncherLayout().getStateManager().goToState(NORMAL);
+            LauncherManager.getStateManager().goToState(NORMAL);
         };
 
         dragLayer.animateView(d.dragView, from, to, scale, 1f, 1f, 0.1f, 0.1f,
@@ -301,7 +298,7 @@ public abstract class ButtonDropTarget extends TextView
         outRect.bottom += mBottomDragPadding;
 
         sTempCords[0] = sTempCords[1] = 0;
-        mLauncher.getDragLayer().getDescendantCoordRelativeToSelf(this, sTempCords);
+        LauncherManager.getDragLayer().getDescendantCoordRelativeToSelf(this, sTempCords);
         outRect.offsetTo(sTempCords[0], sTempCords[1]);
     }
 
@@ -310,7 +307,7 @@ public abstract class ButtonDropTarget extends TextView
         int viewHeight = dragObject.dragView.getMeasuredHeight();
         int drawableWidth = mDrawable.getIntrinsicWidth();
         int drawableHeight = mDrawable.getIntrinsicHeight();
-        DragLayer dragLayer = mLauncher.getDragLayer();
+        DragLayer dragLayer = LauncherManager.getDragLayer();
 
         // Find the rect to animate to (the view is center aligned)
         Rect to = new Rect();

@@ -203,7 +203,7 @@ public class FocusHelper {
             return consume;
         }
 
-        final DeviceProfile profile = LauncherActivity.fromContext(v).getDeviceProfile();
+        final DeviceProfile profile = LauncherManager.getDeviceProfile();
 
         if (DEBUG) {
             Log.v(TAG, String.format(
@@ -317,7 +317,7 @@ public class FocusHelper {
             return consume;
         }
 
-        DeviceProfile profile = LauncherActivity.fromContext(v).getDeviceProfile();
+        DeviceProfile profile = LauncherManager.getDeviceProfile();
 
         if (DEBUG) {
             Log.v(TAG, String.format("Handle WORKSPACE ICONS keyevent=[%s] isVerticalBar=%s",

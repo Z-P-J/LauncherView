@@ -15,13 +15,14 @@
  */
 package com.android.launcher3.touch;
 
+import android.content.Context;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfoWithIcon;
-import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.folder.Folder;
 import com.android.launcher3.folder.FolderIcon;
@@ -43,14 +44,13 @@ public class ItemClickHandler {
             return;
         }
 
-        LauncherActivity launcher = LauncherActivity.fromContext(v.getContext());
-        if (!launcher.getLauncherLayout().getWorkspace().isFinishedSwitchingState()) {
+        if (!LauncherManager.getWorkspace().isFinishedSwitchingState()) {
             return;
         }
 
         Object tag = v.getTag();
         if (tag instanceof ShortcutInfo) {
-            onClickAppShortcut(v, (ItemInfoWithIcon) tag, launcher);
+            onClickAppShortcut(v, (ItemInfoWithIcon) tag, v.getContext());
         } else if (tag instanceof FolderInfo) {
             if (v instanceof FolderIcon) {
                 onClickFolderIcon(v);
@@ -76,7 +76,7 @@ public class ItemClickHandler {
      *
      * @param v The view that was clicked. Must be a tagged with a {@link ShortcutInfo}.
      */
-    private static void onClickAppShortcut(View v, ItemInfoWithIcon shortcut, LauncherActivity launcher) {
-        Toast.makeText(launcher, "onClickAppShortcut title=" + shortcut.title, Toast.LENGTH_SHORT).show();
+    private static void onClickAppShortcut(View v, ItemInfoWithIcon shortcut, Context context) {
+        Toast.makeText(context, "onClickAppShortcut title=" + shortcut.title, Toast.LENGTH_SHORT).show();
     }
 }

@@ -157,7 +157,7 @@ public class LauncherLoader {
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
 
-        DeviceProfile grid = LauncherActivity.fromContext(mContext).getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         int iconSize = grid.iconSizePx - grid.iconDrawablePaddingPx;
 
         Bitmap bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);

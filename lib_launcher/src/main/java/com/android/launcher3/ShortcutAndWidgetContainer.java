@@ -96,12 +96,12 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     public int getCellContentHeight() {
         return Math.min(getMeasuredHeight(),
-                LauncherActivity.fromContext(getContext()).getDeviceProfile().getCellHeight(mContainerType));
+                LauncherManager.getDeviceProfile().getCellHeight(mContainerType));
     }
 
     public void measureChild(View child) {
         CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
-        final DeviceProfile profile = LauncherActivity.fromContext(getContext()).getDeviceProfile();
+        final DeviceProfile profile = LauncherManager.getDeviceProfile();
 
         lp.setup(mCellWidth, mCellHeight, invertLayoutHorizontally(), mCountX);
         // Center the icon/folder

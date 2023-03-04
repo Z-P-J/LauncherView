@@ -16,6 +16,9 @@
 
 package com.android.launcher3.folder;
 
+import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
+import static com.android.launcher3.folder.PreviewItemManager.INITIAL_ITEM_ANIMATION_DURATION;
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -24,7 +27,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.LayoutInflater;
@@ -33,6 +35,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
 
 import com.android.launcher3.Alarm;
 import com.android.launcher3.BubbleTextView;
@@ -43,10 +47,9 @@ import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.FolderInfo.FolderListener;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.OnAlarmListener;
-import com.ark.browser.launcher.R;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.SimpleOnStylusPressListener;
 import com.android.launcher3.StylusEventHelper;
@@ -57,12 +60,10 @@ import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragView;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
+import com.ark.browser.launcher.R;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
-import static com.android.launcher3.folder.PreviewItemManager.INITIAL_ITEM_ANIMATION_DURATION;
 
 /**
  * An icon that can appear on in the workspace representing an {@link Folder}.
@@ -152,7 +153,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
                     "is dependent on this");
         }
 
-        DeviceProfile grid = LauncherActivity.fromContext(context).getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         FolderIcon icon = (FolderIcon) LayoutInflater.from(context)
                 .inflate(resId, group, false);
 
@@ -192,7 +193,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     private void setFolder(Folder folder) {
         mFolder = folder;
-        mPreviewVerifier = new FolderIconPreviewVerifier(LauncherActivity.fromContext(mLauncher).getDeviceProfile().inv);
+        mPreviewVerifier = new FolderIconPreviewVerifier(LauncherManager.getDeviceProfile().inv);
         updatePreviewItems(false);
     }
 

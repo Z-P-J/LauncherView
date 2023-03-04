@@ -9,8 +9,8 @@ import android.widget.SeekBar;
 import androidx.annotation.Nullable;
 
 import com.android.launcher3.InvariantDeviceProfile;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.LauncherManager;
 import com.zpj.fragmentation.dialog.impl.BottomActionDialogFragment;
 
 public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBottomDialog> {
@@ -35,7 +35,7 @@ public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBot
             public void onClick(View v) {
                 idp.numRows = 4;
                 idp.numColumns = 5;
-                LauncherActivity.fromContext(context).rebindWorkspace(idp);
+                LauncherManager.rebindWorkspace(idp);
             }
         });
 
@@ -44,7 +44,7 @@ public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBot
             public void onClick(View v) {
                 idp.numRows = 4;
                 idp.numColumns = 6;
-                LauncherActivity.fromContext(context).rebindWorkspace(idp);
+                LauncherManager.rebindWorkspace(idp);
             }
         });
 
@@ -53,7 +53,7 @@ public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBot
             public void onClick(View v) {
                 idp.numRows = 5;
                 idp.numColumns = 5;
-                LauncherActivity.fromContext(context).rebindWorkspace(idp);
+                LauncherManager.rebindWorkspace(idp);
             }
         });
 
@@ -62,7 +62,7 @@ public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBot
             public void onClick(View v) {
                 idp.numRows = 5;
                 idp.numColumns = 6;
-                LauncherActivity.fromContext(context).rebindWorkspace(idp);
+                LauncherManager.rebindWorkspace(idp);
             }
         });
 
@@ -74,7 +74,7 @@ public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBot
                 float scale = progress / 50f;
                 idp.iconSize = iconSize * scale;
                 Log.d("SettingsBottomDialog", "iconSize=" + (iconSize * scale));
-                LauncherActivity.fromContext(context).rebindWorkspace(idp);
+                LauncherManager.rebindWorkspace(idp);
             }
 
             @Override

@@ -15,19 +15,19 @@
  */
 package com.android.launcher3.touch;
 
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.LauncherState.OVERVIEW;
+
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.LauncherActivity;
 import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.folder.Folder;
-
-import static com.android.launcher3.LauncherState.NORMAL;
-import static com.android.launcher3.LauncherState.OVERVIEW;
 
 /**
  * Class to handle long-clicks on workspace items and start drag as a result.
@@ -41,7 +41,7 @@ public class ItemLongClickListener {
 //            ItemLongClickListener::onAllAppsItemLongClick;
 
     private static boolean onWorkspaceItemLongClick(View v) {
-        LauncherLayout launcher = LauncherActivity.fromContext(v).getLauncherLayout();
+        LauncherLayout launcher = LauncherManager.getLauncherLayout();
         Log.d("ItemLongClickListener", "onWorkspaceItemLongClick isWorkspaceLocked=" + launcher.isWorkspaceLocked());
         if (!canStartDrag(launcher)) return false;
         if (!launcher.isInState(NORMAL) && !launcher.isInState(OVERVIEW)) return false;

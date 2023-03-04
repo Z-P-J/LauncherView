@@ -15,14 +15,14 @@
  */
 package com.android.launcher3.uioverrides;
 
-import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.LauncherActivity;
-import com.android.launcher3.LauncherLayout;
-import com.android.launcher3.LauncherState;
-import com.ark.browser.launcher.R;
-
 import static com.android.launcher3.LauncherAnimUtils.ALL_APPS_TRANSITION_MS;
 import static com.android.launcher3.anim.Interpolators.DEACCEL_2;
+
+import com.android.launcher3.AbstractFloatingView;
+import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.LauncherManager;
+import com.android.launcher3.LauncherState;
+import com.ark.browser.launcher.R;
 
 /**
  * Definition for AllApps state
@@ -46,7 +46,7 @@ public class AllAppsState extends LauncherState {
 
     @Override
     public void onStateEnabled(LauncherLayout launcher) {
-        AbstractFloatingView.closeAllOpenViews(launcher);
+        AbstractFloatingView.closeAllOpenViews();
         dispatchWindowStateChanged(launcher);
     }
 
@@ -62,8 +62,7 @@ public class AllAppsState extends LauncherState {
 
     @Override
     public float[] getWorkspaceScaleAndTranslation(LauncherLayout launcher) {
-        return new float[]{1f, 0,
-                -LauncherActivity.fromContext(launcher).getDeviceProfile().heightPx * PARALLAX_COEFFICIENT};
+        return new float[]{1f, 0, LauncherManager.getDeviceProfile().heightPx * PARALLAX_COEFFICIENT};
     }
 
     @Override

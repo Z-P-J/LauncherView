@@ -29,11 +29,12 @@ import android.view.View.OnLongClickListener;
 import android.widget.Toast;
 
 import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.LauncherState;
-import com.ark.browser.launcher.R;
 import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.widget.WidgetsFullSheet;
+import com.ark.browser.launcher.R;
 import com.ark.browser.launcher.SettingsBottomDialog;
 
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class OptionsPopupView extends ArrowPopup
         if (ev.getAction() != MotionEvent.ACTION_DOWN) {
             return false;
         }
-        if (mLauncher.getDragLayer().isEventOverView(this, ev)) {
+        if (LauncherManager.getDragLayer().isEventOverView(this, ev)) {
             return false;
         }
         close(true);
@@ -100,7 +101,8 @@ public class OptionsPopupView extends ArrowPopup
         mTargetRect.roundOut(outPos);
     }
 
-    public static void show(LauncherLayout launcher, RectF targetRect, List<OptionItem> items) {
+    public static void show(RectF targetRect, List<OptionItem> items) {
+        LauncherLayout launcher = LauncherManager.getLauncherLayout();
         OptionsPopupView popup = (OptionsPopupView) LayoutInflater.from(launcher.getContext())
                 .inflate(R.layout.longpress_options_menu, launcher.getDragLayer(), false);
         popup.mTargetRect = targetRect;
@@ -118,7 +120,8 @@ public class OptionsPopupView extends ArrowPopup
         popup.reorderAndShow(popup.getChildCount());
     }
 
-    public static void showDefaultOptions(LauncherLayout launcher, float x, float y) {
+    public static void showDefaultOptions(float x, float y) {
+        LauncherLayout launcher = LauncherManager.getLauncherLayout();
         float halfSize = launcher.getResources().getDimension(R.dimen.options_menu_thumb_size) / 2;
         if (x < 0 || y < 0) {
             x = launcher.getDragLayer().getWidth() / 2f;
@@ -151,7 +154,7 @@ public class OptionsPopupView extends ArrowPopup
         options.add(new OptionItem(R.string.settings_button_text, R.drawable.ic_setting,
                 OptionsPopupView::startSettings));
 
-        show(launcher, target, options);
+        show(target, options);
     }
 
     public static boolean startSettings(View view) {

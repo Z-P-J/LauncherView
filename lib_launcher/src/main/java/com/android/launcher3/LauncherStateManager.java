@@ -130,8 +130,7 @@ public class LauncherStateManager {
      * @see #goToState(LauncherState, boolean)
      */
     public void goToState(LauncherState state) {
-        LauncherActivity launcherActivity = LauncherActivity.fromContext(mLauncher);
-        goToState(state, !launcherActivity.isForceInvisible() && launcherActivity.isStarted() /* animated */);
+        goToState(state, true);
     }
 
     /**
@@ -314,7 +313,7 @@ public class LauncherStateManager {
 
         state.onStateTransitionEnd(mLauncher);
         mLauncher.getWorkspace().setClipChildren(!state.disablePageClipping);
-        LauncherActivity.fromContext(mLauncher).finishAutoCancelActionMode();
+        LauncherManager.finishAutoCancelActionMode();
 
         if (state == NORMAL) {
             setRestState(null);

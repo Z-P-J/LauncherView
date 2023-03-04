@@ -33,7 +33,6 @@ import com.ark.browser.launcher.R;
 
 public class HotSeat extends FrameLayout implements Insettable {
 
-    private final LauncherActivity mLauncher;
     private CellLayout mContent;
 
     @ViewDebug.ExportedProperty(category = "launcher")
@@ -49,7 +48,6 @@ public class HotSeat extends FrameLayout implements Insettable {
 
     public HotSeat(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mLauncher = LauncherActivity.fromContext(getContext());
     }
 
     public CellLayout getLayout() {
@@ -79,7 +77,7 @@ public class HotSeat extends FrameLayout implements Insettable {
     void resetLayout(boolean hasVerticalHotseat) {
         mContent.removeAllViewsInLayout();
         mHasVerticalHotseat = hasVerticalHotseat;
-        InvariantDeviceProfile idp = mLauncher.getDeviceProfile().inv;
+        InvariantDeviceProfile idp = LauncherManager.getDeviceProfile().inv;
         if (hasVerticalHotseat) {
             mContent.setGridSize(1, idp.numHotseatIcons);
         } else {
@@ -88,7 +86,7 @@ public class HotSeat extends FrameLayout implements Insettable {
 
         // Add the Apps button
         Context context = getContext();
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
         int allAppsButtonRank = grid.inv.getAllAppsButtonRank();
 
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -110,7 +108,7 @@ public class HotSeat extends FrameLayout implements Insettable {
 //                }
             Toast.makeText(context, "All", Toast.LENGTH_SHORT).show();
         });
-        allAppsButton.setOnFocusChangeListener(mLauncher.getLauncherLayout().mFocusHandler);
+        allAppsButton.setOnFocusChangeListener(LauncherManager.getLauncherLayout().mFocusHandler);
 
         // Note: We do this to ensure that the hotseat is always laid out in the orientation of
         // the hotseat in order regardless of which orientation they were added
@@ -125,7 +123,7 @@ public class HotSeat extends FrameLayout implements Insettable {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         // We don't want any clicks to go through to the hotseat unless the workspace is in
         // the normal state or an accessible drag is in progress.
-        return !mLauncher.getLauncherLayout().getWorkspace().workspaceIconsCanBeDragged();
+        return !LauncherManager.getWorkspace().workspaceIconsCanBeDragged();
     }
 
 //    @Override
@@ -138,7 +136,7 @@ public class HotSeat extends FrameLayout implements Insettable {
     @Override
     public void setInsets(Rect insets) {
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) getLayoutParams();
-        DeviceProfile grid = mLauncher.getDeviceProfile();
+        DeviceProfile grid = LauncherManager.getDeviceProfile();
 
         if (grid.isVerticalBarLayout()) {
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;

@@ -16,28 +16,29 @@
 
 package com.android.launcher3.folder;
 
+import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.ENTER_INDEX;
+import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.EXIT_INDEX;
+import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
+import static com.android.launcher3.folder.FolderIcon.DROP_IN_ANIMATION_DURATION;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.android.launcher3.BubbleTextView;
-import com.android.launcher3.LauncherActivity;
+import com.android.launcher3.LauncherManager;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.ENTER_INDEX;
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.EXIT_INDEX;
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
-import static com.android.launcher3.folder.FolderIcon.DROP_IN_ANIMATION_DURATION;
 
 /**
  * Manages the drawing and animations of {@link PreviewItemDrawingParams} for a {@link FolderIcon}.
@@ -126,7 +127,7 @@ public class PreviewItemManager {
     }
 
     private PreviewItemDrawingParams getFinalIconParams(PreviewItemDrawingParams params) {
-        float iconSize = LauncherActivity.fromContext(mIcon.mLauncher).getDeviceProfile().iconSizePx;
+        float iconSize = LauncherManager.getDeviceProfile().iconSizePx;
 
         final float scale = iconSize / mReferenceDrawable.getIntrinsicWidth();
         final float trans = (mIcon.mBackground.previewSize - iconSize) / 2;
