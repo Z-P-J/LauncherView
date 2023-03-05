@@ -59,7 +59,7 @@ public class HomepageUtils {
                     item.spanX = 1;
                     item.spanY = 1;
                     item.itemType = ItemInfo.ITEM_TYPE_APPLICATION;
-                    item.container = -100;
+                    item.container = ItemInfo.CONTAINER_DESKTOP;
                     item.cellX = cellX;
                     item.cellY = cellY;
                     gridList.add(item);
@@ -68,7 +68,7 @@ public class HomepageUtils {
                     folder.cellX = cellX;
                     folder.cellY = cellY;
                     folder.screenId = 0;
-                    folder.container = -100;
+                    folder.container = ItemInfo.CONTAINER_DESKTOP;
                     folder.spanX = 1;
                     folder.spanY = 1;
                     folder.id = id;

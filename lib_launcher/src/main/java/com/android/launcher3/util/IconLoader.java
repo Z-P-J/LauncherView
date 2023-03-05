@@ -21,10 +21,9 @@ import static com.android.launcher3.graphics.ShadowGenerator.BLUR_FACTOR;
 public class IconLoader {
 
 
-    public static void load(BubbleTextView textView, ItemInfoWithIcon info) {
+    public static void load(BubbleTextView textView, Bitmap icon) {
         long start = System.currentTimeMillis();
         int mIconSize = textView.getIconSize();
-        final Bitmap icon = BitmapFactory.decodeResource(textView.getResources(), R.mipmap.ic_launcher_home);
 
         int color = ColorExtractor.findDominantColorByHue(icon);
         if (color == Color.WHITE) {

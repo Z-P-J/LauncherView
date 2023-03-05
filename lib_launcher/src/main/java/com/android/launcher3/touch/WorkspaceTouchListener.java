@@ -36,7 +36,7 @@ import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.dragndrop.DragLayer;
-import com.android.launcher3.views.OptionsPopupView;
+import com.android.launcher3.popup.OptionsPopupView;
 
 /**
  * Helper class to handle touch on empty space in workspace and show options popup on long press

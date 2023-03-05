@@ -38,6 +38,7 @@ import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget;
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.ItemInfo;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
@@ -47,7 +48,6 @@ import com.android.launcher3.touch.ItemLongClickListener;
 import com.ark.browser.launcher.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -66,7 +66,7 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
 
     private BubbleTextView mOriginalIcon;
 
-    private ViewGroup mSystemShortcutContainer;
+    private ViewGroup mContainer;
 
     public PopupContainerWithArrow(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -129,22 +129,21 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
             return null;
         }
 
-        List<SystemShortcut> systemShortcuts = Arrays.asList(SYSTEM_SHORTCUTS);
+        LauncherLayout launcher = LauncherManager.getLauncherLayout();
+        if (launcher.getOptionItemProvider() == null) {
+            icon.clearFocus();
+            return null;
+        }
 
 
         final PopupContainerWithArrow container =
-                (PopupContainerWithArrow) LayoutInflater.from(LauncherManager.getLauncherLayout().getContext()).inflate(
+                (PopupContainerWithArrow) LayoutInflater.from(launcher.getContext()).inflate(
                         R.layout.popup_container, LauncherManager.getDragLayer(), false);
-        container.populateAndShow(icon, new ArrayList<>(), systemShortcuts);
+        container.populateAndShow(icon, new ArrayList<>(),
+                launcher.getOptionItemProvider().createOptions((ItemInfo) icon.getTag()));
 
         return container;
     }
-
-    private static final SystemShortcut[] SYSTEM_SHORTCUTS = new SystemShortcut[]{
-            new SystemShortcut.AppInfo(),
-            new SystemShortcut.Widgets(),
-            new SystemShortcut.Install()
-    };
 
     @Override
     protected void onInflationComplete(boolean isReversed) {
@@ -164,27 +163,28 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         }
     }
 
-    private void populateAndShow(final BubbleTextView originalIcon, final List<String> shortcutIds, List<SystemShortcut> systemShortcuts) {
+    private void populateAndShow(final BubbleTextView originalIcon, final List<String> shortcutIds,
+                                 List<OptionItem> optionItems) {
         mOriginalIcon = originalIcon;
 
         int viewsToFlip = getChildCount();
-        mSystemShortcutContainer = this;
+        mContainer = this;
 
         if (!shortcutIds.isEmpty()) {
             for (int i = shortcutIds.size(); i > 0; i--) {
                 mShortcuts.add(inflateAndAdd(R.layout.deep_shortcut, this));
             }
 
-            if (!systemShortcuts.isEmpty()) {
-                mSystemShortcutContainer = inflateAndAdd(R.layout.system_shortcut_icons, this);
-                for (SystemShortcut shortcut : systemShortcuts) {
-                    initializeSystemShortcut(
-                            R.layout.system_shortcut_icon_only, mSystemShortcutContainer, shortcut);
+            if (!optionItems.isEmpty()) {
+                mContainer = inflateAndAdd(R.layout.system_shortcut_icons, this);
+                for (OptionItem shortcut : optionItems) {
+                    initializeOptionItem(
+                            R.layout.system_shortcut_icon_only, mContainer, shortcut);
                 }
             }
-        } else if (!systemShortcuts.isEmpty()) {
-            for (SystemShortcut shortcut : systemShortcuts) {
-                initializeSystemShortcut(R.layout.system_shortcut, this, shortcut);
+        } else if (!optionItems.isEmpty()) {
+            for (OptionItem shortcut : optionItems) {
+                initializeOptionItem(R.layout.system_shortcut, this, shortcut);
             }
         }
 
@@ -207,27 +207,23 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
                 : mOriginalIcon.getHeight());
     }
 
-    private void initializeSystemShortcut(int resId, ViewGroup container, SystemShortcut info) {
+    private void initializeOptionItem(int resId, ViewGroup container, OptionItem info) {
         View view = inflateAndAdd(resId, container);
         if (view instanceof DeepShortcutView) {
             // Expanded system shortcut, with both icon and text shown on white background.
             final DeepShortcutView shortcutView = (DeepShortcutView) view;
-            shortcutView.getIconView().setBackgroundResource(info.iconResId);
-            shortcutView.getBubbleText().setText(info.labelResId);
+            shortcutView.getIconView().setBackgroundResource(info.getIconRes());
+            shortcutView.getBubbleText().setText(info.getLabelRes());
         } else if (view instanceof ImageView) {
             // Only the system shortcut icon shows on a gray background header.
             final ImageView shortcutIcon = (ImageView) view;
-            shortcutIcon.setImageResource(info.iconResId);
-            shortcutIcon.setContentDescription(getContext().getText(info.labelResId));
+            shortcutIcon.setImageResource(info.getIconRes());
+            shortcutIcon.setContentDescription(getContext().getText(info.getLabelRes()));
         }
         view.setTag(info);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                info.getOnClickListener(v.getContext(),
-                        (ItemInfo) mOriginalIcon.getTag()).onClick(v);
-                close(true);
-            }
+        view.setOnClickListener(v -> {
+            info.onClick(v);
+            close(true);
         });
     }
 

@@ -25,7 +25,9 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.UserHandle;
@@ -35,6 +37,7 @@ import androidx.annotation.Nullable;
 import android.text.method.TextKeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -44,19 +47,27 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
+import com.android.launcher3.popup.OptionItem;
+import com.android.launcher3.popup.OptionsPopupView;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.uioverrides.DisplayRotationListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
+import com.android.launcher3.widget.WidgetsFullSheet;
+import com.ark.browser.launcher.SettingsBottomDialog;
 import com.ark.browser.launcher.database.HomepageManager;
 import com.ark.browser.launcher.R;
+import com.zpj.utils.Callback;
 import com.zpj.utils.ContextUtils;
 
 import java.util.ArrayList;
@@ -222,6 +233,28 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
         getSystemUiController().updateUiState(SystemUiController.UI_STATE_BASE_WINDOW,
                 Themes.getAttrBoolean(getContext(), R.attr.isWorkspaceDarkText));
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        if (mWorkspace.getChildCount() > 0) {
+            outState.putInt(RUNTIME_STATE_CURRENT_SCREEN, mWorkspace.getNextPage());
+
+        }
+        outState.putInt(RUNTIME_STATE, mStateManager.getState().ordinal);
+
+        AbstractFloatingView widgets = AbstractFloatingView
+                .getOpenView(this, AbstractFloatingView.TYPE_WIDGETS_FULL_SHEET);
+        if (widgets != null) {
+            SparseArray<Parcelable> widgetsState = new SparseArray<>();
+            widgets.saveHierarchyState(widgetsState);
+            outState.putSparseParcelableArray(RUNTIME_STATE_WIDGET_PANEL, widgetsState);
+        } else {
+            outState.remove(RUNTIME_STATE_WIDGET_PANEL);
+        }
+
+        // We close any open folders and shortcut containers since they will not be re-opened,
+        // and we need to make sure this state is reflected.
+        AbstractFloatingView.closeAllOpenViews(false);
     }
 
     public void onPause() {
@@ -504,8 +537,53 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
             addAppWidgetImpl(appWidgetId, info, hostView);
         } else {
-            addAppWidgetImpl(appWidgetId, info, null);
+            addAppWidgetImpl(appWidgetId, info, createTabItemView(info));
         }
+    }
+
+    public boolean addTabItem(long appWidgetId, String title, String url) {
+        TabItemInfo tabItemInfo = new TabItemInfo();
+        tabItemInfo.container = ItemInfo.CONTAINER_DESKTOP;
+        tabItemInfo.screenId = 0;
+        tabItemInfo.itemType = ItemInfo.ITEM_TYPE_WIDGET;
+        tabItemInfo.spanX = 1;
+        tabItemInfo.spanY = 1;
+        tabItemInfo.title = title;
+        tabItemInfo.url = url;
+        tabItemInfo.id = ItemInfo.NO_ID;
+//        addAppWidgetImpl(appWidgetId, tabItemInfo, null);
+
+        Workspace workspace = getWorkspace();
+        for (long screenId : workspace.getScreenOrder()) {
+            if (addTabItemToScreen(screenId, tabItemInfo)) {
+                return true;
+            }
+        }
+        if (workspace.addExtraEmptyScreen()) {
+            long screenId = workspace.commitExtraEmptyScreen();
+            return addTabItemToScreen(screenId, tabItemInfo);
+        }
+        return false;
+    }
+
+    private boolean addTabItemToScreen(long screenId, TabItemInfo itemInfo) {
+        Workspace workspace = getWorkspace();
+        CellLayout cellLayout = workspace.getScreenWithId(screenId);
+        int countX = cellLayout.getCountX();
+        int countY = cellLayout.getCountY();
+        Log.d(TAG, "countX=" + countX + " countY=" + countY);
+        int[] cellXY = new int[2];
+        if (cellLayout.findCellForSpan(cellXY, 1, 1)) {
+            itemInfo.screenId = screenId;
+            itemInfo.cellX = cellXY[0];
+            itemInfo.cellY = cellXY[1];
+
+            Log.d(TAG, "addItemToDatabase cellx=" + cellXY[0] + " cellY=" + cellXY[1] + " url=" + itemInfo.url);
+            View child = createTabItemView(itemInfo);
+            addAppWidgetImpl(itemInfo.tabId, itemInfo, child);
+            return true;
+        }
+        return false;
     }
 
     void addAppWidgetImpl(long appWidgetId, TabItemInfo info,
@@ -521,27 +599,31 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         mWorkspace.removeExtraEmptyScreenDelayed(true, onComplete, 0, false);
     }
 
+    private View createTabItemView(TabItemInfo itemInfo) {
+        View card = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
+        card.setVisibility(View.VISIBLE);
+        card.setTag(itemInfo);
+
+        TextView textView = card.findViewById(R.id.tv_name);
+        textView.setText(itemInfo.title);
+
+        ImageView ivIcon = card.findViewById(R.id.iv_icon);
+        if (mIconLoader == null) {
+            ivIcon.setImageResource(R.drawable.background);
+        } else {
+            mIconLoader.load(itemInfo, ivIcon::setImageBitmap);
+        }
+
+        return card;
+    }
+
     void completeAddAppWidget(long appWidgetId, TabItemInfo itemInfo, View hostView) {
-
-//        if (appWidgetInfo == null) {
-//            appWidgetInfo = mAppWidgetManager.getLauncherAppWidgetInfo(appWidgetId);
-//        }
-
-//        getModelWriter().addItemToDatabase(launcherInfo,
-//                itemInfo.container, itemInfo.screenId, itemInfo.cellX, itemInfo.cellY);
-
         HomepageManager.getInstance().addItemToDatabase(itemInfo,
                 itemInfo.container, itemInfo.screenId, itemInfo.cellX, itemInfo.cellY);
 
-        if (hostView == null) {
-            // Perform actual inflation because we're live
-            View card = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
-            hostView = card;
-        }
         hostView.setVisibility(View.VISIBLE);
         hostView.setTag(itemInfo);
         itemInfo.tabId = appWidgetId;
-//        prepareAppWidget(hostView, launcherInfo);
         mWorkspace.addInScreen(hostView, itemInfo);
     }
 
@@ -553,7 +635,12 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
      * @param deleteFromDb whether or not to delete this item from the db.
      */
     public boolean removeItem(View v, final ItemInfo itemInfo, boolean deleteFromDb) {
-        if (itemInfo instanceof ShortcutInfo) {
+        if (itemInfo instanceof TabItemInfo) {
+            mWorkspace.removeWorkspaceItem(v);
+            if (deleteFromDb) {
+                HomepageManager.getInstance().deleteItemFromDatabase(itemInfo);
+            }
+        } else if (itemInfo instanceof ShortcutInfo) {
             // Remove the shortcut from the folder before removing it from launcher
             View folderIcon = mWorkspace.getHomescreenIconByItemId(itemInfo.container);
             if (folderIcon instanceof FolderIcon) {
@@ -577,6 +664,74 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
             return false;
         }
         return true;
+    }
+
+    public boolean removeItem(String url, boolean deleteFromDb) {
+        View iconView = mWorkspace.getIconByUrl(url);
+        if (iconView == null) {
+            return false;
+        } else {
+            ItemInfo itemInfo = (ItemInfo) iconView.getTag();
+            View folderIcon = mWorkspace.getHomescreenIconByItemId(itemInfo.container);
+            if (folderIcon instanceof FolderIcon) {
+                ((FolderInfo) folderIcon.getTag()).remove((ShortcutInfo) itemInfo, true);
+            } else {
+                mWorkspace.removeWorkspaceItem(iconView);
+            }
+            if (deleteFromDb) {
+                HomepageManager.getInstance().deleteItemFromDatabase(itemInfo);
+            }
+        }
+        mWorkspace.stripEmptyScreens();
+        return true;
+    }
+
+    public boolean addItem(String title, String url) {
+        ShortcutInfo shortcutInfo = new ShortcutInfo();
+        shortcutInfo.url = url;
+        shortcutInfo.title = title;
+        shortcutInfo.itemType = ItemInfo.ITEM_TYPE_APPLICATION;
+        shortcutInfo.container = ItemInfo.CONTAINER_DESKTOP;
+        shortcutInfo.spanX = 1;
+        shortcutInfo.spanY = 1;
+        shortcutInfo.screenId = 0;
+
+        Workspace workspace = getWorkspace();
+        for (long screenId : workspace.getScreenOrder()) {
+            if (addToScreen(screenId, shortcutInfo)) {
+                return true;
+            }
+        }
+        if (workspace.addExtraEmptyScreen()) {
+            long screenId = workspace.commitExtraEmptyScreen();
+            return addToScreen(screenId, shortcutInfo);
+        }
+        return false;
+    }
+
+    private boolean addToScreen(long screenId, ShortcutInfo shortcutInfo) {
+        Workspace workspace = getWorkspace();
+        CellLayout cellLayout = workspace.getScreenWithId(screenId);
+        int countX = cellLayout.getCountX();
+        int countY = cellLayout.getCountY();
+        Log.d(TAG, "countX=" + countX + " countY=" + countY);
+        int[] cellXY = new int[2];
+        if (cellLayout.findCellForSpan(cellXY, 1, 1)) {
+            shortcutInfo.screenId = screenId;
+            shortcutInfo.cellX = cellXY[0];
+            shortcutInfo.cellY = cellXY[1];
+
+            HomepageManager.getInstance().addItemToDatabase(shortcutInfo,
+                    ItemInfo.CONTAINER_DESKTOP,
+                    screenId,
+                    cellXY[0],
+                    cellXY[1]);
+            Log.d(TAG, "addItemToDatabase cellx=" + cellXY[0] + " cellY=" + cellXY[1] + " url=" + shortcutInfo.url);
+            View child = createShortcut((ViewGroup) workspace.getChildAt(workspace.getPageIndexForScreenId(screenId)), shortcutInfo);
+            workspace.addInScreen(child, shortcutInfo);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -725,8 +880,11 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
                     break;
                 }
                 case ItemInfo.ITEM_TYPE_WIDGET: {
-                    view = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
-                    view.setTag(item);
+                    TabItemInfo tabItemInfo = (TabItemInfo) item;
+//                    view = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
+//                    view.setTag(item);
+
+                    view = createTabItemView(tabItemInfo);
                     break;
                 }
                 default:
@@ -891,7 +1049,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     protected void reapplyUi() {
         getRootView().dispatchInsets();
-        getStateManager().reapplyState(true /* cancelCurrentAnimation */);
+        mStateManager.reapplyState(true /* cancelCurrentAnimation */);
     }
 
 
@@ -958,6 +1116,34 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         if (mDeviceProfile.updateIsSeascape(getWindowManager())) {
             reapplyUi();
         }
+    }
+
+    private IconLoader mIconLoader;
+    private OptionItemProvider mOptionItemProvider;
+
+    public void setIconLoader(IconLoader iconLoader) {
+        mIconLoader = iconLoader;
+    }
+
+    public IconLoader getIconLoader() {
+        return mIconLoader;
+    }
+
+    public void setOptionItemProvider(OptionItemProvider provider) {
+        mOptionItemProvider = provider;
+    }
+
+    public OptionItemProvider getOptionItemProvider() {
+        return mOptionItemProvider;
+    }
+
+    public interface IconLoader {
+        void load(ItemInfo itemInfo, Callback<Bitmap> callback);
+    }
+
+    public interface OptionItemProvider {
+        List<OptionItem> createOptions();
+        List<OptionItem> createOptions(ItemInfo itemInfo);
     }
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.launcher3.views;
+package com.android.launcher3.popup;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -30,8 +30,6 @@ import android.widget.Toast;
 
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
-import com.android.launcher3.LauncherState;
-import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.widget.WidgetsFullSheet;
 import com.ark.browser.launcher.R;
@@ -72,11 +70,9 @@ public class OptionsPopupView extends ArrowPopup
         if (item == null) {
             return false;
         }
-        if (item.mClickListener.onLongClick(view)) {
-            close(true);
-            return true;
-        }
-        return false;
+        item.onClick(view);
+        close(true);
+        return true;
     }
 
     @Override
@@ -110,8 +106,8 @@ public class OptionsPopupView extends ArrowPopup
         for (OptionItem item : items) {
             Log.d("OptionsPopupView", "show");
             DeepShortcutView view = popup.inflateAndAdd(R.layout.system_shortcut, popup);
-            view.getIconView().setBackgroundResource(item.mIconRes);
-            view.getBubbleText().setText(item.mLabelRes);
+            view.getIconView().setBackgroundResource(item.getIconRes());
+            view.getBubbleText().setText(item.getLabelRes());
             view.setDividerVisibility(View.INVISIBLE);
             view.setOnClickListener(popup);
             view.setOnLongClickListener(popup);
@@ -122,6 +118,9 @@ public class OptionsPopupView extends ArrowPopup
 
     public static void showDefaultOptions(float x, float y) {
         LauncherLayout launcher = LauncherManager.getLauncherLayout();
+        if (launcher.getOptionItemProvider() == null) {
+            return;
+        }
         float halfSize = launcher.getResources().getDimension(R.dimen.options_menu_thumb_size) / 2;
         if (x < 0 || y < 0) {
             x = launcher.getDragLayer().getWidth() / 2f;
@@ -129,31 +128,7 @@ public class OptionsPopupView extends ArrowPopup
         }
         RectF target = new RectF(x - halfSize, y - halfSize, x + halfSize, y + halfSize);
 
-        ArrayList<OptionItem> options = new ArrayList<>();
-        options.add(new OptionItem(R.string.wallpaper_button_text, R.drawable.ic_wallpaper,
-                new OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
-                        launcher.getStateManager().goToState(LauncherState.EDIT_MODE);
-
-                        new SettingsBottomDialog().show(v.getContext());
-
-                        return true;
-                    }
-                }));
-        options.add(new OptionItem(R.string.widget_button_text, R.drawable.ic_widget,
-                new OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        Toast.makeText(v.getContext(), "微件", Toast.LENGTH_SHORT).show();
-                        WidgetsFullSheet.show(launcher, true);
-                        return true;
-                    }
-                }));
-        options.add(new OptionItem(R.string.settings_button_text, R.drawable.ic_setting,
-                OptionsPopupView::startSettings));
-
+        List<OptionItem> options = launcher.getOptionItemProvider().createOptions();
         show(target, options);
     }
 
@@ -162,16 +137,4 @@ public class OptionsPopupView extends ArrowPopup
         return true;
     }
 
-    public static class OptionItem {
-
-        private final int mLabelRes;
-        private final int mIconRes;
-        private final OnLongClickListener mClickListener;
-
-        public OptionItem(int labelRes, int iconRes, OnLongClickListener clickListener) {
-            mLabelRes = labelRes;
-            mIconRes = iconRes;
-            mClickListener = clickListener;
-        }
-    }
 }

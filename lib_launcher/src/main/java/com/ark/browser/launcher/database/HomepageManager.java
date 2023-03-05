@@ -32,21 +32,6 @@ import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_I
 @Database(name = HomepageManager.NAME, version = HomepageManager.VERSION)
 public class HomepageManager {
 
-//    @Migration(version = 29, database = HomepageManager.class)
-//    public static class HomeMigration extends AlterTableMigration<FavoriteItem> {
-//
-//        public HomeMigration(Class<FavoriteItem> table) {
-//            super(table);
-//        }
-//
-//        @Override
-//        public void onPreMigrate() {
-//            Log.d(TAG, "HomeMigration onPreMigrate");
-//            addColumn(SQLiteType.INTEGER, "tabId");
-//        }
-//    }
-
-
     private static final String TAG = "HomepageManager";
 
     static final String NAME = "launcher";
@@ -363,6 +348,7 @@ public class HomepageManager {
                     mWorkspaceItems.remove(item);
                     break;
                 case ItemInfo.ITEM_TYPE_APPLICATION:
+                case ItemInfo.ITEM_TYPE_WIDGET:
                     mWorkspaceItems.remove(item);
                     break;
             }

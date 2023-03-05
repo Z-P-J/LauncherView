@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 
 import com.android.launcher3.Insettable;
-import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.dragndrop.DragOptions;
@@ -47,19 +46,10 @@ public class WidgetsFullSheet extends BaseWidgetSheet
 
     private final Rect mInsets = new Rect();
 
-//    private final WidgetsListAdapter mAdapter;
-//
-//    private WidgetsRecyclerView mRecyclerView;
-
     private View ivTest;
 
     public WidgetsFullSheet(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LauncherAppState apps = LauncherAppState.getInstance(context);
-//        mAdapter = new WidgetsListAdapter(context,
-//                LayoutInflater.from(context), apps.getWidgetCache(), apps.getIconCache(),
-//                this, this);
-
     }
 
     public WidgetsFullSheet(Context context, AttributeSet attrs) {
@@ -77,15 +67,6 @@ public class WidgetsFullSheet extends BaseWidgetSheet
                 return beginDraggingWidget(ivTest);
             }
         });
-
-//        mRecyclerView = findViewById(R.id.widgets_list_view);
-//        mRecyclerView.setAdapter(mAdapter);
-//        mAdapter.setApplyBitmapDeferred(true, mRecyclerView);
-
-//        TopRoundedCornerView springLayout = (TopRoundedCornerView) mContent;
-//        springLayout.addSpringView(R.id.widgets_list_view);
-//        mRecyclerView.setEdgeEffectFactory(springLayout.createEdgeEffectFactory());
-//        onWidgetsBound();
     }
 
     private boolean beginDraggingWidget(View v) {
@@ -113,9 +94,6 @@ public class WidgetsFullSheet extends BaseWidgetSheet
     public void setInsets(Rect insets) {
         mInsets.set(insets);
 
-//        mRecyclerView.setPadding(
-//                mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(),
-//                mRecyclerView.getPaddingRight(), insets.bottom);
         if (insets.bottom > 0) {
             setupNavBarColor();
         } else {
@@ -173,19 +151,15 @@ public class WidgetsFullSheet extends BaseWidgetSheet
             mOpenCloseAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-//                    mRecyclerView.setLayoutFrozen(false);
-//                    mAdapter.setApplyBitmapDeferred(false, mRecyclerView);
                     mOpenCloseAnimator.removeListener(this);
                 }
             });
             post(() -> {
-//                mRecyclerView.setLayoutFrozen(true);
                 mOpenCloseAnimator.start();
                 mContent.animate().alpha(1).setDuration(FADE_IN_DURATION);
             });
         } else {
             setTranslationShift(TRANSLATION_SHIFT_OPENED);
-//            mAdapter.setApplyBitmapDeferred(false, mRecyclerView);
         }
     }
 
@@ -201,21 +175,21 @@ public class WidgetsFullSheet extends BaseWidgetSheet
 
     @Override
     public boolean onControllerInterceptTouchEvent(MotionEvent ev) {
-        // Disable swipe down when recycler view is scrolling
-//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-//            mNoIntercept = false;
-//            RecyclerViewFastScroller scroller = mRecyclerView.getScrollbar();
-//            if (scroller.getThumbOffsetY() >= 0 &&
-//                    mLauncher.getDragLayer().isEventOverView(scroller, ev)) {
-//                mNoIntercept = true;
-//            } else if (mLauncher.getDragLayer().isEventOverView(mContent, ev)) {
-//                mNoIntercept = !mRecyclerView.shouldContainerScroll(ev, mLauncher.getDragLayer());
-//            }
-//        }
         return super.onControllerInterceptTouchEvent(ev);
     }
 
     public static WidgetsFullSheet show(LauncherLayout launcher, boolean animate) {
+        WidgetsFullSheet sheet = (WidgetsFullSheet) LayoutInflater.from(launcher.getContext())
+                .inflate(R.layout.widgets_full_sheet, launcher.getDragLayer(), false);
+        sheet.mLauncher = launcher;
+        sheet.mIsOpen = true;
+        launcher.getDragLayer().addView(sheet);
+        sheet.open(animate);
+        return sheet;
+    }
+
+    public static WidgetsFullSheet show(boolean animate) {
+        LauncherLayout launcher = LauncherManager.getLauncherLayout();
         WidgetsFullSheet sheet = (WidgetsFullSheet) LayoutInflater.from(launcher.getContext())
                 .inflate(R.layout.widgets_full_sheet, launcher.getDragLayer(), false);
         sheet.mLauncher = launcher;

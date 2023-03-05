@@ -1,32 +1,24 @@
 package com.android.launcher3;
 
-import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
-import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;
-
-import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.util.SparseArray;
 import android.view.View;
+import android.widget.Toast;
 
-import com.android.launcher3.dragndrop.DragLayer;
-import com.android.launcher3.states.RotationHelper;
+import androidx.annotation.Nullable;
+
+import com.android.launcher3.popup.OptionItem;
+import com.android.launcher3.popup.OptionsPopupView;
+import com.android.launcher3.widget.WidgetsFullSheet;
 import com.ark.browser.launcher.R;
+import com.ark.browser.launcher.SettingsBottomDialog;
 import com.zpj.fragmentation.SimpleFragment;
+import com.zpj.utils.Callback;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LauncherFragment extends SimpleFragment {
-
-    // Type: int
-    private static final String RUNTIME_STATE_CURRENT_SCREEN = "launcher.current_screen";
-    // Type: int
-    private static final String RUNTIME_STATE = "launcher.state";
-    // Type: ActivityResultInfo
-    private static final String RUNTIME_STATE_PENDING_ACTIVITY_RESULT = "launcher.activity_result";
-    // Type: SparseArray<Parcelable>
-    private static final String RUNTIME_STATE_WIDGET_PANEL = "launcher.widget_panel";
 
     private LauncherLayout mLauncherLayout;
 
@@ -38,31 +30,67 @@ public class LauncherFragment extends SimpleFragment {
     @Override
     protected void initView(View view, @Nullable Bundle savedInstanceState) {
         mLauncherLayout = findViewById(R.id.launcher_layout);
+
+        mLauncherLayout.setOptionItemProvider(new LauncherLayout.OptionItemProvider() {
+            @Override
+            public List<OptionItem> createOptions() {
+                ArrayList<OptionItem> options = new ArrayList<>();
+                options.add(new OptionItem(R.string.wallpaper_button_text, R.drawable.ic_wallpaper,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(v.getContext(), "壁纸选择", Toast.LENGTH_SHORT).show();
+//                        launcher.getStateManager().goToState(LauncherState.EDIT_MODE);
+                                new SettingsBottomDialog().show(v.getContext());
+                            }
+                        }));
+                options.add(new OptionItem(R.string.widget_button_text, R.drawable.ic_widget,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(v.getContext(), "微件", Toast.LENGTH_SHORT).show();
+                                WidgetsFullSheet.show(true);
+                            }
+                        }));
+                options.add(new OptionItem(R.string.settings_button_text, R.drawable.ic_setting,
+                        OptionsPopupView::startSettings));
+                return options;
+            }
+
+            @Override
+            public List<OptionItem> createOptions(ItemInfo itemInfo) {
+                ArrayList<OptionItem> options = new ArrayList<>();
+                options.add(new OptionItem(R.string.widget_button_text, R.drawable.ic_widget,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(v.getContext(), "微件", Toast.LENGTH_SHORT).show();
+                            }
+                        }));
+                options.add(new OptionItem(R.string.app_info_drop_target_label, R.drawable.ic_info_no_shadow,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(v.getContext(), "应用信息", Toast.LENGTH_SHORT).show();
+                            }
+                        }));
+                options.add(new OptionItem(R.string.install_drop_target_label, R.drawable.ic_install_no_shadow,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(v.getContext(), "安装", Toast.LENGTH_SHORT).show();
+                            }
+                        }));
+                return options;
+            }
+        });
+
         mLauncherLayout.init(savedInstanceState);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mLauncherLayout.getWorkspace().getChildCount() > 0) {
-            outState.putInt(RUNTIME_STATE_CURRENT_SCREEN, mLauncherLayout.getWorkspace().getNextPage());
-
-        }
-        outState.putInt(RUNTIME_STATE, mLauncherLayout.getStateManager().getState().ordinal);
-
-        AbstractFloatingView widgets = AbstractFloatingView
-                .getOpenView(mLauncherLayout, AbstractFloatingView.TYPE_WIDGETS_FULL_SHEET);
-        if (widgets != null) {
-            SparseArray<Parcelable> widgetsState = new SparseArray<>();
-            widgets.saveHierarchyState(widgetsState);
-            outState.putSparseParcelableArray(RUNTIME_STATE_WIDGET_PANEL, widgetsState);
-        } else {
-            outState.remove(RUNTIME_STATE_WIDGET_PANEL);
-        }
-
-        // We close any open folders and shortcut containers since they will not be re-opened,
-        // and we need to make sure this state is reflected.
-        AbstractFloatingView.closeAllOpenViews(false);
-
+        mLauncherLayout.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -79,21 +107,11 @@ public class LauncherFragment extends SimpleFragment {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
-
-    @Override
     public boolean onBackPressedSupport() {
         if (mLauncherLayout.onBackPressed()) {
             return true;
         }
         return super.onBackPressedSupport();
-    }
-
-    protected void reapplyUi() {
-        mLauncherLayout.getRootView().dispatchInsets();
-        mLauncherLayout.getStateManager().reapplyState(true /* cancelCurrentAnimation */);
     }
 
 }

@@ -20,6 +20,8 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -42,6 +44,7 @@ import androidx.core.graphics.ColorUtils;
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.util.IconLoader;
 import com.ark.browser.launcher.R;
+import com.zpj.utils.Callback;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan
@@ -166,7 +169,17 @@ public class BubbleTextView extends androidx.appcompat.widget.AppCompatTextView 
         Log.d("BubbleTextView", "icon=" + info.iconBitmap);
 //        FastBitmapDrawable iconDrawable = DrawableFactory.get(getContext()).newIcon(info);
 
-        IconLoader.load(this, info);
+        LauncherLayout.IconLoader iconLoader = LauncherManager.getLauncherLayout().getIconLoader();
+        if (iconLoader == null) {
+            IconLoader.load(this, BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_home));
+        } else {
+            iconLoader.load(info, icon -> {
+                if (icon != null) {
+                    IconLoader.load(BubbleTextView.this, icon);
+                }
+            });
+        }
+
 //        setIcon(iconDrawable);
         setText(info.title);
         if (info.contentDescription != null) {

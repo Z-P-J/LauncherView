@@ -41,6 +41,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -2863,6 +2864,13 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
                 return info != null && info.id == id;
             }
         });
+    }
+
+    public View getIconByUrl(final String url) {
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
+        return getFirstMatch((info, v) -> info != null && url.equals(info.url));
     }
 
     public View getViewForTag(final Object tag) {

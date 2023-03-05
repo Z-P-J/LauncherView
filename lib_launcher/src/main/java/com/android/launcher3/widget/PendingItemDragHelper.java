@@ -43,13 +43,16 @@ public class PendingItemDragHelper extends DragPreviewProvider {
     public PendingItemDragHelper(View view) {
         super(view);
 //        mAddInfo = (ItemInfo) view.getTag();
-        FavoriteItem item = HomepageManager.getInstance().getAllFavorites().get(0);
+//        FavoriteItem item = HomepageManager.getInstance().getAllFavorites().get(0);
         mAddInfo = new TabItemInfo();
-        item.applyCommonProperties(mAddInfo);
+//        item.applyCommonProperties(mAddInfo);
+        mAddInfo.container = ItemInfo.CONTAINER_DESKTOP;
+        mAddInfo.screenId = 0;
         mAddInfo.itemType = ItemInfo.ITEM_TYPE_WIDGET;
-        mAddInfo.spanX = 2;
-        mAddInfo.spanY = 2;
+        mAddInfo.spanX = 1;
+        mAddInfo.spanY = 1;
         mAddInfo.title = "TabCard";
+        mAddInfo.url = "www.baidu.com";
         mAddInfo.id = ItemInfo.NO_ID;
     }
 
