@@ -22,6 +22,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.LauncherManager;
 import com.ark.browser.launcher.R;
 
 public class QsbContainerView extends FrameLayout {
@@ -41,10 +43,10 @@ public class QsbContainerView extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        findViewById(R.id.btn_qsb_search).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(), "搜索", Toast.LENGTH_SHORT).show();
+        findViewById(R.id.btn_qsb_search).setOnClickListener(view -> {
+            LauncherLayout.ClickHandler clickHandler = LauncherManager.getLauncherLayout().getClickHandler();
+            if (clickHandler != null) {
+                clickHandler.onClickToSearch(view);
             }
         });
     }

@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfoWithIcon;
+import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.folder.Folder;
@@ -77,6 +78,9 @@ public class ItemClickHandler {
      * @param v The view that was clicked. Must be a tagged with a {@link ShortcutInfo}.
      */
     private static void onClickAppShortcut(View v, ItemInfoWithIcon shortcut, Context context) {
-        Toast.makeText(context, "onClickAppShortcut title=" + shortcut.title, Toast.LENGTH_SHORT).show();
+        LauncherLayout.ClickHandler clickHandler = LauncherManager.getLauncherLayout().getClickHandler();
+        if (clickHandler != null) {
+            clickHandler.onClickAppShortcut(v, shortcut);
+        }
     }
 }

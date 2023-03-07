@@ -136,13 +136,6 @@ public class HomepageManager {
     public boolean checkItemPlacement(InvariantDeviceProfile mIDP, ItemInfo item, ArrayList<Long> workspaceScreens) {
         long containerIndex = item.screenId;
         if (item.container == ItemInfo.CONTAINER_HOTSEAT) {
-            // Return early if we detect that an item is under the hotseat button
-            if (mIDP.isAllAppsButtonRank((int) item.screenId)) {
-                Log.e(TAG, "Error loading shortcut into hotseat " + item
-                        + " into position (" + item.screenId + ":" + item.cellX + ","
-                        + item.cellY + ") occupied by all apps");
-                return false;
-            }
 
             final GridOccupancy hotseatOccupancy =
                     occupied.get((long) ItemInfo.CONTAINER_HOTSEAT);

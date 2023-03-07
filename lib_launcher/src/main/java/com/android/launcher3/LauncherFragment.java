@@ -1,6 +1,8 @@
 package com.android.launcher3;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -12,6 +14,7 @@ import com.android.launcher3.popup.OptionsPopupView;
 import com.android.launcher3.widget.WidgetsFullSheet;
 import com.ark.browser.launcher.R;
 import com.ark.browser.launcher.SettingsBottomDialog;
+import com.ark.browser.launcher.utils.DeepLinks;
 import com.zpj.fragmentation.SimpleFragment;
 import com.zpj.utils.Callback;
 
@@ -30,6 +33,23 @@ public class LauncherFragment extends SimpleFragment {
     @Override
     protected void initView(View view, @Nullable Bundle savedInstanceState) {
         mLauncherLayout = findViewById(R.id.launcher_layout);
+        
+        mLauncherLayout.setClickHandler(new LauncherLayout.ClickHandler() {
+            @Override
+            public void onClickAppShortcut(View v, ItemInfoWithIcon itemInfo) {
+                Toast.makeText(context, "title=" + itemInfo.title + " url=" + itemInfo.url, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onClickTabCard(View v, TabItemInfo itemInfo) {
+                Toast.makeText(context, "title=" + itemInfo.title + " url=" + itemInfo.url, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onClickToSearch(View v) {
+                Toast.makeText(context, "onClickToSearch", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         mLauncherLayout.setOptionItemProvider(new LauncherLayout.OptionItemProvider() {
             @Override
@@ -82,6 +102,34 @@ public class LauncherFragment extends SimpleFragment {
                             }
                         }));
                 return options;
+            }
+        });
+
+        mLauncherLayout.setIconLoader(new LauncherLayout.IconLoader() {
+            @Override
+            public void load(ItemInfo itemInfo, Callback<Bitmap> callback) {
+                Resources resources = getResources();
+                int resId = R.mipmap.ic_launcher_home;
+                if (DeepLinks.isDeepLink(itemInfo.url)) {
+                    switch (itemInfo.url) {
+                        case DeepLinks.DEEPLINK_MANAGER:
+                            resId = R.drawable.icon_browser_manager;
+                            break;
+                        case DeepLinks.DEEPLINK_COLLECTIONS:
+                            resId = R.drawable.icon_collections;
+                            break;
+                        case DeepLinks.DEEPLINK_BROWSER:
+                            resId = R.drawable.icon_browser;
+                            break;
+                        case DeepLinks.DEEPLINK_DOWNLOADS:
+                            resId = R.drawable.icon_download_manager;
+                            break;
+                        case DeepLinks.DEEPLINK_SETTINGS:
+                            resId = R.drawable.icon_settings;
+                            break;
+                    }
+                }
+                callback.onCallback(BitmapFactory.decodeResource(resources, resId));
             }
         });
 

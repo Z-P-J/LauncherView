@@ -335,14 +335,6 @@ public class InvariantDeviceProfile {
         return this;
     }
 
-    public int getAllAppsButtonRank() {
-        return numHotseatIcons / 2;
-    }
-
-    public boolean isAllAppsButtonRank(int rank) {
-        return rank == getAllAppsButtonRank();
-    }
-
     public DeviceProfile getDeviceProfile(Context context) {
         return context.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE ? landscapeProfile : portraitProfile;

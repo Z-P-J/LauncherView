@@ -1902,9 +1902,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
 
     public void onNoCellFound(View dropTargetLayout) {
         if (mLauncher.isHotseatLayout(dropTargetLayout)) {
-            HotSeat hotseat = mLauncher.getHotseat();
-            boolean droppedOnAllAppsIcon = mTargetCell != null && !LauncherManager.getDeviceProfile().inv.isAllAppsButtonRank(
-                    hotseat.getOrderInHotseat(mTargetCell[0], mTargetCell[1]));
+            boolean droppedOnAllAppsIcon = mTargetCell != null;
             if (!droppedOnAllAppsIcon) {
                 // Only show message when hotseat is full and drop target was not AllApps button
                 showOutOfSpaceMessage(true);

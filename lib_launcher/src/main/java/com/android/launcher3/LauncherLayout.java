@@ -614,6 +614,13 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
             mIconLoader.load(itemInfo, ivIcon::setImageBitmap);
         }
 
+        card.setOnClickListener(v -> {
+            ClickHandler clickHandler = LauncherManager.getLauncherLayout().getClickHandler();
+            if (clickHandler != null) {
+                clickHandler.onClickTabCard(v, itemInfo);
+            }
+        });
+
         return card;
     }
 
@@ -1120,6 +1127,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     private IconLoader mIconLoader;
     private OptionItemProvider mOptionItemProvider;
+    private ClickHandler mClickHandler;
 
     public void setIconLoader(IconLoader iconLoader) {
         mIconLoader = iconLoader;
@@ -1135,6 +1143,20 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     public OptionItemProvider getOptionItemProvider() {
         return mOptionItemProvider;
+    }
+
+    public void setClickHandler(ClickHandler clickHandler) {
+        mClickHandler = clickHandler;
+    }
+
+    public ClickHandler getClickHandler() {
+        return mClickHandler;
+    }
+
+    public interface ClickHandler {
+        void onClickAppShortcut(View v, ItemInfoWithIcon itemInfo);
+        void onClickTabCard(View v, TabItemInfo itemInfo);
+        void onClickToSearch(View v);
     }
 
     public interface IconLoader {

@@ -6,6 +6,7 @@ import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
 import com.ark.browser.launcher.R;
 import com.android.launcher3.ShortcutInfo;
+import com.ark.browser.launcher.model.FavoriteItem;
 import com.zpj.utils.ContextUtils;
 import com.zpj.utils.FileUtils;
 
@@ -37,8 +38,33 @@ public class HomepageUtils {
         return jsonObject;
     }
 
+    private static ShortcutInfo createHotseatItem(int pos, String title, String url) {
+        ShortcutInfo item = new ShortcutInfo();
+        item.setIconBitmap(null);
+        item.title = title;
+        item.id = pos + 1;
+        item.url = url;
+        item.screenId = pos;
+        item.spanX = 1;
+        item.spanY = 1;
+        item.itemType = ItemInfo.ITEM_TYPE_APPLICATION;
+        item.container = ItemInfo.CONTAINER_HOTSEAT;
+        item.cellX = pos;
+        item.cellY = 0;
+        return item;
+    }
+
     public static List<ItemInfo> initHomeNav() {
         List<ItemInfo> gridList = new ArrayList<>();
+
+        gridList.add(createHotseatItem(0, "浏览器管家", DeepLinks.DEEPLINK_MANAGER));
+        gridList.add(createHotseatItem(1, "书签收藏",  DeepLinks.DEEPLINK_COLLECTIONS));
+        gridList.add(createHotseatItem(2, "菜单",  DeepLinks.DEEPLINK_BROWSER));
+        gridList.add(createHotseatItem(3, "下载管理",  DeepLinks.DEEPLINK_DOWNLOADS));
+        gridList.add(createHotseatItem(4, "设置",  DeepLinks.DEEPLINK_SETTINGS));
+
+        int colCount = gridList.size();
+
         try {
             JSONArray jsonArray = getJson().getJSONArray("sites");
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -46,10 +72,10 @@ public class HomepageUtils {
                 int type = site.getInt("type");
                 String url = site.getString("url");
                 String title = site.getString("title");
-                int id = site.getInt("position") + 1;
+                int id = site.getInt("position") + 1 + colCount;
                 int cellX = i % 5;
                 int cellY = i / 5 + 3;
-                if (type == 0) {
+                if (type == ItemInfo.ITEM_TYPE_APPLICATION) {
                     ShortcutInfo item = new ShortcutInfo();
                     item.setIconBitmap(BitmapFactory.decodeResource(ContextUtils.getApplicationContext().getResources(), R.drawable.ic_launcher_home));
                     item.title = title;
@@ -85,7 +111,7 @@ public class HomepageUtils {
                         item.spanX = 1;
                         item.spanY = 1;
                         item.itemType = ItemInfo.ITEM_TYPE_APPLICATION;
-                        item.container = -100;
+                        item.container = ItemInfo.CONTAINER_DESKTOP;
                         item.cellX = j % 4;
                         item.cellY = j / 4;
                         folder.add(item, false);

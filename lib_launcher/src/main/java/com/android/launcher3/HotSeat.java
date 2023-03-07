@@ -83,40 +83,6 @@ public class HotSeat extends FrameLayout implements Insettable {
         } else {
             mContent.setGridSize(idp.numHotseatIcons, 1);
         }
-
-        // Add the Apps button
-        Context context = getContext();
-        DeviceProfile grid = LauncherManager.getDeviceProfile();
-        int allAppsButtonRank = grid.inv.getAllAppsButtonRank();
-
-        LayoutInflater inflater = LayoutInflater.from(context);
-        TextView allAppsButton = (TextView)
-                inflater.inflate(R.layout.all_apps_button, mContent, false);
-        Drawable d = context.getResources().getDrawable(R.drawable.all_apps_button_icon);
-        d.setBounds(0, 0, grid.iconSizePx, grid.iconSizePx);
-
-        int scaleDownPx = getResources().getDimensionPixelSize(R.dimen.all_apps_button_scale_down);
-        Rect bounds = d.getBounds();
-        d.setBounds(bounds.left, bounds.top + scaleDownPx / 2, bounds.right - scaleDownPx,
-                bounds.bottom - scaleDownPx / 2);
-        allAppsButton.setCompoundDrawables(null, d, null, null);
-
-        allAppsButton.setContentDescription(context.getString(R.string.all_apps_button_label));
-        allAppsButton.setOnClickListener((v) -> {
-//                if (!mLauncher.isInState(ALL_APPS)) {
-//                    mLauncher.getStateManager().goToState(ALL_APPS, true);
-//                }
-            Toast.makeText(context, "All", Toast.LENGTH_SHORT).show();
-        });
-        allAppsButton.setOnFocusChangeListener(LauncherManager.getLauncherLayout().mFocusHandler);
-
-        // Note: We do this to ensure that the hotseat is always laid out in the orientation of
-        // the hotseat in order regardless of which orientation they were added
-        int x = getCellXFromOrder(allAppsButtonRank);
-        int y = getCellYFromOrder(allAppsButtonRank);
-        CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x, y, 1, 1);
-        lp.canReorder = false;
-        mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
     }
 
     @Override

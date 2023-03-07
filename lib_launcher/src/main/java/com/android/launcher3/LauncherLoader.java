@@ -193,6 +193,7 @@ public class LauncherLoader {
             screenItem.setModified(System.currentTimeMillis());
             screenItem.setScreenRank(0);
             screenItem.save();
+
             PrefsHelper.with().applyBoolean("is_first_run", false);
         }
 
