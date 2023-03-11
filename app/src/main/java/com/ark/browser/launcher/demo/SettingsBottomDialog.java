@@ -1,4 +1,4 @@
-package com.ark.browser.launcher;
+package com.ark.browser.launcher.demo;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -17,17 +17,17 @@ public class SettingsBottomDialog extends BottomActionDialogFragment<SettingsBot
 
     @Override
     protected int getContentLayoutId() {
-        return R.layout.fragment_dialog_settings;
+        return com.ark.browser.launcher.R.layout.fragment_dialog_settings;
     }
 
     @Override
     protected void initView(View view, @Nullable Bundle savedInstanceState) {
         super.initView(view, savedInstanceState);
-        Button btn1 = findViewById(R.id.btn_1);
-        Button btn2 = findViewById(R.id.btn_2);
-        Button btn3 = findViewById(R.id.btn_3);
-        Button btn4 = findViewById(R.id.btn_4);
-        SeekBar seekBar = findViewById(R.id.seek_bar);
+        Button btn1 = findViewById(com.ark.browser.launcher.R.id.btn_1);
+        Button btn2 = findViewById(com.ark.browser.launcher.R.id.btn_2);
+        Button btn3 = findViewById(com.ark.browser.launcher.R.id.btn_3);
+        Button btn4 = findViewById(com.ark.browser.launcher.R.id.btn_4);
+        SeekBar seekBar = findViewById(com.ark.browser.launcher.R.id.seek_bar);
         LauncherAppState app = LauncherAppState.getInstance(context);
         InvariantDeviceProfile idp = app.getInvariantDeviceProfile();
         btn1.setOnClickListener(new View.OnClickListener() {

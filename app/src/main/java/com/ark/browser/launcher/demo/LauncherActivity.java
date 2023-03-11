@@ -7,8 +7,6 @@ import android.util.Log;
 import android.view.ActionMode;
 import android.widget.Toast;
 
-import com.android.launcher3.LauncherFragment;
-
 public class LauncherActivity extends BaseActivity {
 
     private static final String TAG = "LauncherActivity";

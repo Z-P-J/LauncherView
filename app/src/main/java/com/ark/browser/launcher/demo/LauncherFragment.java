@@ -1,4 +1,4 @@
-package com.android.launcher3;
+package com.ark.browser.launcher.demo;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -9,12 +9,19 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.android.launcher3.ItemInfo;
+import com.android.launcher3.ItemInfoWithIcon;
+import com.android.launcher3.LauncherLayout;
+import com.android.launcher3.TabItemInfo;
+import com.android.launcher3.model.FavoriteItem;
+import com.android.launcher3.model.ScreenItem;
 import com.android.launcher3.popup.OptionItem;
 import com.android.launcher3.popup.OptionsPopupView;
 import com.android.launcher3.widget.WidgetsFullSheet;
 import com.ark.browser.launcher.R;
-import com.ark.browser.launcher.SettingsBottomDialog;
-import com.ark.browser.launcher.utils.DeepLinks;
+import com.android.launcher3.util.DeepLinks;
+import com.ark.browser.launcher.demo.utils.HomepageUtils;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.zpj.fragmentation.SimpleFragment;
 import com.zpj.utils.Callback;
 
@@ -105,9 +112,23 @@ public class LauncherFragment extends SimpleFragment {
             }
         });
 
-        mLauncherLayout.setIconLoader(new LauncherLayout.IconLoader() {
+        mLauncherLayout.setItemLoader(new LauncherLayout.ItemLoader() {
             @Override
-            public void load(ItemInfo itemInfo, Callback<Bitmap> callback) {
+            public void onFirstRun() {
+                Delete.table(FavoriteItem.class);
+                ArrayList<ItemInfo> itemInfoArrayList = new ArrayList<>(HomepageUtils.initHomeNav());
+                for (ItemInfo info : itemInfoArrayList) {
+                    FavoriteItem item = FavoriteItem.from(info);
+                    item.save();
+                }
+                ScreenItem screenItem = new ScreenItem();
+                screenItem.setModified(System.currentTimeMillis());
+                screenItem.setScreenRank(0);
+                screenItem.save();
+            }
+
+            @Override
+            public void loadIcon(ItemInfo itemInfo, Callback<Bitmap> callback) {
                 Resources resources = getResources();
                 int resId = R.mipmap.ic_launcher_home;
                 if (DeepLinks.isDeepLink(itemInfo.url)) {

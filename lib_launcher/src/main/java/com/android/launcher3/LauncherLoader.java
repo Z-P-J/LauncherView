@@ -17,26 +17,13 @@
 package com.android.launcher3;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.launcher3.graphics.ColorExtractor;
-import com.android.launcher3.graphics.ShadowGenerator;
+import com.android.launcher3.database.HomepageManager;
+import com.android.launcher3.model.FavoriteItem;
 import com.android.launcher3.util.Thunk;
-import com.ark.browser.launcher.database.HomepageManager;
-import com.ark.browser.launcher.R;
-import com.ark.browser.launcher.model.FavoriteItem;
-import com.ark.browser.launcher.model.ScreenItem;
-import com.ark.browser.launcher.utils.HomepageUtils;
-import com.raizlabs.android.dbflow.sql.language.Delete;
-import com.zpj.utils.ContextUtils;
 import com.zpj.utils.PrefsHelper;
 
 import java.lang.ref.WeakReference;
@@ -143,57 +130,48 @@ public class LauncherLoader {
         Log.d(TAG, "loadWorkspace");
 
 
-        final Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher_home);
-
-        int color = ColorExtractor.findDominantColorByHue(icon);
-        if (color == Color.WHITE) {
-            color = Color.LTGRAY;
-        } else {
-            color = Color.WHITE;
-        }
-
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeCap(Paint.Cap.ROUND);
-
-        DeviceProfile grid = LauncherManager.getDeviceProfile();
-        int iconSize = grid.iconSizePx - grid.iconDrawablePaddingPx;
-
-        Bitmap bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas();
-        canvas.setBitmap(bitmap);
-        paint.setColor(color);
-        canvas.drawCircle(iconSize / 2f, iconSize / 2f, iconSize * 0.5f, paint);
-        Matrix matrix = new Matrix();
-        matrix.setScale(0.8f, 0.8f);
-        matrix.postTranslate(0.1f * iconSize, 0.1f * iconSize);
-        canvas.drawBitmap(icon, matrix, paint);
+//        final Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher_home);
 //
-
-
-        Bitmap newBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(newBitmap);
-        new ShadowGenerator(ContextUtils.getApplicationContext()).recreateIcon(bitmap, canvas);
-        bitmap.recycle();
+//        int color = ColorExtractor.findDominantColorByHue(icon);
+//        if (color == Color.WHITE) {
+//            color = Color.LTGRAY;
+//        } else {
+//            color = Color.WHITE;
+//        }
+//
+//        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+//        paint.setStrokeJoin(Paint.Join.ROUND);
+//        paint.setStrokeCap(Paint.Cap.ROUND);
+//
+//        DeviceProfile grid = LauncherManager.getDeviceProfile();
+//        int iconSize = grid.iconSizePx - grid.iconDrawablePaddingPx;
+//
+//        Bitmap bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas();
+//        canvas.setBitmap(bitmap);
+//        paint.setColor(color);
+//        canvas.drawCircle(iconSize / 2f, iconSize / 2f, iconSize * 0.5f, paint);
+//        Matrix matrix = new Matrix();
+//        matrix.setScale(0.8f, 0.8f);
+//        matrix.postTranslate(0.1f * iconSize, 0.1f * iconSize);
+//        canvas.drawBitmap(icon, matrix, paint);
+////
+//
+//
+//        Bitmap newBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
+//        canvas.setBitmap(newBitmap);
+//        new ShadowGenerator(ContextUtils.getApplicationContext()).recreateIcon(bitmap, canvas);
+//        bitmap.recycle();
 
 
         Log.d(TAG, "loadWorkspace--1");
 
         if (PrefsHelper.with().getBoolean("is_first_run", true)) {
-            Log.d(TAG, "loadWorkspace--1.1");
-            Delete.table(FavoriteItem.class);
-            Log.d(TAG, "loadWorkspace--1.2");
-            ArrayList<ItemInfo> itemInfoArrayList = new ArrayList<>(HomepageUtils.initHomeNav());
-            for (ItemInfo info : itemInfoArrayList) {
-                FavoriteItem item = FavoriteItem.from(info);
-                item.save();
+            LauncherLayout.ItemLoader itemLoader = LauncherManager.getLauncherLayout().getItemLoader();
+            if (itemLoader != null) {
+                itemLoader.onFirstRun();
             }
-            ScreenItem screenItem = new ScreenItem();
-            screenItem.setModified(System.currentTimeMillis());
-            screenItem.setScreenRank(0);
-            screenItem.save();
-
             PrefsHelper.with().applyBoolean("is_first_run", false);
         }
 
@@ -214,7 +192,7 @@ public class LauncherLoader {
                     Log.d(TAG, "loadWorkspace 1");
                     ShortcutInfo info = new ShortcutInfo();
                     item.applyCommonProperties(info);
-                    info.setIconBitmap(newBitmap);
+//                    info.setIconBitmap(newBitmap);
                     Log.d(TAG, "loadWorkspace 2");
                     manager.checkAndAddItem(mApp.getInvariantDeviceProfile(), info);
                     Log.d(TAG, "loadWorkspace 3");

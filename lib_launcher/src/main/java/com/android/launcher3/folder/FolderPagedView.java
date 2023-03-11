@@ -46,7 +46,7 @@ import com.android.launcher3.pageindicators.PageIndicatorDots;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
 import com.ark.browser.launcher.R;
-import com.ark.browser.launcher.database.HomepageManager;
+import com.android.launcher3.database.HomepageManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;

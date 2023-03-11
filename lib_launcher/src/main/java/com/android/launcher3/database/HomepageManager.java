@@ -1,4 +1,4 @@
-package com.ark.browser.launcher.database;
+package com.android.launcher3.database;
 
 import android.util.Log;
 
@@ -11,10 +11,10 @@ import com.android.launcher3.folder.Folder;
 import com.android.launcher3.folder.FolderIconPreviewVerifier;
 import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.LongArrayMap;
-import com.ark.browser.launcher.model.FavoriteItem;
-import com.ark.browser.launcher.model.FavoriteItem_Table;
-import com.ark.browser.launcher.model.ScreenItem;
-import com.ark.browser.launcher.model.ScreenItem_Table;
+import com.android.launcher3.model.FavoriteItem;
+import com.android.launcher3.model.FavoriteItem_Table;
+import com.android.launcher3.model.ScreenItem;
+import com.android.launcher3.model.ScreenItem_Table;
 import com.raizlabs.android.dbflow.annotation.Database;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;

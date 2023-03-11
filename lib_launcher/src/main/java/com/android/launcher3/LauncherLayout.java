@@ -18,6 +18,9 @@ package com.android.launcher3;
 
 import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
 import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;
+import static com.android.launcher3.LauncherState.ALL_APPS;
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.util.SystemUiController.UI_STATE_OVERVIEW;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -27,13 +30,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.UserHandle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import android.text.method.TextKeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -49,23 +48,23 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+
+import com.android.launcher3.database.HomepageManager;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.popup.OptionItem;
-import com.android.launcher3.popup.OptionsPopupView;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.uioverrides.DisplayRotationListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
-import com.android.launcher3.widget.WidgetsFullSheet;
-import com.ark.browser.launcher.SettingsBottomDialog;
-import com.ark.browser.launcher.database.HomepageManager;
 import com.ark.browser.launcher.R;
 import com.zpj.utils.Callback;
 import com.zpj.utils.ContextUtils;
@@ -73,10 +72,6 @@ import com.zpj.utils.ContextUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static com.android.launcher3.LauncherState.ALL_APPS;
-import static com.android.launcher3.LauncherState.NORMAL;
-import static com.android.launcher3.util.SystemUiController.UI_STATE_OVERVIEW;
 
 /**
  * Default launcher application.
@@ -608,10 +603,10 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         textView.setText(itemInfo.title);
 
         ImageView ivIcon = card.findViewById(R.id.iv_icon);
-        if (mIconLoader == null) {
+        if (mItemLoader == null) {
             ivIcon.setImageResource(R.drawable.background);
         } else {
-            mIconLoader.load(itemInfo, ivIcon::setImageBitmap);
+            mItemLoader.loadIcon(itemInfo, ivIcon::setImageBitmap);
         }
 
         card.setOnClickListener(v -> {
@@ -1125,16 +1120,16 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         }
     }
 
-    private IconLoader mIconLoader;
+    private ItemLoader mItemLoader;
     private OptionItemProvider mOptionItemProvider;
     private ClickHandler mClickHandler;
 
-    public void setIconLoader(IconLoader iconLoader) {
-        mIconLoader = iconLoader;
+    public void setItemLoader(ItemLoader itemLoader) {
+        mItemLoader = itemLoader;
     }
 
-    public IconLoader getIconLoader() {
-        return mIconLoader;
+    public ItemLoader getItemLoader() {
+        return mItemLoader;
     }
 
     public void setOptionItemProvider(OptionItemProvider provider) {
@@ -1159,13 +1154,18 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         void onClickToSearch(View v);
     }
 
-    public interface IconLoader {
-        void load(ItemInfo itemInfo, Callback<Bitmap> callback);
-    }
-
     public interface OptionItemProvider {
         List<OptionItem> createOptions();
         List<OptionItem> createOptions(ItemInfo itemInfo);
+    }
+
+    public interface ItemLoader {
+
+        @WorkerThread
+        void onFirstRun();
+
+        void loadIcon(ItemInfo itemInfo, Callback<Bitmap> callback);
+
     }
 
 }

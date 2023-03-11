@@ -1,7 +1,7 @@
-package com.ark.browser.launcher.model;
+package com.android.launcher3.model;
 
 import com.android.launcher3.ItemInfo;
-import com.ark.browser.launcher.database.HomepageManager;
+import com.android.launcher3.database.HomepageManager;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.NotNull;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;

@@ -55,7 +55,7 @@ import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.ParcelableSparseArray;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
-import com.ark.browser.launcher.database.HomepageManager;
+import com.android.launcher3.database.HomepageManager;
 import com.ark.browser.launcher.R;
 
 import java.lang.annotation.Retention;

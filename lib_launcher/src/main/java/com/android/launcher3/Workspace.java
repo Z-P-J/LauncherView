@@ -73,7 +73,7 @@ import com.android.launcher3.util.LongArrayMap;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.WidgetUtil;
 import com.ark.browser.launcher.R;
-import com.ark.browser.launcher.database.HomepageManager;
+import com.android.launcher3.database.HomepageManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;

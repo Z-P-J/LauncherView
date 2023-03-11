@@ -1,4 +1,4 @@
-package com.ark.browser.launcher.utils;
+package com.ark.browser.launcher.demo.utils;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package com.ark.browser.launcher.utils;
+package com.android.launcher3.util;
 
 public class DeepLinks {
 

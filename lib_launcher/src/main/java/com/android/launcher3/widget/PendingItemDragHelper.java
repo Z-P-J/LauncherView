@@ -26,8 +26,6 @@ import com.android.launcher3.LauncherManager;
 import com.android.launcher3.TabItemInfo;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.graphics.DragPreviewProvider;
-import com.ark.browser.launcher.database.HomepageManager;
-import com.ark.browser.launcher.model.FavoriteItem;
 
 /**
  * Extension of {@link DragPreviewProvider} with logic specific to pending widgets/shortcuts
