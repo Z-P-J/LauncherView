@@ -32,11 +32,11 @@ import android.view.animation.AnimationUtils;
 
 import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.CellLayout;
-import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.LauncherLayout;
 import com.ark.browser.launcher.R;
 import com.android.launcher3.ShortcutAndWidgetContainer;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.anim.PropertyResetListener;
 import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;
 import com.android.launcher3.dragndrop.DragLayer;
@@ -45,7 +45,7 @@ import com.android.launcher3.util.Themes;
 import java.util.List;
 
 import static com.android.launcher3.BubbleTextView.TEXT_ALPHA_PROPERTY;
-import static com.android.launcher3.LauncherAnimUtils.SCALE_PROPERTY;
+import static com.android.launcher3.util.LauncherAnimUtils.SCALE_PROPERTY;
 import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
 
 /**

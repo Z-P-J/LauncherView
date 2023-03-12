@@ -38,7 +38,7 @@ import com.android.launcher3.LauncherManager;
 import com.android.launcher3.PagedView;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.ShortcutInfo;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.Workspace.ItemOperator;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;

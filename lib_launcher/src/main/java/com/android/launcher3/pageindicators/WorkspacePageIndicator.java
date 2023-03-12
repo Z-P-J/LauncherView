@@ -22,7 +22,7 @@ import android.widget.FrameLayout;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Insettable;
 import com.android.launcher3.LauncherManager;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.ark.browser.launcher.R;
 
 /**

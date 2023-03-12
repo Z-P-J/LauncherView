@@ -39,7 +39,7 @@ import com.android.launcher3.util.TouchController;
 
 import java.util.ArrayList;
 
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
 import static com.android.launcher3.LauncherState.NORMAL;
 
 /**

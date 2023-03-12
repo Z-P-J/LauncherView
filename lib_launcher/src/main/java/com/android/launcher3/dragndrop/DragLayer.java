@@ -144,7 +144,7 @@ public class DragLayer extends BaseDragLayer {
         if (LauncherManager.getWorkspace() == null) {
             return false;
         }
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView();
         if (!(topView instanceof Folder)) {
             return false;
         } else {

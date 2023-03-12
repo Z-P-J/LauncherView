@@ -19,7 +19,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 
-import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.util.LauncherAnimUtils;
 
 /**
  * Animates a Folder preview item.

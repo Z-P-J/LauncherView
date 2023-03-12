@@ -38,9 +38,9 @@ import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.LauncherManager;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.anim.RevealOutlineAnimation;
 import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;
 import com.android.launcher3.dragndrop.DragLayer;

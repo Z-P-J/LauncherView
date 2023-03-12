@@ -35,7 +35,7 @@ import androidx.annotation.NonNull;
 import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.ShortcutInfo;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;

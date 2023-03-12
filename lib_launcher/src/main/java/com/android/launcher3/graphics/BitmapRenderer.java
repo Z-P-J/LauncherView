@@ -21,7 +21,7 @@ import android.graphics.Canvas;
 import android.graphics.Picture;
 import android.os.Build;
 
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 
 public class BitmapRenderer {
 

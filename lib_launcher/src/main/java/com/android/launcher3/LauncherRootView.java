@@ -14,6 +14,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewDebug;
 
+import com.android.launcher3.util.Utilities;
+
 public class LauncherRootView extends InsettableFrameLayout {
 
     private final Paint mOpaquePaint;

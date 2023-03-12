@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.BubbleTextView;
 import com.ark.browser.launcher.R;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 
 /**
  * A {@link BubbleTextView} that has the shortcut icon on the left and drag handle on the right.

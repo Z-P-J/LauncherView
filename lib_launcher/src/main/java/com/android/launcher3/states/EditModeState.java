@@ -15,7 +15,7 @@
  */
 package com.android.launcher3.states;
 
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
 import static com.android.launcher3.states.RotationHelper.REQUEST_LOCK;
 
 import android.graphics.Rect;

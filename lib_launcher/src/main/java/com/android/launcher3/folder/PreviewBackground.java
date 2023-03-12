@@ -38,7 +38,7 @@ import androidx.core.graphics.ColorUtils;
 
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
-import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.util.Themes;
 

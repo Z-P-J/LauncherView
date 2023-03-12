@@ -15,7 +15,7 @@
  */
 package com.android.launcher3.uioverrides;
 
-import static com.android.launcher3.LauncherAnimUtils.ALL_APPS_TRANSITION_MS;
+import static com.android.launcher3.util.LauncherAnimUtils.ALL_APPS_TRANSITION_MS;
 import static com.android.launcher3.anim.Interpolators.DEACCEL_2;
 
 import com.android.launcher3.AbstractFloatingView;

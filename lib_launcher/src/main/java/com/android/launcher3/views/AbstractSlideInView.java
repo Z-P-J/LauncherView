@@ -27,9 +27,9 @@ import android.view.View;
 import android.view.animation.Interpolator;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.LauncherLayout;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.touch.SwipeDetector;
 

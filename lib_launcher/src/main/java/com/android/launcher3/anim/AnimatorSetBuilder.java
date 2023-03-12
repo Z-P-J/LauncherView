@@ -20,7 +20,7 @@ import android.animation.AnimatorSet;
 import android.util.SparseArray;
 import android.view.animation.Interpolator;
 
-import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.util.LauncherAnimUtils;
 
 import java.util.ArrayList;
 

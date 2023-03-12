@@ -25,7 +25,7 @@ import android.widget.FrameLayout;
 
 import com.android.launcher3.BubbleTextView;
 import com.ark.browser.launcher.R;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 
 /**
  * A {@link android.widget.FrameLayout} that contains a {@link DeepShortcutView}.

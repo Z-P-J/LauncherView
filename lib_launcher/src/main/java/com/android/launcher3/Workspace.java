@@ -16,9 +16,9 @@
 
 package com.android.launcher3;
 
-import static com.android.launcher3.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
+import static com.android.launcher3.util.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
 import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.LauncherState.SPRING_LOADED;
@@ -72,6 +72,7 @@ import com.android.launcher3.touch.WorkspaceTouchListener;
 import com.android.launcher3.util.LongArrayMap;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.WidgetUtil;
+import com.android.launcher3.util.Utilities;
 import com.ark.browser.launcher.R;
 import com.android.launcher3.database.HomepageManager;
 
@@ -2789,7 +2790,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         if (!workspaceInModalState() && !mIsSwitchingState) {
             result = super.scrollLeft();
         }
-        Folder openFolder = Folder.getOpen(mLauncher);
+        Folder openFolder = Folder.getOpen();
         if (openFolder != null) {
             openFolder.completeDragExit();
         }
@@ -2802,7 +2803,7 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         if (!workspaceInModalState() && !mIsSwitchingState) {
             result = super.scrollRight();
         }
-        Folder openFolder = Folder.getOpen(mLauncher);
+        Folder openFolder = Folder.getOpen();
         if (openFolder != null) {
             openFolder.completeDragExit();
         }

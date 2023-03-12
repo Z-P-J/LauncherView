@@ -25,7 +25,7 @@ import android.widget.Toast;
 import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.LauncherManager;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;

@@ -21,6 +21,8 @@ import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.util.FocusLogic;
+import com.android.launcher3.util.LauncherAnimUtils;
+import com.android.launcher3.util.Utilities;
 import com.ark.browser.launcher.R;
 
 // 插件缩放框

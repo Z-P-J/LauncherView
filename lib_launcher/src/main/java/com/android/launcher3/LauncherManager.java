@@ -3,6 +3,7 @@ package com.android.launcher3;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.util.SystemUiController;
+import com.android.launcher3.util.Utilities;
 
 public class LauncherManager {
 

@@ -16,7 +16,7 @@
 
 package com.android.launcher3.folder;
 
-import static com.android.launcher3.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
 import static com.android.launcher3.LauncherState.NORMAL;
 
 import android.animation.Animator;
@@ -60,7 +60,7 @@ import com.android.launcher3.LauncherManager;
 import com.android.launcher3.OnAlarmListener;
 import com.android.launcher3.PagedView;
 import com.android.launcher3.ShortcutInfo;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.Workspace.ItemOperator;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragController.DragListener;
@@ -460,7 +460,7 @@ public class Folder extends AbstractFloatingView implements DragSource,
      * is played.
      */
     public void animateOpen() {
-        Folder openFolder = getOpen(mLauncher);
+        Folder openFolder = getOpen();
         if (openFolder != null && openFolder != this) {
             // Close any open folder before opening a folder.
             openFolder.close(true);
@@ -1364,8 +1364,8 @@ public class Folder extends AbstractFloatingView implements DragSource,
     /**
      * Returns a folder which is already open or null
      */
-    public static Folder getOpen(LauncherLayout launcher) {
-        return getOpenView(launcher, TYPE_FOLDER);
+    public static Folder getOpen() {
+        return getOpenView(TYPE_FOLDER);
     }
 
     @Override

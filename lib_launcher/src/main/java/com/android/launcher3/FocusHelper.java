@@ -26,6 +26,7 @@ import com.android.launcher3.folder.Folder;
 import com.android.launcher3.folder.FolderPagedView;
 import com.android.launcher3.util.FocusLogic;
 import com.android.launcher3.util.Thunk;
+import com.android.launcher3.util.Utilities;
 import com.ark.browser.launcher.R;
 
 /**

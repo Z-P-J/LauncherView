@@ -54,7 +54,7 @@ public class ItemLongClickListener {
     public static void beginDrag(View v, LauncherLayout launcher, ItemInfo info,
                                  DragOptions dragOptions) {
         if (info.container >= 0) {
-            Folder folder = Folder.getOpen(launcher);
+            Folder folder = Folder.getOpen();
             if (folder != null) {
                 if (!folder.getItemsInReadingOrder().contains(v)) {
                     folder.close(true);

@@ -26,8 +26,8 @@ import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.PropertySetter;
 import com.android.launcher3.graphics.WorkspaceAndHotseatScrim;
 
-import static com.android.launcher3.LauncherAnimUtils.DRAWABLE_ALPHA;
-import static com.android.launcher3.LauncherAnimUtils.SCALE_PROPERTY;
+import static com.android.launcher3.util.LauncherAnimUtils.DRAWABLE_ALPHA;
+import static com.android.launcher3.util.LauncherAnimUtils.SCALE_PROPERTY;
 import static com.android.launcher3.LauncherState.EDIT_MODE;
 import static com.android.launcher3.LauncherState.HOTSEAT_ICONS;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_FADE;

@@ -24,6 +24,7 @@ import android.util.Log;
 import com.android.launcher3.database.HomepageManager;
 import com.android.launcher3.model.FavoriteItem;
 import com.android.launcher3.util.Thunk;
+import com.android.launcher3.util.Utilities;
 import com.zpj.utils.PrefsHelper;
 
 import java.lang.ref.WeakReference;

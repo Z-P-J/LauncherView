@@ -8,7 +8,7 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 
 /**
  * A {@link ViewOutlineProvider} that has helper functions to create reveal animations.

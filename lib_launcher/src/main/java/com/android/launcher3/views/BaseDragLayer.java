@@ -16,7 +16,7 @@
 
 package com.android.launcher3.views;
 
-import static com.android.launcher3.Utilities.SINGLE_FRAME_MS;
+import static com.android.launcher3.util.Utilities.SINGLE_FRAME_MS;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -30,7 +30,7 @@ import android.widget.FrameLayout;
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.InsettableFrameLayout;
 import com.android.launcher3.LauncherManager;
-import com.android.launcher3.Utilities;
+import com.android.launcher3.util.Utilities;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.MultiValueAlpha.AlphaProperty;
 import com.android.launcher3.util.TouchController;
@@ -79,7 +79,7 @@ public abstract class BaseDragLayer extends InsettableFrameLayout {
     protected boolean findActiveController(MotionEvent ev) {
         mActiveController = null;
 
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView();
         if (topView != null && topView.onControllerInterceptTouchEvent(ev)) {
             mActiveController = topView;
             return true;
@@ -207,12 +207,12 @@ public abstract class BaseDragLayer extends InsettableFrameLayout {
     @Override
     public boolean dispatchUnhandledMove(View focused, int direction) {
         // Consume the unhandled move if a container is open, to avoid switching pages underneath.
-        return AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout()) != null;
+        return AbstractFloatingView.getTopOpenView() != null;
     }
 
     @Override
     protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
-        View topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
+        View topView = AbstractFloatingView.getTopOpenView();
         if (topView != null) {
             return topView.requestFocus(direction, previouslyFocusedRect);
         } else {
@@ -222,7 +222,7 @@ public abstract class BaseDragLayer extends InsettableFrameLayout {
 
     @Override
     public void addFocusables(ArrayList<View> views, int direction, int focusableMode) {
-        View topView = AbstractFloatingView.getTopOpenView(LauncherManager.getLauncherLayout());
+        View topView = AbstractFloatingView.getTopOpenView();
         if (topView != null) {
             topView.addFocusables(views, direction);
         } else {

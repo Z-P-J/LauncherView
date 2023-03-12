@@ -17,6 +17,7 @@
 package com.android.launcher3;
 
 import com.android.launcher3.database.HomepageManager;
+import com.android.launcher3.util.Utilities;
 
 import java.util.ArrayList;
 

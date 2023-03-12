@@ -4,6 +4,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import com.android.launcher3.util.Utilities;
+
 /**
  * Helper for identifying when a stylus touches a view while the primary stylus button is pressed.
  * This can occur in {@value MotionEvent#ACTION_DOWN} or {@value MotionEvent#ACTION_MOVE}.

@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.launcher3.CellLayout.ContainerType;
+import com.android.launcher3.util.Utilities;
 
 import static android.view.MotionEvent.ACTION_DOWN;
 

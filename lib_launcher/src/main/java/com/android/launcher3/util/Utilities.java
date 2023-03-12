@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.android.launcher3.util;
 
 import android.content.Context;
 import android.content.res.Resources;

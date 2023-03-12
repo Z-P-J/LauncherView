@@ -65,6 +65,7 @@ import com.android.launcher3.uioverrides.DisplayRotationListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
+import com.android.launcher3.util.LauncherAnimUtils;
 import com.ark.browser.launcher.R;
 import com.zpj.utils.Callback;
 import com.zpj.utils.ContextUtils;
@@ -238,7 +239,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         outState.putInt(RUNTIME_STATE, mStateManager.getState().ordinal);
 
         AbstractFloatingView widgets = AbstractFloatingView
-                .getOpenView(this, AbstractFloatingView.TYPE_WIDGETS_FULL_SHEET);
+                .getOpenView(AbstractFloatingView.TYPE_WIDGETS_FULL_SHEET);
         if (widgets != null) {
             SparseArray<Parcelable> widgetsState = new SparseArray<>();
             widgets.saveHierarchyState(widgetsState);
@@ -453,7 +454,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
         // Note: There should be at most one log per method call. This is enforced implicitly
         // by using if-else statements.
-        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(this);
+        AbstractFloatingView topView = AbstractFloatingView.getTopOpenView();
         Log.d(TAG, "topView=" + topView + " isInState(ALL_APPS)=" + isInState(ALL_APPS));
         if (topView != null && topView.onBackPressed()) {
             // Handled by the floating view.

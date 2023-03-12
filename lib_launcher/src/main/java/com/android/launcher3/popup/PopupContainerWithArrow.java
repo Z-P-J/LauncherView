@@ -350,6 +350,6 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
      * Returns a PopupContainerWithArrow which is already open or null
      */
     public static PopupContainerWithArrow getOpen() {
-        return getOpenView(LauncherManager.getLauncherLayout(), TYPE_ACTION_POPUP);
+        return getOpenView(TYPE_ACTION_POPUP);
     }
 }

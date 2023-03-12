@@ -22,6 +22,7 @@ import android.animation.ValueAnimator;
 import android.view.View;
 
 import com.android.launcher3.util.Thunk;
+import com.android.launcher3.util.LauncherAnimUtils;
 
 /**
  * A convenience class for two-way animations, e.g. a fadeIn/fadeOut animation.

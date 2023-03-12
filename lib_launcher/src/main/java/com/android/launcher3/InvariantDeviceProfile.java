@@ -26,6 +26,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.android.launcher3.util.Thunk;
+import com.android.launcher3.util.Utilities;
 
 import java.util.ArrayList;
 import java.util.Collections;

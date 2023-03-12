@@ -27,6 +27,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.android.launcher3.CellLayout.ContainerType;
+import com.android.launcher3.util.Utilities;
 import com.ark.browser.launcher.R;
 
 public class DeviceProfile {

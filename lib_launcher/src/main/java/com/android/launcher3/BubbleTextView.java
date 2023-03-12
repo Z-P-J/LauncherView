@@ -41,7 +41,9 @@ import android.view.ViewDebug;
 import androidx.core.graphics.ColorUtils;
 
 import com.android.launcher3.folder.FolderIcon;
+import com.android.launcher3.util.CheckLongPressHelper;
 import com.android.launcher3.util.IconLoader;
+import com.android.launcher3.util.Utilities;
 import com.ark.browser.launcher.R;
 
 /**
