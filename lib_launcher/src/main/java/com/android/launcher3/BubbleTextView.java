@@ -44,7 +44,7 @@ import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.util.CheckLongPressHelper;
 import com.android.launcher3.util.IconLoader;
 import com.android.launcher3.util.Utilities;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan
@@ -170,9 +170,7 @@ public class BubbleTextView extends androidx.appcompat.widget.AppCompatTextView 
 //        FastBitmapDrawable iconDrawable = DrawableFactory.get(getContext()).newIcon(info);
 
         LauncherLayout.ItemLoader itemLoader = LauncherManager.getLauncherLayout().getItemLoader();
-        if (itemLoader == null) {
-            IconLoader.load(this, BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_home));
-        } else {
+        if (itemLoader != null) {
             itemLoader.loadIcon(info, icon -> {
                 if (icon != null) {
                     IconLoader.load(BubbleTextView.this, icon);

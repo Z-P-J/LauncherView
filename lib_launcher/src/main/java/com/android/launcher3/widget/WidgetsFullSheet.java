@@ -32,7 +32,7 @@ import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.views.TopRoundedCornerView;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * Popup for showing the full list of available widgets

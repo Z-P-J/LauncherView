@@ -33,7 +33,7 @@ import android.os.Build;
 import android.view.View;
 
 import com.android.launcher3.util.LauncherAnimUtils;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;

@@ -30,7 +30,7 @@ import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragController.DragListener;
 import com.android.launcher3.dragndrop.DragOptions;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import static com.android.launcher3.ButtonDropTarget.TOOLTIP_DEFAULT;
 import static com.android.launcher3.ButtonDropTarget.TOOLTIP_LEFT;

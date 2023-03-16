@@ -47,7 +47,7 @@ import com.android.launcher3.graphics.WorkspaceAndHotseatScrim;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.views.BaseDragLayer;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * A ViewGroup that coordinates dragging across its descendants

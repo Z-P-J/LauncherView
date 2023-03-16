@@ -58,7 +58,7 @@ import com.android.launcher3.util.Thunk;
 import com.android.launcher3.database.HomepageManager;
 import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.util.Utilities;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

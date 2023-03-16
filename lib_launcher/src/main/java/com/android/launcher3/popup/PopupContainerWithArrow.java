@@ -45,7 +45,7 @@ import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.touch.ItemLongClickListener;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.util.ArrayList;
 import java.util.List;

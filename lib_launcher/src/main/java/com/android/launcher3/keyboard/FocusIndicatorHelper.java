@@ -31,7 +31,7 @@ import android.util.Property;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * A helper class to draw background of a focused view.

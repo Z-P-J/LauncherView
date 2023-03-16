@@ -25,7 +25,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.android.launcher3.BubbleTextView;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * Extension of {@link BubbleTextView} which draws two shadows on the text (ambient and key shadows}

@@ -34,7 +34,7 @@ import android.view.View;
 import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.folder.FolderIcon;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.nio.ByteBuffer;
 

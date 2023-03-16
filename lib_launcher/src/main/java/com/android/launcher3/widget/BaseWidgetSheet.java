@@ -30,7 +30,7 @@ import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.AbstractSlideInView;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * Base class for various widgets popup

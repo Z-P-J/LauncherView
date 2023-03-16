@@ -45,7 +45,7 @@ import com.android.launcher3.pageindicators.PageIndicator;
 import com.android.launcher3.touch.OverScroll;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.Utilities;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.util.ArrayList;
 

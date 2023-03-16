@@ -13,7 +13,7 @@ import com.android.launcher3.FastBitmapDrawable;
 import com.android.launcher3.ItemInfoWithIcon;
 import com.android.launcher3.graphics.ColorExtractor;
 import com.android.launcher3.graphics.ShadowGenerator;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.zpj.utils.ContextUtils;
 
 import static com.android.launcher3.graphics.ShadowGenerator.BLUR_FACTOR;

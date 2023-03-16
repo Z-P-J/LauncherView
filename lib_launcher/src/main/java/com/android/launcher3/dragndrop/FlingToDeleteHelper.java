@@ -29,7 +29,7 @@ import com.android.launcher3.DropTarget;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.util.FlingAnimation;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * Utility class to manage fling to delete action during drag and drop.

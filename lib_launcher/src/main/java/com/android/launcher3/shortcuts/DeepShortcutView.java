@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.android.launcher3.BubbleTextView;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.android.launcher3.util.Utilities;
 
 /**

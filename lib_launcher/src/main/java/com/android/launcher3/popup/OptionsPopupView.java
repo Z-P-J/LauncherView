@@ -31,7 +31,7 @@ import android.widget.Toast;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.shortcuts.DeepShortcutView;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.util.List;
 

@@ -35,7 +35,7 @@ import android.view.ViewOutlineProvider;
 import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.android.launcher3.util.Utilities;
 import com.android.launcher3.util.Themes;
 

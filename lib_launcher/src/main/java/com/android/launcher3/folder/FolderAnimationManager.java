@@ -34,7 +34,7 @@ import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.LauncherLayout;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.android.launcher3.ShortcutAndWidgetContainer;
 import com.android.launcher3.util.Utilities;
 import com.android.launcher3.anim.PropertyResetListener;

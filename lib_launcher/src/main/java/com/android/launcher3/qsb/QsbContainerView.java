@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 public class QsbContainerView extends FrameLayout {
 

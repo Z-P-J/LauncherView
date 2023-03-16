@@ -9,7 +9,7 @@ import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 public class InsettableFrameLayout extends FrameLayout implements Insettable {
 

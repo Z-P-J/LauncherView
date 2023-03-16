@@ -23,7 +23,7 @@ import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.util.FocusLogic;
 import com.android.launcher3.util.LauncherAnimUtils;
 import com.android.launcher3.util.Utilities;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 // 插件缩放框
 public class AppWidgetResizeFrame extends AbstractFloatingView implements View.OnKeyListener, DragController.DragListener {

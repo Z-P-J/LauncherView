@@ -46,7 +46,7 @@ import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.graphics.TriangleShape;
 import com.android.launcher3.util.Themes;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.util.ArrayList;
 import java.util.Collections;

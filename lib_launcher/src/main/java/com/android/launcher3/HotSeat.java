@@ -29,7 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 public class HotSeat extends FrameLayout implements Insettable {
 

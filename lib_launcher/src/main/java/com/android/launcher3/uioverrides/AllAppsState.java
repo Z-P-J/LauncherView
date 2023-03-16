@@ -22,7 +22,7 @@ import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.LauncherState;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * Definition for AllApps state

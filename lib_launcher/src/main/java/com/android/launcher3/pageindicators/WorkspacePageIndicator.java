@@ -23,7 +23,7 @@ import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Insettable;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.util.Utilities;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 /**
  * A PageIndicator that briefly shows a fraction of a line when moving between pages

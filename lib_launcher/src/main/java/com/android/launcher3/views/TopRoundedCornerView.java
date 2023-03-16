@@ -22,7 +22,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.android.launcher3.util.Themes;
 
 /**

@@ -60,7 +60,7 @@ import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragView;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 
 import java.util.ArrayList;
 import java.util.List;

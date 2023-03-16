@@ -66,7 +66,7 @@ import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.LauncherAnimUtils;
-import com.ark.browser.launcher.R;
+import com.android.launcher3.R;
 import com.zpj.utils.Callback;
 import com.zpj.utils.ContextUtils;
 
