@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.launcher3.views;
+package com.ark.browser.launcher.demo.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

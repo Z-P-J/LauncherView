@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.launcher3.widget;
+package com.ark.browser.launcher.demo.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -29,7 +29,6 @@ import com.android.launcher3.util.Utilities;
 import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
-import com.android.launcher3.views.AbstractSlideInView;
 import com.android.launcher3.R;
 
 /**

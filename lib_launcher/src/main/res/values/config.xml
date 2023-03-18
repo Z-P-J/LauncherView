@@ -8,10 +8,6 @@
 <!-- DragController -->
     <item type="id" name="drag_event_parity" />
 
-<!-- AllApps & Launcher transitions -->
-    <!-- Out of 100, the percent to shrink the workspace during spring loaded mode. -->
-    <integer name="config_workspaceSpringLoadShrinkPercentage">76</integer>
-
     <!-- View tag key used to store SpringAnimation data. -->
 
     <!-- Workspace -->
@@ -36,10 +32,6 @@
 
 <!-- Hotseat -->
     <bool name="hotseat_transpose_layout_with_orientation">true</bool>
-
-
-    <!-- Name of a drawable factory class. -->
-    <string name="drawable_factory_class" translatable="false"></string>
 
     <!-- View ID to use for QSB widget -->
     <item type="id" name="qsb_widget" />

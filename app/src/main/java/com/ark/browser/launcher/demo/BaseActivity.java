@@ -16,19 +16,13 @@
 
 package com.ark.browser.launcher.demo;
 
-import android.content.Context;
-import android.content.ContextWrapper;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import androidx.annotation.IntDef;
 
-import com.android.launcher3.DeviceProfile.OnDeviceProfileChangeListener;
-import com.android.launcher3.util.SystemUiController;
 import com.zpj.fragmentation.SupportActivity;
 
 import java.lang.annotation.Retention;
-import java.util.ArrayList;
-
-import static com.android.launcher3.util.SystemUiController.UI_STATE_OVERVIEW;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 public abstract class BaseActivity extends SupportActivity {
 

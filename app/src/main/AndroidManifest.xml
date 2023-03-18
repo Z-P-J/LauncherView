@@ -31,29 +31,6 @@
         android:restoreAnyVersion="true"
         android:supportsRtl="true" >
 
-        <!--
-        Main launcher activity. When extending only change the name, and keep all the
-        attributes and intent filters the same
-        -->
-<!--        <activity-->
-<!--            android:name="com.android.launcher3.Launcher"-->
-<!--            android:launchMode="singleTask"-->
-<!--            android:clearTaskOnLaunch="true"-->
-<!--            android:stateNotNeeded="true"-->
-<!--            android:windowSoftInputMode="adjustPan"-->
-<!--            android:screenOrientation="unspecified"-->
-<!--            android:configChanges="keyboard|keyboardHidden|mcc|mnc|navigation|orientation|screenSize|screenLayout|smallestScreenSize"-->
-<!--            android:resizeableActivity="true"-->
-<!--            android:resumeWhilePausing="true"-->
-<!--            android:taskAffinity=""-->
-<!--            android:enabled="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
-
         <activity
             android:name=".LauncherActivity"
             android:launchMode="singleTask"

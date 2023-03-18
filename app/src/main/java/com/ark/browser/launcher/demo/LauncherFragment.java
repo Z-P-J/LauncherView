@@ -18,8 +18,8 @@ import com.android.launcher3.model.ScreenItem;
 import com.android.launcher3.popup.OptionItem;
 import com.android.launcher3.popup.OptionsPopupView;
 import com.android.launcher3.util.DeepLinks;
-import com.android.launcher3.widget.WidgetsFullSheet;
 import com.ark.browser.launcher.demo.utils.HomepageUtils;
+import com.ark.browser.launcher.demo.widget.WidgetsFullSheet;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.zpj.fragmentation.SimpleFragment;
 import com.zpj.utils.Callback;
@@ -44,7 +44,6 @@ public class LauncherFragment extends SimpleFragment {
             @Override
             public void onClickAppShortcut(View v, ItemInfoWithIcon itemInfo) {
                 Toast.makeText(context, "title=" + itemInfo.title + " url=" + itemInfo.url, Toast.LENGTH_SHORT).show();
-
             }
 
             @Override

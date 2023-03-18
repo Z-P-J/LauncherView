@@ -20,7 +20,6 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -44,7 +43,6 @@ import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.util.CheckLongPressHelper;
 import com.android.launcher3.util.IconLoader;
 import com.android.launcher3.util.Utilities;
-import com.android.launcher3.R;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.launcher3.widget;
+package com.ark.browser.launcher.demo.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,8 +31,8 @@ import com.android.launcher3.Insettable;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.LauncherManager;
 import com.android.launcher3.dragndrop.DragOptions;
-import com.android.launcher3.views.TopRoundedCornerView;
-import com.android.launcher3.R;
+import com.ark.browser.launcher.demo.R;
+import com.ark.browser.launcher.demo.views.TopRoundedCornerView;
 
 /**
  * Popup for showing the full list of available widgets

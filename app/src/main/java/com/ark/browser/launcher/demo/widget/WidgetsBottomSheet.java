@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3.widget;
+package com.ark.browser.launcher.demo.widget;
 
 import android.animation.PropertyValuesHolder;
 import android.content.Context;

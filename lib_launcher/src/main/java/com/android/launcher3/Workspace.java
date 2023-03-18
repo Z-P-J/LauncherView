@@ -16,13 +16,13 @@
 
 package com.android.launcher3;
 
-import static com.android.launcher3.util.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
-import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
-import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
 import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.LauncherState.SPRING_LOADED;
 import static com.android.launcher3.dragndrop.DragLayer.ALPHA_INDEX_OVERLAY;
+import static com.android.launcher3.util.LauncherAnimUtils.OVERVIEW_TRANSITION_MS;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_EXIT_DELAY;
+import static com.android.launcher3.util.LauncherAnimUtils.SPRING_LOADED_TRANSITION_MS;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -56,6 +56,7 @@ import android.widget.Toast;
 import com.android.launcher3.LauncherStateManager.AnimationConfig;
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.Interpolators;
+import com.android.launcher3.database.HomepageManager;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
@@ -71,10 +72,8 @@ import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.touch.WorkspaceTouchListener;
 import com.android.launcher3.util.LongArrayMap;
 import com.android.launcher3.util.Thunk;
-import com.android.launcher3.util.WidgetUtil;
 import com.android.launcher3.util.Utilities;
-import com.android.launcher3.R;
-import com.android.launcher3.database.HomepageManager;
+import com.android.launcher3.util.WidgetUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -2452,7 +2451,10 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
 //                    ((PendingAddWidgetInfo) pendingInfo).boundWidget : null;
 //
             ImageView finalView = new ImageView(getContext());
-            finalView.setImageResource(R.drawable.ic_allapps_pressed);
+            LauncherLayout.ItemLoader loader = mLauncher.getItemLoader();
+            if (loader != null) {
+                loader.loadIcon(pendingInfo, finalView::setImageBitmap);
+            }
 
             if (finalView != null && updateWidgetSize) {
                 AppWidgetResizeFrame.updateWidgetSizeRanges(finalView, getContext(), item.spanX,
