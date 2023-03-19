@@ -32,11 +32,6 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
 
-    // Database
-    annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:4.2.4"
-    implementation "com.github.Raizlabs.DBFlow:dbflow-core:4.2.4"
-    implementation "com.github.Raizlabs.DBFlow:dbflow:4.2.4"
-
     implementation 'com.github.Z-P-J:ZUtils:2.0.0'
     implementation 'com.github.Z-P-J:ZFragmentation-Dialog:2.0.0'
     implementation 'com.github.Z-P-J:ZFragmentation:2.0.0'

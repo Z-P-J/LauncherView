@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.android.launcher3.database.HomepageManager;
 import com.android.launcher3.model.FavoriteItem;
+import com.android.launcher3.model.ScreenItem;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.Utilities;
 import com.zpj.utils.PrefsHelper;
@@ -169,6 +170,12 @@ public class LauncherLoader {
         Log.d(TAG, "loadWorkspace--1");
 
         if (PrefsHelper.with().getBoolean("is_first_run", true)) {
+
+            ScreenItem screenItem = new ScreenItem();
+            screenItem.setModified(System.currentTimeMillis());
+            screenItem.setScreenRank(0);
+            screenItem.insert();
+
             LauncherLayout.ItemLoader itemLoader = LauncherManager.getLauncherLayout().getItemLoader();
             if (itemLoader != null) {
                 itemLoader.onFirstRun();

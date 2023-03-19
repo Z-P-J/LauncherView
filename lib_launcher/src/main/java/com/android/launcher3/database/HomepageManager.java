@@ -1,5 +1,7 @@
 package com.android.launcher3.database;
 
+import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
+
 import android.util.Log;
 
 import com.android.launcher3.FolderInfo;
@@ -9,17 +11,10 @@ import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.folder.Folder;
 import com.android.launcher3.folder.FolderIconPreviewVerifier;
+import com.android.launcher3.model.FavoriteItem;
+import com.android.launcher3.model.ScreenItem;
 import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.LongArrayMap;
-import com.android.launcher3.model.FavoriteItem;
-import com.android.launcher3.model.FavoriteItem_Table;
-import com.android.launcher3.model.ScreenItem;
-import com.android.launcher3.model.ScreenItem_Table;
-import com.raizlabs.android.dbflow.annotation.Database;
-import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
-import com.raizlabs.android.dbflow.structure.database.transaction.ProcessModelTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,15 +22,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
-
-@Database(name = HomepageManager.NAME, version = HomepageManager.VERSION)
 public class HomepageManager {
 
     private static final String TAG = "HomepageManager";
-
-    static final String NAME = "launcher";
-    public static final int VERSION = 1;
 
     private final ArrayList<ItemInfo> itemsToRemove = new ArrayList<>();
     private final LongArrayMap<GridOccupancy> occupied = new LongArrayMap<>();
@@ -68,17 +57,16 @@ public class HomepageManager {
 //    }
 
     public List<FavoriteItem> getAllFavorites() {
-        return SQLite.select()
-                .from(FavoriteItem.class)
-                .queryList();
+        return SQLite.with(FavoriteItemTable.class).queryAll();
     }
 
     public void checkAndAddItem(InvariantDeviceProfile mIDP, ItemInfo info) {
+        Log.d(TAG, "checkAndAddItem mWorkspaceScreens=" + mWorkspaceScreens);
         if (checkItemPlacement(mIDP, info, mWorkspaceScreens)) {
-            Log.d("loadWorkspace", "checkAndAddItem checkItemPlacement");
+            Log.d(TAG, "checkAndAddItem checkItemPlacement");
             addItem(info, false);
         } else {
-            Log.d("loadWorkspace", "checkAndAddItem markDeleted");
+            Log.d(TAG, "checkAndAddItem markDeleted info=" + info);
             markDeleted(info, "Item position overlap");
         }
     }
@@ -278,10 +266,8 @@ public class HomepageManager {
 
 
     public static FavoriteItem getFavoriteByUrl(String url) {
-        List<FavoriteItem> historyList = SQLite.select()
-                .from(FavoriteItem.class)
-                .where(FavoriteItem_Table.url.is(url))
-                .queryList();
+        List<FavoriteItem> historyList = SQLite.with(FavoriteItemTable.class)
+                .queryByUrl(url);
         if (historyList.isEmpty()) {
             return null;
         } else {
@@ -293,14 +279,12 @@ public class HomepageManager {
     }
 
     public void deleteAllFavorites() {
-        SQLite.delete()
-                .from(FavoriteItem.class)
-                .execute();
+        SQLite.with(FavoriteItemTable.class).delete();
         clear();
     }
 
     public void addOrMoveItemInDatabase(ItemInfo item,
-                                               long container, long screenId, int cellX, int cellY) {
+                                        long container, long screenId, int cellX, int cellY) {
         Log.d(TAG, "addOrMoveItemInDatabase item=" + item + " container=" + container +
                 " screenId=" + screenId + " cellX=" + cellX + " cellY=" + cellY);
         if (item.container == ItemInfo.NO_ID) {
@@ -313,7 +297,7 @@ public class HomepageManager {
     }
 
     public void addItemToDatabase(final ItemInfo item,
-                                         long container, long screenId, int cellX, int cellY) {
+                                  long container, long screenId, int cellX, int cellY) {
         Log.d(TAG, "addItemToDatabase");
         updateItemInfoProps(item, container, screenId, cellX, cellY);
         FavoriteItem favoriteItem = FavoriteItem.from(item);
@@ -350,7 +334,7 @@ public class HomepageManager {
     }
 
     public void moveItemInDatabase(final ItemInfo item,
-                                          long container, long screenId, int cellX, int cellY) {
+                                   long container, long screenId, int cellX, int cellY) {
         Log.d(TAG, "moveItemInDatabase");
         updateItemInfoProps(item, container, screenId, cellX, cellY);
         boolean result = FavoriteItem.from(item).update();
@@ -367,7 +351,7 @@ public class HomepageManager {
     }
 
     public void modifyItemInDatabase(final ItemInfo item,
-                                            long container, long screenId, int cellX, int cellY, int spanX, int spanY) {
+                                     long container, long screenId, int cellX, int cellY, int spanX, int spanY) {
         Log.d(TAG, "modifyItemInDatabase item=" + item);
         Log.d(TAG, "modifyItemInDatabase container=" + container + " screenId=" + screenId +
                 " cellX=" + cellX + " cellY=" + cellY + " spanX=" + spanX + " spanY=" + spanY);
@@ -403,25 +387,23 @@ public class HomepageManager {
 //        item.screenId = screenId;
     }
 
-    public static List<Long> loadWorkspaceScreensDb() {
-        Log.d(TAG, "loadWorkspaceScreensDb");
-        List<ScreenItem> screenItemList = SQLite.select()
-                .from(ScreenItem.class)
-                .orderBy(ScreenItem_Table.screenRank, false)
-                .queryList();
-        List<Long> list = new ArrayList<>();
-        for (ScreenItem item : screenItemList) {
-            list.add(item.getScreenRank());
-        }
-        return list;
-    }
+//    public static List<Long> loadWorkspaceScreensDb() {
+//        Log.d(TAG, "loadWorkspaceScreensDb");
+//        List<ScreenItem> screenItemList = SQLite.select()
+//                .from(ScreenItem.class)
+//                .orderBy(ScreenItem_Table.screenRank, false)
+//                .queryList();
+//        List<Long> list = new ArrayList<>();
+//        for (ScreenItem item : screenItemList) {
+//            list.add(item.getScreenRank());
+//        }
+//        return list;
+//    }
 
     public void loadWorkspaceScreens() {
         Log.d(TAG, "loadWorkspaceScreensDb");
-        List<ScreenItem> screenItemList = SQLite.select()
-                .from(ScreenItem.class)
-                .orderBy(ScreenItem_Table.screenRank, false)
-                .queryList();
+        List<ScreenItem> screenItemList = SQLite.with(ScreenItemTable.class)
+                .queryAll("screenRank asc");
         mWorkspaceScreens.clear();
         for (ScreenItem item : screenItemList) {
             mWorkspaceScreens.add(item.getScreenRank());
@@ -429,15 +411,11 @@ public class HomepageManager {
     }
 
     public void deleteFolderAndContentsFromDatabase(final FolderInfo info) {
-        SQLite.delete()
-                .from(FavoriteItem.class)
-                .where(FavoriteItem_Table.container.is(info.id))
-                .execute();
+        SQLite.with(FavoriteItemTable.class)
+                .deleteByContainer(info.id);
         info.contents.clear();
-        SQLite.delete()
-                .from(FavoriteItem.class)
-                .where(FavoriteItem_Table._id.is(info.id))
-                .execute();
+        SQLite.with(FavoriteItemTable.class)
+                .delete(info.id);
         removeItem(info);
     }
 
@@ -455,9 +433,6 @@ public class HomepageManager {
         }
         Log.d(TAG, "updateWorkspaceScreenOrder screensCopy=" + screensCopy);
 
-        SQLite.delete()
-                .from(ScreenItem.class)
-                .execute();
         List<ScreenItem> screenItemList = new ArrayList<>();
         int count = screensCopy.size();
         for (int i = 0; i < count; i++) {
@@ -469,32 +444,40 @@ public class HomepageManager {
         }
         Log.d(TAG, "updateWorkspaceScreenOrder screenItemList=" + screenItemList);
 
-        FlowManager.getDatabase(HomepageManager.class)
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (INSTANCE) {
+                    SQLite.with(ScreenItemTable.class).delete();
+                    SQLite.with(ScreenItemTable.class).insertAll(screenItemList);
+                    mWorkspaceScreens.clear();
+                    mWorkspaceScreens.addAll(screensCopy);
+
+                    Log.d(TAG, "updateWorkspaceScreenOrder all=" +
+                            SQLite.with(ScreenItemTable.class).queryAll());
+                }
+            }
+        }).start();
+
+//        FlowManager.getDatabase(HomepageManager.class)
 //                .beginTransactionAsync(new ProcessModelTransaction.Builder<>(new ProcessModelTransaction.ProcessModel<ScreenItem>() {
 //                    @Override
 //                    public void processModel(ScreenItem screenItem, DatabaseWrapper wrapper) {
-//                        screenItem.save();
+//                        Log.d(TAG, "updateWorkspaceScreenOrder screenItem=" + screenItem + " exists=" + screenItem.exists());
+//                        boolean result = screenItem.save();
+//                        Log.d(TAG, "updateWorkspaceScreenOrder screenItem=" + screenItem + " result=" + result);
 //                    }
 //                }).addAll(screenItemList).build())
+//                .error((transaction, error) -> {
+//                    throw new RuntimeException(error);
+//                }).success(transaction -> {
+//            synchronized (INSTANCE) {
+//                mWorkspaceScreens.clear();
+//                mWorkspaceScreens.addAll(screensCopy);
+//            }
+//        })
 //                .build()
-                .beginTransactionAsync(new ProcessModelTransaction.Builder<>(new ProcessModelTransaction.ProcessModel<ScreenItem>() {
-                    @Override
-                    public void processModel(ScreenItem screenItem, DatabaseWrapper wrapper) {
-                        Log.d(TAG, "updateWorkspaceScreenOrder screenItem=" + screenItem + " exists=" + screenItem.exists());
-                        boolean result = screenItem.save();
-                        Log.d(TAG, "updateWorkspaceScreenOrder screenItem=" + screenItem + " result=" + result);
-                    }
-                }).addAll(screenItemList).build())
-                .error((transaction, error) -> {
-                    throw new RuntimeException(error);
-                }).success(transaction -> {
-            synchronized (INSTANCE) {
-                mWorkspaceScreens.clear();
-                mWorkspaceScreens.addAll(screensCopy);
-            }
-        })
-                .build()
-                .execute();
+//                .execute();
     }
 
     public synchronized void clear() {

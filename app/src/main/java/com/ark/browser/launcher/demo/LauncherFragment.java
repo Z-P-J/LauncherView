@@ -13,14 +13,14 @@ import com.android.launcher3.ItemInfo;
 import com.android.launcher3.ItemInfoWithIcon;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.TabItemInfo;
+import com.android.launcher3.database.FavoriteItemTable;
+import com.android.launcher3.database.SQLite;
 import com.android.launcher3.model.FavoriteItem;
-import com.android.launcher3.model.ScreenItem;
 import com.android.launcher3.popup.OptionItem;
 import com.android.launcher3.popup.OptionsPopupView;
 import com.android.launcher3.util.DeepLinks;
 import com.ark.browser.launcher.demo.utils.HomepageUtils;
 import com.ark.browser.launcher.demo.widget.WidgetsFullSheet;
-import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.zpj.fragmentation.SimpleFragment;
 import com.zpj.utils.Callback;
 
@@ -114,16 +114,11 @@ public class LauncherFragment extends SimpleFragment {
         mLauncherLayout.setItemLoader(new LauncherLayout.ItemLoader() {
             @Override
             public void onFirstRun() {
-                Delete.table(FavoriteItem.class);
+                SQLite.with(FavoriteItemTable.class).delete();
                 ArrayList<ItemInfo> itemInfoArrayList = new ArrayList<>(HomepageUtils.initHomeNav());
                 for (ItemInfo info : itemInfoArrayList) {
-                    FavoriteItem item = FavoriteItem.from(info);
-                    item.save();
+                    FavoriteItem.from(info).insert();
                 }
-                ScreenItem screenItem = new ScreenItem();
-                screenItem.setModified(System.currentTimeMillis());
-                screenItem.setScreenRank(0);
-                screenItem.save();
             }
 
             @Override

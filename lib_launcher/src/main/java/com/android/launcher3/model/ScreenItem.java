@@ -1,22 +1,14 @@
 package com.android.launcher3.model;
 
-import com.android.launcher3.database.HomepageManager;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.android.launcher3.database.SQLite;
+import com.android.launcher3.database.ScreenItemTable;
 
-@Table(database = HomepageManager.class, name = "workspaceScreens")
-public class ScreenItem extends BaseModel {
+public class ScreenItem {
 
-    @PrimaryKey(autoincrement = true)
-    @Column(name = "_id")
     private long id;
 
-    @Column
     private long screenRank;
 
-    @Column
     private long modified;
 
     public long getId() {
@@ -41,6 +33,18 @@ public class ScreenItem extends BaseModel {
 
     public void setModified(long modified) {
         this.modified = modified;
+    }
+
+    public void delete() {
+        SQLite.with(ScreenItemTable.class).delete(getId());
+    }
+
+    public boolean update() {
+        return SQLite.with(ScreenItemTable.class).update(this);
+    }
+
+    public void insert() {
+        SQLite.with(ScreenItemTable.class).insert(this);
     }
 
     @Override

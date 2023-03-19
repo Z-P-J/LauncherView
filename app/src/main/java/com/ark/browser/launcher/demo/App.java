@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.zpj.utils.ContextUtils;
 import com.zpj.utils.PrefsHelper;
 
@@ -16,8 +15,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
-
-        FlowManager.init(this);
 
         Log.d("App", "getApplication=" + getApplication());
         Log.d("App", "getApplication=" + ContextUtils.getApplicationContext());

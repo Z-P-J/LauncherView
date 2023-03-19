@@ -1,45 +1,33 @@
 package com.android.launcher3.model;
 
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.database.HomepageManager;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.NotNull;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.android.launcher3.database.FavoriteItemTable;
+import com.android.launcher3.database.SQLite;
 
-@Table(database = HomepageManager.class, name = "favorites")
-public class FavoriteItem extends BaseModel {
+public class FavoriteItem {
 
-    @PrimaryKey(autoincrement = true)
-    @Column(name = "_id")
     private long id;
-    @Column(name = "tabId")
+
     private long tabId;
-    @Column
+
     private String title;
-    @Column
+
     private String url;
-    @Column
+
     private long container;
-    @Column
+
     private long screen;
-    @Column
+
     private int cellX;
-    @Column
+
     private int cellY;
 
-    @NotNull
-    @Column(defaultValue = "1")
     private int spanX = 1;
 
-    @NotNull
-    @Column(defaultValue = "1")
     private int spanY = 1;
 
-    @Column
     private int itemType;
-    @Column()
+
     private long modified;
 
 
@@ -177,6 +165,18 @@ public class FavoriteItem extends BaseModel {
             info.spanY = spanY;
         }
         info.itemType = itemType;
+    }
+
+    public void delete() {
+        SQLite.with(FavoriteItemTable.class).delete(getId());
+    }
+
+    public boolean update() {
+        return SQLite.with(FavoriteItemTable.class).update(this);
+    }
+
+    public void insert() {
+        SQLite.with(FavoriteItemTable.class).insert(this);
     }
 
     @Override
