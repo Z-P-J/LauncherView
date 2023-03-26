@@ -4,7 +4,6 @@ import android.graphics.BitmapFactory;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.util.DeepLinks;
 import com.android.launcher3.ShortcutInfo;
 import com.ark.browser.launcher.demo.R;
 import com.zpj.utils.ContextUtils;

@@ -66,7 +66,6 @@ import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.LauncherAnimUtils;
-import com.android.launcher3.R;
 import com.zpj.utils.Callback;
 import com.zpj.utils.ContextUtils;
 
@@ -596,7 +595,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
     }
 
     private View createTabItemView(TabItemInfo itemInfo) {
-        View card = LayoutInflater.from(getContext()).inflate(R.layout.item_tab_card, null, false);
+        View card = LayoutInflater.from(getContext()).inflate(R.layout.item_card_tab, null, false);
         card.setVisibility(View.VISIBLE);
         card.setTag(itemInfo);
 
@@ -604,9 +603,7 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         textView.setText(itemInfo.title);
 
         ImageView ivIcon = card.findViewById(R.id.iv_icon);
-        if (mItemLoader == null) {
-            ivIcon.setImageResource(R.drawable.background);
-        } else {
+        if (mItemLoader != null) {
             mItemLoader.loadIcon(itemInfo, ivIcon::setImageBitmap);
         }
 

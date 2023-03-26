@@ -18,7 +18,7 @@ import com.android.launcher3.database.SQLite;
 import com.android.launcher3.model.FavoriteItem;
 import com.android.launcher3.popup.OptionItem;
 import com.android.launcher3.popup.OptionsPopupView;
-import com.android.launcher3.util.DeepLinks;
+import com.ark.browser.launcher.demo.utils.DeepLinks;
 import com.ark.browser.launcher.demo.utils.HomepageUtils;
 import com.ark.browser.launcher.demo.widget.WidgetsFullSheet;
 import com.zpj.fragmentation.SimpleFragment;

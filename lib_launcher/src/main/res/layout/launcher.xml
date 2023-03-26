@@ -16,7 +16,6 @@
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     android:fitsSystemWindows="true">
 
     <com.android.launcher3.dragndrop.DragLayer
