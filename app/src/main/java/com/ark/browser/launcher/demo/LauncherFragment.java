@@ -1,14 +1,18 @@
 package com.ark.browser.launcher.demo;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.ItemInfoWithIcon;
 import com.android.launcher3.LauncherLayout;
@@ -20,6 +24,7 @@ import com.android.launcher3.popup.OptionItem;
 import com.android.launcher3.popup.OptionsPopupView;
 import com.ark.browser.launcher.demo.utils.DeepLinks;
 import com.ark.browser.launcher.demo.utils.HomepageUtils;
+import com.ark.browser.launcher.demo.utils.SkinChangeAnimation;
 import com.ark.browser.launcher.demo.widget.WidgetsFullSheet;
 import com.zpj.fragmentation.SimpleFragment;
 import com.zpj.utils.Callback;
@@ -44,6 +49,30 @@ public class LauncherFragment extends SimpleFragment {
             @Override
             public void onClickAppShortcut(View v, ItemInfoWithIcon itemInfo) {
                 Toast.makeText(context, "title=" + itemInfo.title + " url=" + itemInfo.url, Toast.LENGTH_SHORT).show();
+
+                if (v instanceof BubbleTextView) {
+                    Rect rect = new Rect();
+                    ((BubbleTextView) v).getIconBounds(rect);
+
+                    int[] location = new int[2];
+                    v.getLocationOnScreen(location);
+
+                    int x = location[0] + rect.centerX();
+                    int y = location[1] + rect.centerY();
+
+                    SkinChangeAnimation.with(getContext())
+                            .setStartPosition(x, y)
+                            .setDuration(1000)
+                            .setStartRunnable(() -> {
+                                Toast.makeText(context, "start animation", Toast.LENGTH_SHORT).show();
+                            })
+                            .setDismissRunnable(() -> {
+                                Toast.makeText(context, "dismiss animation", Toast.LENGTH_SHORT).show();
+                            })
+                            .start();
+
+                }
+
             }
 
             @Override
@@ -145,6 +174,63 @@ public class LauncherFragment extends SimpleFragment {
                     }
                 }
                 callback.onCallback(BitmapFactory.decodeResource(resources, resId));
+            }
+        });
+
+        mLauncherLayout.setSlideListener(new LauncherLayout.SlideListener() {
+
+            AlertDialog alertDialog;
+
+
+            @Override
+            public void onSlideStart(int direction) {
+                Toast.makeText(context, "onSlideStart", Toast.LENGTH_SHORT).show();
+                if (alertDialog != null) {
+                    alertDialog.cancel();
+                }
+                alertDialog = new AlertDialog.Builder(context)
+                        .setTitle("手势滑动监听")
+                        .setMessage("移动方向：" + (direction == 1 ? "向上" : "向下"))
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                alertDialog = null;
+                            }
+                        })
+                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                alertDialog = null;
+                            }
+                        })
+                        .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create();
+                alertDialog.show();
+            }
+
+            @Override
+            public void onSlideVertical(float dy, int direction) {
+
+            }
+
+            @Override
+            public void onSlideEnd() {
+
+            }
+
+            @Override
+            public boolean canHandleLongPress() {
+                return alertDialog == null;
+            }
+
+            @Override
+            public boolean canStartDrag() {
+                return alertDialog == null;
             }
         });
 

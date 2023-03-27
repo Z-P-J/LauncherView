@@ -40,7 +40,9 @@ import android.util.SparseArray;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -108,6 +110,8 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     private Configuration mOldConfig;
 
+    private final float mTouchSlop;
+
     @Thunk
     Workspace mWorkspace;
     private View mLauncherView;
@@ -138,6 +142,30 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     private LauncherLoader loader;
 
+    private boolean mIsMoved;
+    private int mMoveDirection = 0;
+    private boolean mIsDragging;
+    private float mDownX;
+    private float mDownY;
+    private SlideListener mSlideListener;
+
+    public interface SlideListener {
+
+        void onSlideStart(int direction);
+
+        void onSlideVertical(float dy, int direction);
+
+        void onSlideEnd();
+
+        default boolean canHandleLongPress() {
+            return true;
+        }
+
+        default boolean canStartDrag() {
+            return true;
+        }
+    }
+
     public LauncherLayout(@NonNull Context context) {
         this(context, null);
     }
@@ -150,6 +178,8 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         super(context, attrs, defStyleAttr);
 
         LauncherManager.init(this);
+
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
         mRotationListener = new DisplayRotationListener(getContext(), this::onDeviceRotationChanged);
 
@@ -202,6 +232,92 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
         getRootView().dispatchInsets();
 
+    }
+
+    public void setSlideListener(SlideListener listener) {
+        mSlideListener = listener;
+    }
+
+    public boolean canHandleLongPress() {
+        return mSlideListener != null && mSlideListener.canHandleLongPress();
+    }
+
+    public boolean canStartDrag() {
+        // We prevent dragging when we are loading the workspace as it is possible to pick up a view
+        // that is subsequently removed from the workspace in startBinding().
+        if (isWorkspaceLocked()) {
+            return false;
+        }
+        // Return early if an item is already being dragged (e.g. when long-pressing two shortcuts)
+        if (getDragController().isDragging()) {
+            return false;
+        }
+        return mSlideListener != null && mSlideListener.canStartDrag();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mDownX = event.getRawX();
+                mDownY = event.getRawY();
+                mIsMoved = false;
+                mMoveDirection = 0;
+                mIsDragging = mDragController.isDragging() || AbstractFloatingView.getTopOpenView() != null;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mIsDragging) {
+                    break;
+                }
+                if (AbstractFloatingView.getTopOpenView() != null) {
+                    mIsDragging = true;
+                    break;
+                }
+                if (mDragController.isDragging()) {
+                    mIsDragging = true;
+                    break;
+                }
+                float dx = event.getRawX() - mDownX;
+                float dy = event.getRawY() - mDownY;
+                if (!mIsMoved) {
+                    if (Math.abs(dy) > mTouchSlop && Math.abs(dy) > Math.abs(dx)) {
+                        mIsMoved = true;
+                        mMoveDirection = dy > 0 ? -1 : 1;
+                        MotionEvent e = MotionEvent.obtain(event);
+                        e.setAction(MotionEvent.ACTION_CANCEL);
+                        super.dispatchTouchEvent(e);
+                        if (mSlideListener != null) {
+                            mSlideListener.onSlideStart(mMoveDirection);
+                        }
+                    }
+                }
+                if (mIsMoved) {
+                    if (mSlideListener != null) {
+                        mSlideListener.onSlideVertical(dy, mMoveDirection);
+                    }
+                    return true;
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                if (mIsDragging) {
+                    mIsDragging = false;
+                    break;
+                }
+                if (mIsMoved) {
+                    if (mSlideListener != null) {
+                        mSlideListener.onSlideEnd();
+                    }
+                    MotionEvent e = MotionEvent.obtain(event);
+                    e.setAction(MotionEvent.ACTION_CANCEL);
+                    super.dispatchTouchEvent(e);
+                    return true;
+                }
+                break;
+        }
+        boolean result = super.dispatchTouchEvent(event);
+        Log.d(TAG, "dispatchTouchEvent event=" + MotionEvent.actionToString(event.getAction()) + " result=" + result);
+        return result;
     }
 
     public void init(Bundle savedInstanceState) {
@@ -396,7 +512,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 //    }
 
 
-
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -467,7 +582,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         }
         return false;
     }
-
 
 
     public DragController getDragController() {
@@ -739,7 +853,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         Log.d(TAG, "keyEvent=" + event);
         return (event.getKeyCode() == KeyEvent.KEYCODE_HOME) || super.dispatchKeyEvent(event);
     }
-
 
 
     boolean isHotseatLayout(View layout) {
@@ -1018,11 +1131,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
     }
 
 
-
-
-
-
-
     public RotationHelper getRotationHelper() {
         return mRotationHelper;
     }
@@ -1051,7 +1159,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         getRootView().dispatchInsets();
         mStateManager.reapplyState(true /* cancelCurrentAnimation */);
     }
-
 
 
     private final ArrayList<DeviceProfile.OnDeviceProfileChangeListener> mDPChangeListeners = new ArrayList<>();
@@ -1148,12 +1255,15 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
     public interface ClickHandler {
         void onClickAppShortcut(View v, ItemInfoWithIcon itemInfo);
+
         void onClickTabCard(View v, TabItemInfo itemInfo);
+
         void onClickToSearch(View v);
     }
 
     public interface OptionItemProvider {
         List<OptionItem> createOptions();
+
         List<OptionItem> createOptions(ItemInfo itemInfo);
     }
 

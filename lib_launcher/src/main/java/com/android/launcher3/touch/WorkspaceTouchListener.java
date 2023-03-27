@@ -140,7 +140,7 @@ public class WorkspaceTouchListener implements OnTouchListener, Runnable {
 
     private boolean canHandleLongPress() {
         return AbstractFloatingView.getTopOpenView() == null
-                && mLauncher.isInState(NORMAL);
+                && mLauncher.isInState(NORMAL) && mLauncher.canHandleLongPress();
     }
 
     private void cancelLongPress() {

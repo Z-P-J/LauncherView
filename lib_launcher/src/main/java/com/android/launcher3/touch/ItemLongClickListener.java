@@ -42,10 +42,17 @@ public class ItemLongClickListener {
 
     private static boolean onWorkspaceItemLongClick(View v) {
         LauncherLayout launcher = LauncherManager.getLauncherLayout();
-        Log.d("ItemLongClickListener", "onWorkspaceItemLongClick isWorkspaceLocked=" + launcher.isWorkspaceLocked());
-        if (!canStartDrag(launcher)) return false;
-        if (!launcher.isInState(NORMAL) && !launcher.isInState(OVERVIEW)) return false;
-        if (!(v.getTag() instanceof ItemInfo)) return false;
+        if (!canStartDrag(launcher)) {
+            return false;
+        }
+        if (!launcher.isInState(NORMAL) && !launcher.isInState(OVERVIEW)) {
+            return false;
+        }
+        if (!(v.getTag() instanceof ItemInfo)) {
+            return false;
+        }
+
+        Log.e("ItemLongClickListener", "beginDrag");
 
         beginDrag(v, launcher, (ItemInfo) v.getTag(), new DragOptions());
         return true;
@@ -99,13 +106,6 @@ public class ItemLongClickListener {
 //    }
 
     public static boolean canStartDrag(LauncherLayout launcher) {
-        if (launcher == null) {
-            return false;
-        }
-        // We prevent dragging when we are loading the workspace as it is possible to pick up a view
-        // that is subsequently removed from the workspace in startBinding().
-        if (launcher.isWorkspaceLocked()) return false;
-        // Return early if an item is already being dragged (e.g. when long-pressing two shortcuts)
-        return !launcher.getDragController().isDragging();
+        return launcher != null && launcher.canStartDrag();
     }
 }
