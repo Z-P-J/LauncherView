@@ -1,5 +1,8 @@
 package com.android.launcher3.database;
 
+import com.android.launcher3.database.core.IDatabase;
+import com.android.launcher3.database.core.ITable;
+
 import java.util.HashMap;
 import java.util.Map;
 

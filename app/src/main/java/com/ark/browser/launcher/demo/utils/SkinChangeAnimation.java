@@ -16,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.cardview.widget.CardView;
+
 import com.zpj.utils.ContextUtils;
 import com.zpj.utils.ScreenUtils;
 
@@ -29,7 +31,7 @@ public final class SkinChangeAnimation {
 
     //DecorView
     private ViewGroup mRootView;
-    private View animationView;
+    private AnimationView animationView;
 
     //扩散的起点
     private float mStartX = 0, mStartY = 0;
@@ -90,7 +92,9 @@ public final class SkinChangeAnimation {
             animationView.setPivotY(mStartY);
             animationView.setScaleX(0f);
             animationView.setScaleY(0f);
-            animationView.setBackgroundColor(Color.BLACK);
+            animationView.setRadius(1000);
+//            animationView.setBackgroundColor(Color.BLACK);
+            animationView.setCardBackgroundColor(Color.WHITE);
             animationView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             mRootView.addView(animationView);
 
@@ -121,71 +125,34 @@ public final class SkinChangeAnimation {
     }
 
     private void startAnimation() {
-//        //动画播放完毕, 移除View
-//        Animator.AnimatorListener mAnimatorListener = new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                isStarted = false;
-//
-//                //动画播放完毕, 移除View
-//                if (mRootView != null) {
-//                    mRootView.removeView(animationView);
-//                    mRootView = null;
-//                }
-//                if (mPaint != null) {
-//                    mPaint = null;
-//                }
-//                context = null;
-//                animationView = null;
-//                if (dismissRunnable != null) {
-//                    dismissRunnable.run();
-//                }
-//            }
-//
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//                if (startRunnable != null) {
-//                    startRunnable.run();
-//                }
-//            }
-//        };
-//        //更新圆的半径
-//        ValueAnimator.AnimatorUpdateListener mAnimatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator animation) {
-//                float p = animation.getAnimatedFraction();
-//                animationView.setPivotX(mStartX);
-//                animationView.setPivotY(mStartY);
-//                animationView.setScaleX(p);
-//                animationView.setScaleY(p);
-//
-//            }
-//        };
-//
-//        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, mMaxRadius).setDuration(mDuration);
-//        valueAnimator.addUpdateListener(mAnimatorUpdateListener);
-//        valueAnimator.addListener(mAnimatorListener);
-//        valueAnimator.start();
-
         animationView.animate()
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        isStarted = false;
-
-                        //动画播放完毕, 移除View
-                        if (mRootView != null) {
-                            mRootView.removeView(animationView);
-                            mRootView = null;
-                        }
-                        if (mPaint != null) {
-                            mPaint = null;
-                        }
-                        context = null;
-                        animationView = null;
                         if (dismissRunnable != null) {
                             dismissRunnable.run();
                         }
+                        animationView.animate()
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        isStarted = false;
+                                        //动画播放完毕, 移除View
+                                        if (mRootView != null) {
+                                            mRootView.removeView(animationView);
+                                            mRootView = null;
+                                        }
+                                        if (mPaint != null) {
+                                            mPaint = null;
+                                        }
+                                        context = null;
+                                        animationView = null;
+                                    }
+                                })
+                                .setUpdateListener(null)
+                                .alpha(0f)
+                                .setDuration(200)
+                                .start();
                     }
 
                     @Override
@@ -198,16 +165,17 @@ public final class SkinChangeAnimation {
                 .setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-
+                        float f = animation.getAnimatedFraction();
+                        animationView.setRadius((1 - f) * 1000);
                     }
                 })
                 .scaleX(1f)
                 .scaleY(1f)
-                .setDuration(1000)
+                .setDuration(360)
                 .start();
     }
 
-    public class AnimationView extends View
+    public class AnimationView extends CardView
             implements View.OnClickListener, View.OnLongClickListener, View.OnTouchListener {
 
         public AnimationView(Context context) {

@@ -1257,8 +1257,6 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
         void onClickAppShortcut(View v, ItemInfoWithIcon itemInfo);
 
         void onClickTabCard(View v, TabItemInfo itemInfo);
-
-        void onClickToSearch(View v);
     }
 
     public interface OptionItemProvider {
@@ -1271,6 +1269,8 @@ public class LauncherLayout extends FrameLayout implements LauncherLoader.Callba
 
         @WorkerThread
         void onFirstRun();
+
+        View onCreateSearchBar(ViewGroup root);
 
         void loadIcon(ItemInfo itemInfo, Callback<Bitmap> callback);
 

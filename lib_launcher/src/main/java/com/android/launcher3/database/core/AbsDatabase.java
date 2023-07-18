@@ -1,4 +1,4 @@
-package com.android.launcher3.database;
+package com.android.launcher3.database.core;
 
 import android.database.sqlite.SQLiteDatabase;
 

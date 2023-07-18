@@ -40,8 +40,8 @@ import android.view.ViewDebug;
 import androidx.core.graphics.ColorUtils;
 
 import com.android.launcher3.folder.FolderIcon;
+import com.android.launcher3.graphics.ColorExtractor;
 import com.android.launcher3.util.CheckLongPressHelper;
-import com.android.launcher3.util.IconLoader;
 import com.android.launcher3.util.Utilities;
 
 /**
@@ -171,7 +171,7 @@ public class BubbleTextView extends androidx.appcompat.widget.AppCompatTextView 
         if (itemLoader != null) {
             itemLoader.loadIcon(info, icon -> {
                 if (icon != null) {
-                    IconLoader.load(BubbleTextView.this, icon);
+                    setIcon(new FastBitmapDrawable(icon, ColorExtractor.findDominantColorByHue(icon)));
                 }
             });
         }

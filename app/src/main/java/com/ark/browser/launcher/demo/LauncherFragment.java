@@ -2,9 +2,6 @@ package com.ark.browser.launcher.demo;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
@@ -17,17 +14,12 @@ import com.android.launcher3.ItemInfo;
 import com.android.launcher3.ItemInfoWithIcon;
 import com.android.launcher3.LauncherLayout;
 import com.android.launcher3.TabItemInfo;
-import com.android.launcher3.database.FavoriteItemTable;
-import com.android.launcher3.database.SQLite;
-import com.android.launcher3.model.FavoriteItem;
 import com.android.launcher3.popup.OptionItem;
 import com.android.launcher3.popup.OptionsPopupView;
-import com.ark.browser.launcher.demo.utils.DeepLinks;
-import com.ark.browser.launcher.demo.utils.HomepageUtils;
+import com.ark.browser.launcher.demo.utils.HomepageItemLoader;
 import com.ark.browser.launcher.demo.utils.SkinChangeAnimation;
 import com.ark.browser.launcher.demo.widget.WidgetsFullSheet;
 import com.zpj.fragmentation.SimpleFragment;
-import com.zpj.utils.Callback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,11 +70,6 @@ public class LauncherFragment extends SimpleFragment {
             @Override
             public void onClickTabCard(View v, TabItemInfo itemInfo) {
                 Toast.makeText(context, "title=" + itemInfo.title + " url=" + itemInfo.url, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onClickToSearch(View v) {
-                Toast.makeText(context, "onClickToSearch", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -140,42 +127,7 @@ public class LauncherFragment extends SimpleFragment {
             }
         });
 
-        mLauncherLayout.setItemLoader(new LauncherLayout.ItemLoader() {
-            @Override
-            public void onFirstRun() {
-                SQLite.with(FavoriteItemTable.class).delete();
-                ArrayList<ItemInfo> itemInfoArrayList = new ArrayList<>(HomepageUtils.initHomeNav());
-                for (ItemInfo info : itemInfoArrayList) {
-                    FavoriteItem.from(info).insert();
-                }
-            }
-
-            @Override
-            public void loadIcon(ItemInfo itemInfo, Callback<Bitmap> callback) {
-                Resources resources = getResources();
-                int resId = R.mipmap.ic_launcher_home;
-                if (DeepLinks.isDeepLink(itemInfo.url)) {
-                    switch (itemInfo.url) {
-                        case DeepLinks.DEEPLINK_MANAGER:
-                            resId = R.drawable.icon_browser_manager;
-                            break;
-                        case DeepLinks.DEEPLINK_COLLECTIONS:
-                            resId = R.drawable.icon_collections;
-                            break;
-                        case DeepLinks.DEEPLINK_BROWSER:
-                            resId = R.drawable.icon_browser;
-                            break;
-                        case DeepLinks.DEEPLINK_DOWNLOADS:
-                            resId = R.drawable.icon_download_manager;
-                            break;
-                        case DeepLinks.DEEPLINK_SETTINGS:
-                            resId = R.drawable.icon_settings;
-                            break;
-                    }
-                }
-                callback.onCallback(BitmapFactory.decodeResource(resources, resId));
-            }
-        });
+        mLauncherLayout.setItemLoader(new HomepageItemLoader());
 
         mLauncherLayout.setSlideListener(new LauncherLayout.SlideListener() {
 

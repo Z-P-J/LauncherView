@@ -68,6 +68,7 @@ import com.android.launcher3.folder.PreviewBackground;
 import com.android.launcher3.graphics.DragPreviewProvider;
 import com.android.launcher3.pageindicators.WorkspacePageIndicator;
 import com.android.launcher3.popup.PopupContainerWithArrow;
+import com.android.launcher3.qsb.QsbContainerView;
 import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.touch.WorkspaceTouchListener;
 import com.android.launcher3.util.LongArrayMap;
@@ -445,8 +446,17 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         if (qsb == null) {
             // In transposed layout, we add the QSB in the Grid. As workspace does not touch the
             // edges, we do not need a full width QSB.
-            qsb = LayoutInflater.from(getContext())
-                    .inflate(R.layout.search_container_workspace, firstPage, false);
+
+            QsbContainerView containerView = new QsbContainerView(getContext());
+            LauncherLayout.ItemLoader itemLoader = mLauncher.getItemLoader();
+            if (itemLoader != null) {
+                containerView.addView(itemLoader.onCreateSearchBar(firstPage));
+                qsb = containerView;
+            }
+        }
+
+        if (qsb == null) {
+            return;
         }
 
         CellLayout.LayoutParams lp = new CellLayout.LayoutParams(0, 0, firstPage.getCountX(), 2);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3.graphics;
+package com.ark.browser.launcher.demo.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -38,7 +38,7 @@ public class ShadowGenerator {
 
     // Percent of actual icon size
     private static final float HALF_DISTANCE = 0.5f;
-    public static final float BLUR_FACTOR = 1.5f / 48; // 0.5f
+    public static final float BLUR_FACTOR = 3f / 48; // 0.5f
 
     // Percent of actual icon size
     public static final float KEY_SHADOW_DISTANCE = 1f / 48;

@@ -9,6 +9,8 @@ import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.ShortcutInfo;
 import com.android.launcher3.Workspace;
+import com.android.launcher3.database.table.FavoriteItemTable;
+import com.android.launcher3.database.table.ScreenItemTable;
 import com.android.launcher3.folder.Folder;
 import com.android.launcher3.folder.FolderIconPreviewVerifier;
 import com.android.launcher3.model.FavoriteItem;

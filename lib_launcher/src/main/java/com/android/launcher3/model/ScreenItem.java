@@ -1,7 +1,7 @@
 package com.android.launcher3.model;
 
 import com.android.launcher3.database.SQLite;
-import com.android.launcher3.database.ScreenItemTable;
+import com.android.launcher3.database.table.ScreenItemTable;
 
 public class ScreenItem {
 

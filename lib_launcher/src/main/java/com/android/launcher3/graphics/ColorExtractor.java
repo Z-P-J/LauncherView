@@ -37,7 +37,7 @@ public class ColorExtractor {
     public static int findDominantColorByHue(Bitmap bitmap, int samples) {
         final int height = bitmap.getHeight();
         final int width = bitmap.getWidth();
-        int sampleStride = (int) Math.sqrt((height * width) / samples);
+        int sampleStride = (int) Math.sqrt(((float) height * width) / samples);
         if (sampleStride < 1) {
             sampleStride = 1;
         }

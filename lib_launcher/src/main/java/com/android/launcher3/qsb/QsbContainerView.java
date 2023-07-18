@@ -41,17 +41,6 @@ public class QsbContainerView extends FrameLayout {
     }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        findViewById(R.id.btn_qsb_search).setOnClickListener(view -> {
-            LauncherLayout.ClickHandler clickHandler = LauncherManager.getLauncherLayout().getClickHandler();
-            if (clickHandler != null) {
-                clickHandler.onClickToSearch(view);
-            }
-        });
-    }
-
-    @Override
     public void setPadding(int left, int top, int right, int bottom) {
         super.setPadding(0, 0, 0, 0);
     }

@@ -1,4 +1,4 @@
-package com.android.launcher3.database;
+package com.android.launcher3.database.core;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -83,9 +83,7 @@ public abstract class AbsTable<T> implements ITable {
     }
 
     public void delete() {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
-        delete(db, null, null);
-        db.close();
+        delete(null, (String[]) null);
     }
 
     public void delete(Object id) {
@@ -93,15 +91,14 @@ public abstract class AbsTable<T> implements ITable {
     }
 
     public void delete(String column, Object target) {
-        try (SQLiteDatabase db = mHelper.getWritableDatabase();) {
-            delete(db, column + "=?", new String[]{String.valueOf(target)});
-        }
+        delete(column + "=?", new String[]{String.valueOf(target)});
     }
 
-    private void delete(SQLiteDatabase db, String whereClause, String[] whereArgs) {
+    private void delete(String whereClause, String[] whereArgs) {
         if (TextUtils.isEmpty(whereClause)) {
             whereArgs = null;
         }
+        SQLiteDatabase db = mHelper.getWritableDatabase();
         int result = db.delete(getTableName(), whereClause, whereArgs);
         Log.e("HomepageManager", "delete table=" + getTableName() + " result=" + result
                 + " whereClause=" + whereClause

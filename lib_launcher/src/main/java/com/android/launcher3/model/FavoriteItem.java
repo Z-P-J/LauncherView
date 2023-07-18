@@ -1,7 +1,7 @@
 package com.android.launcher3.model;
 
 import com.android.launcher3.ItemInfo;
-import com.android.launcher3.database.FavoriteItemTable;
+import com.android.launcher3.database.table.FavoriteItemTable;
 import com.android.launcher3.database.SQLite;
 
 public class FavoriteItem {

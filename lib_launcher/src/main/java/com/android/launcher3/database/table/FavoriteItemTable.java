@@ -1,9 +1,10 @@
-package com.android.launcher3.database;
+package com.android.launcher3.database.table;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.android.launcher3.database.core.AbsTable;
 import com.android.launcher3.model.FavoriteItem;
 
 import java.util.List;

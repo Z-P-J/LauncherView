@@ -1,7 +1,4 @@
-package com.android.launcher3.database;
-
-import java.util.List;
-import java.util.Map;
+package com.android.launcher3.database.core;
 
 public interface IDatabase {
 
